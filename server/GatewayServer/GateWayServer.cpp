@@ -88,8 +88,9 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 		memset(msg,0,sizeof(msg));
 		sprintf(msg, "{\"state\":1,\"data\":\"error:netid=%d,datasize=%d\"}", id, size);
 		sendMsgToClient(id,msg,strlen(msg));
-		return
-#endif		
+		return;
+#endif	
+	
 		struct KernalNetWork *pNetWork = m_Epoll.getNetWork( id );
 
 		// 将消息转发给内部服务器
