@@ -14,7 +14,8 @@ PRO_OBJ_DIR=$(PRO_DIR)/objs
 PRO_EXTERNAL_INC=$(PRO_DIR)/../../External
 PRO_SRC=$(PRO_DIR)
 
-CFLAGS := -g -I$(PRO_SRC) -I$(PRO_DIR)/../../External -I$(PRO_DIR)/../../Engine -fPIC -shared  -std=c++11 
+CFLAGS_CPP := -g -I$(PRO_SRC) -I$(PRO_DIR)/../../External -I$(PRO_DIR)/../../Engine -fPIC -shared  -std=c++11 
+CFLAGS := -g -I$(PRO_SRC) -I$(PRO_DIR)/../../External -I$(PRO_DIR)/../../Engine -fPIC -shared 
 LIBS := -lpthread
 
 DIRS := $(shell find $(PRO_SRC) -maxdepth 4 -type d)
@@ -35,11 +36,11 @@ PRO_C_OBJS := $(addprefix $(PRO_OBJ_DIR)/,$(PRO_C_OBJS))
 
 all: $(PRO_OBJS) $(PRO_C_OBJS)
 	mkdir -p $(PRO_BIN)
-	$(CXX) $(CFLAGS) $^ -o $(PRO_BIN)/$(TARGET) $(LIBS)
+	$(CXX) $(CFLAGS_CPP) $^ -o $(PRO_BIN)/$(TARGET) $(LIBS)
 
 define compile_cxx_file
     @for file in $(SRC); do \
-    ( $(CXX) $(CFLAGS) -c $$file -o $(PRO_OBJ_DIR)/`expr "$$file" : '.*/\([^.]*\).*'`.o   $(LIBS)  ) \
+    ( $(CXX) $(CFLAGS_CPP) -c $$file -o $(PRO_OBJ_DIR)/`expr "$$file" : '.*/\([^.]*\).*'`.o   $(LIBS)  ) \
     done;
 endef
 
