@@ -60,6 +60,9 @@ private:
 	std::multimap< ServerType, ServerInfo* > m_Servers;
 	typedef std::multimap< ServerType, ServerInfo* >::iterator server_multimap;
 
+	int                   m_CenterMinCmd;
+	int                   m_CenterMaxCmd;
+	
 	int                   m_PlatformMinCmd;
 	int                   m_PlatformMaxCmd;
 	

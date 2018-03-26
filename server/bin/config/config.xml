@@ -9,7 +9,8 @@
 		<thread>8</thread>
 		<listen ip="127.0.0.1" port="8010"/>
 		<http ip="127.0.0.1" port="8011"/>
-		<platformcmd min="1000" max="2000"/>
+		<centercmd min="1000" max="2000"/>
+		<platformcmd min="2000" max="3000"/>
 		<gamecmd min="10000" max="-1"/>
 	</gateway>
 	<platform>

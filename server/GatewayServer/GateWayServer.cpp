@@ -53,6 +53,9 @@ void GateWayServer::oninit()
 	listenHttp(httpIP, httpPort);
 #endif
 
+	m_CenterMinCmd = getConfig()->getAttributeInt("config/gateway/centercmd", "min");
+	m_CenterMaxCmd = getConfig()->getAttributeInt("config/gateway/centercmd", "max");
+
 	m_PlatformMinCmd = getConfig()->getAttributeInt("config/gateway/platformcmd", "min");
 	m_PlatformMaxCmd = getConfig()->getAttributeInt("config/gateway/platformcmd", "max");
 
