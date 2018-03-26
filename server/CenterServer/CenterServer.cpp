@@ -154,7 +154,7 @@ void CenterServer::onExit()
 
 }
 
-void GameServer::handleGateWayMsg( int session, int clientID, char *data, int datalen )
+void CenterServer::handleGateWayMsg( int session, int clientID, char *data, int datalen )
 {
 	//TODO:处理客户端消息
 }
