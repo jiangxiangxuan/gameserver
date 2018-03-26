@@ -83,6 +83,13 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 	}
 	else if( NETWORK_DATA == type )
 	{
+#ifdef 1
+		char msg[128] = {0};
+		memset(msg,0,sizeof(msg));
+		sprintf(msg, "{\"state\":1,\"data\":\"error:netid=%d,datasize=%d\"}", id, size);
+		sendMsgToClient(id,msg,strlen(msg));
+		return
+#endif		
 		struct KernalNetWork *pNetWork = m_Epoll.getNetWork( id );
 
 		// 将消息转发给内部服务器
@@ -101,6 +108,13 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 			else if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_GameMinCmd )
 			{
 				sendMsgToGame( id, type, data, size );
+			}
+			else
+			{
+				char msg[128] = {0};
+				memset(msg,0,sizeof(msg));
+				sprintf(msg, "{\"state\":1,\"data\":\"error:netid=%d,datasize=%d\"}", id, size);
+				sendMsgToClient(id,msg,strlen(msg));
 			}
 		}
 		else if( data ) // 将消息转发给客户端
@@ -169,11 +183,11 @@ void GateWayServer::sendMsgToGame( unsigned int id, KernalMessageType type, cons
         auto servers = m_Servers.equal_range( SERVER_GAME );
         for( auto it = servers.first; it != servers.second; ++it )
         {
-                if( it->second )
-                {
-                        MsgSend( m_Epoll, it->second->id, GateWayInternalServerMsg, 0, msg );
-                        break;
-                }
+            if( it->second )
+            {
+                MsgSend( m_Epoll, it->second->id, GateWayInternalServerMsg, 0, msg );
+                break;
+            }
         }
 }
 
@@ -246,7 +260,7 @@ void GateWayServer::registerCenterServerInfo()
 				if (code < 0 || error)
 				{
 					//m_Epoll.close( m_CenterServerID );
-          ::close( m_CenterServerID );
+					::close( m_CenterServerID );
 				}
 				else
 				{

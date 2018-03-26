@@ -133,11 +133,11 @@ void PlatformServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value
 {
 	if( SERVERSTATE_RUN == value.state )
 	{
-    m_DBAgent.addDBAServer(value);
+		m_DBAgent.addDBAServer(value);
 	}
 	else
 	{
-    m_DBAgent.removeDBAServer(value);
+		m_DBAgent.removeDBAServer(value);
 	}
 }
 
