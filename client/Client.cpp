@@ -49,8 +49,6 @@ void Client::oninit()
 		m_ClientWorkThreads.push( pThread );
 	}
 
-	luaStateInit();
-
 	unsigned int tid = m_Timer.addTimer(100, 1);
 	
 }
@@ -62,9 +60,7 @@ void Client::onuninit()
 
 void Client::handleTimerMsg( unsigned int id )
 {
-	lua_getglobal( m_LuaState, "handleTimerMsg" );
-	lua_pushinteger( m_LuaState, id );
-	lua_pcall( m_LuaState, 1, 0, 0 );
+	
 }
 
 void Client::onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
@@ -74,12 +70,8 @@ void Client::onMsg( unsigned int id, KernalMessageType type, const char *data, u
 		handleTimerMsg( id );
 	}
 	else
-	{		
-		lua_getglobal( m_LuaState, "handleMsg" );
-		lua_pushstring( m_LuaState, data );
-		lua_pushinteger( m_LuaState, size );
-		lua_pushinteger( m_LuaState, m_Timer.gettime() );
-		lua_pcall( m_LuaState, 3, 0, 0 );
+	{
+		
 	}
 }
 
@@ -184,16 +176,5 @@ void Client::onRun()
 
 void Client::onExit()
 {	
-	
-}
-
-void Client::luaStateInit()
-{
-	m_LuaState = luaL_newstate();
-    luaopen_base( m_LuaState );
-	luaL_openlibs( m_LuaState );
-	
-	luaL_loadfile( m_LuaState, "src/main.lua");
-	lua_pcall( m_LuaState, 0, 0, 0 );
 	
 }
