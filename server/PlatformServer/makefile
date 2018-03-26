@@ -13,8 +13,8 @@ PRO_OBJ_DIR=$(PRO_DIR)/objs
 
 PRO_SRC=$(PRO_DIR)
 
-CFLAGS := -g -I$(PRO_SRC) -I$(PRO_DIR)/../ -I$(PRO_DIR)/../Engine -I$(PRO_DIR)/../External -I$(PRO_DIR)/../Protocol -std=c++11 #-fPIC -shared  #-std=c++11
-LIBS := -lpthread -L$(PRO_DIR)/../Lib -ldl -lm -lkernal -lidbc #-llua
+CFLAGS := -g -I$(PRO_SRC) -I$(PRO_DIR)/../ -I$(PRO_DIR)/../Engine -I$(PRO_DIR)/../External -I$(PRO_DIR)/../Common -I$(PRO_DIR)/../Protocol -std=c++11 #-fPIC -shared  #-std=c++11
+LIBS := -lpthread -L$(PRO_DIR)/../Lib -ldl -lm -lkernal -lidbc -lcommon #-llua
 
 DIRS := $(shell find $(PRO_SRC) -maxdepth 4 -type d)
 PROTOCOLDIRS := $(shell find $(PRO_SRC)/../Protocol -maxdepth 4 -type d)
