@@ -1,43 +1,7 @@
 
 #include "GameServer.h"
-#include "Kernal/LuaKernalLock.h"
 
 GameServer *GameServer::ms_pGameServer = NULL;
-
-static int lua_sendClientMsg(lua_State *L)
-{
-    int session = lua_tonumber(L,1);
-    int clientID = lua_tonumber(L,2);
-    const char *data = lua_tostring(L,3);
-    int datalen = lua_tonumber(L,4);
-	GameServer::getInstance()->sendMsgToClient( session, clientID, (char*)data, datalen );
-	return 0;
-}
-
-static int lua_sendPlatformMsg(lua_State *L)
-{
-    int serverID = lua_tonumber(L,1);
-    const char *data = lua_tostring(L,2);
-    int datalen = lua_tonumber(L,3);
-	GameServer::getInstance()->sendMsgToPlatform( serverID, (char*)data, datalen );
-	return 0;
-}
-
-static int lua_addTimer(lua_State *L)
-{
-    unsigned int expire = lua_tonumber(L,1);
-    int times = lua_tonumber(L,2);
-	unsigned int timerID = GameServer::getInstance()->addTimer( expire, times );
-    lua_pushinteger( L, timerID );
-	return 1;
-}
-
-static int lua_delTimer(lua_State *L)
-{
-    unsigned int timerID = lua_tonumber(L,1);
-	GameServer::getInstance()->delTimer( timerID );
-	return 0;
-}
 
 void *GameServerConnectCenterWorker( void *arg )
 {
@@ -93,8 +57,6 @@ void GameServer::oninit()
 	int         redisport  = getConfig()->getAttributeInt("config/game/redis", "port");
 	m_pIdbcRedis->connect( redisip, redisport );
 
-	luaStateInit();
-
 	connectCenterServer();
 }
 
@@ -110,19 +72,14 @@ void GameServer::onuninit()
 
 void GameServer::handleTimerMsg( unsigned int id )
 {
-	lua_getglobal( m_LuaState, "handleTimerMsg" );
-	lua_pushinteger( m_LuaState, id );
-	lua_pcall( m_LuaState, 1, 0, 0 );
+	//TODO:处理定时器消息	
 }
 
 void GameServer::onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
 {
-	m_LuaStateLocker.lock();
 	if( TIMER_DATA == type )
 	{
 		handleTimerMsg( id );
-
-		luaStateError();
 	}
 	else if( NETWORK_DATA == type )
 	{
@@ -132,8 +89,6 @@ void GameServer::onMsg( unsigned int id, KernalMessageType type, const char *dat
 		DealMsg( id, PlatformGameServerMsg,    buff );
         DealMsg( id, CenterNotifyServerInfo,   buff );
 		DealEnd();
-
-		luaStateError();
 	}
 	else if( NETWORK_CLOSE == type )
 	{
@@ -143,21 +98,11 @@ void GameServer::onMsg( unsigned int id, KernalMessageType type, const char *dat
 			connectCenterServer();
 		}
 	}
-	m_LuaStateLocker.unlock();
 }
 
 void GameServer::handleGateWayMsg( int session, int clientID, char *data, int datalen )
 {
 	//TODO:处理客户端消息
-
-	lua_getglobal( m_LuaState, "handleMsg" );
-	lua_pushinteger( m_LuaState, session );
-    lua_pushinteger( m_LuaState, clientID );
-	lua_pushstring( m_LuaState, data );
-    lua_pushinteger( m_LuaState, datalen );
-	lua_pcall( m_LuaState, 4, 0, 0 );
-
-    //lua_pop( m_LuaState, 1 );
 }
 
 void GameServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value )
@@ -175,12 +120,6 @@ void GameServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value )
 void GameServer::handlePlatformMsg( int serverID, char *data, int datalen )
 {
 	//TODO:处理大厅消息
-
-	lua_getglobal( m_LuaState, "handlePlatformMsg" );
-    lua_pushinteger( m_LuaState, serverID );
-	lua_pushstring( m_LuaState, data );
-    lua_pushinteger( m_LuaState, datalen );
-	lua_pcall( m_LuaState, 3, 0, 0 );
 }
 
 void GameServer::sendMsgToClient( int session, int clientID, char *data, int datalen )
@@ -226,35 +165,6 @@ unsigned int GameServer::addTimer( unsigned int expire, int times )
 void GameServer::delTimer( unsigned int id )
 {
 	m_Timer.deleteTimer( id );
-}
-
-void GameServer::luaStateInit()
-{
-	m_LuaState = luaL_newstate();
-    luaopen_base( m_LuaState );
-	luaL_openlibs( m_LuaState );
-
-    lua_pushcfunction( m_LuaState, lua_sendClientMsg );
-    lua_setglobal( m_LuaState, "sendClientMsg" );
-
-    lua_pushcfunction( m_LuaState, lua_sendPlatformMsg );
-    lua_setglobal( m_LuaState, "sendPlatformMsg" );
-
-    lua_pushcfunction( m_LuaState, lua_addTimer );
-    lua_setglobal( m_LuaState, "addTimer" );
-
-    lua_pushcfunction( m_LuaState, lua_delTimer );
-    lua_setglobal( m_LuaState, "delTimer" );
-
-    loadKernalMutexLocker( m_LuaState );
-
-    lua_pop( m_LuaState, 1 );
-
-	luaL_loadfile( m_LuaState, "src/main.lua");
-	luaStateError();
-	lua_pcall( m_LuaState, 0, 0, 0 );
-	luaStateError();
-
 }
 
 void GameServer::connectCenterServer()
@@ -353,13 +263,4 @@ void GameServer::registerCenterServerInfo()
     pthread_mutex_destroy( &mutex );
     pthread_cond_destroy( &cond );
 
-}
-
-void GameServer::luaStateError()
-{
-	const char* err = lua_tostring(m_LuaState, -1);
-	if( err )
-	{
-		printf("Error: %s\n", err);
-	}
 }

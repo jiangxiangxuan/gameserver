@@ -6,10 +6,6 @@
 #include "Kernal/KernalMap.h"
 #include "Idbc/redis/idbc_redis_noncluster.h"
 #include "Msg.h"
-extern "C"
-{
-	#include <lua/lua.hpp>
-}
 
 class GameServer : public KernalServerBase
 {
@@ -47,16 +43,11 @@ public:
 
 	void registerCenterServerInfo();
 protected:
-	void luaStateInit();
 	void connectCenterServer();
-
-	void luaStateError();
 private:
 	static GameServer *ms_pGameServer;
 private:
 	IdbcRedis         *m_pIdbcRedis;
-	lua_State         *m_LuaState;
-	KernalMutexLocker  m_LuaStateLocker;
 	int                m_CenterServerID;
 	KernalThread       m_CenterThread;//连接中心服务器 线程
 };

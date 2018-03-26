@@ -7,10 +7,6 @@
 #include "Idbc/redis/idbc_redis_noncluster.h"
 #include "Msg.h"
 #include "DBAgent.h"
-extern "C"
-{
-	#include <lua/lua.hpp>
-}
 
 class PlatformServer : public KernalServerBase
 {
@@ -54,17 +50,12 @@ public:
 
 	void registerCenterServerInfo();
 protected:
-	void luaStateInit();
 	void connectCenterServer();
-
-	void luaStateError();
 private:
 	static PlatformServer *ms_pPlatformServer;
 private:
 	IdbcRedis         *m_pIdbcRedis;
 	DBAgent            m_DBAgent;
-	lua_State         *m_LuaState;
-	KernalMutexLocker  m_LuaStateLocker;
 	KernalThread       m_CenterThread;//连接中心服务器 线程
 	int                m_CenterServerID;
 

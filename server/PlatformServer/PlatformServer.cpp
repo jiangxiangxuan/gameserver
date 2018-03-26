@@ -1,51 +1,7 @@
 
 #include "PlatformServer.h"
-#include "Kernal/LuaKernalLock.h"
 
 PlatformServer *PlatformServer::ms_pPlatformServer = NULL;
-
-static int lua_sendClientMsg(lua_State *L)
-{
-    int session = lua_tonumber(L,1);
-    int clientID = lua_tonumber(L,2);
-    const char *data = lua_tostring(L,3);
-    int datalen = lua_tonumber(L,4);
-	PlatformServer::getInstance()->sendMsgToClient( session, clientID, (char*)data, datalen );
-	return 0;
-}
-
-static int lua_sendGameMsg(lua_State *L)
-{
-    int serverID = lua_tonumber(L,1);
-    const char *data = lua_tostring(L,2);
-    int datalen = lua_tonumber(L,3);
-	PlatformServer::getInstance()->sendMsgToGame( serverID, (char*)data, datalen );
-	return 0;
-}
-
-static int lua_executeSql(lua_State *L)
-{
-    const char *sql = lua_tostring(L,1);
-	int eventid = PlatformServer::getInstance()->executeDBSql( sql );
-    lua_pushinteger( L, eventid );
-	return 1;
-}
-
-static int lua_addTimer(lua_State *L)
-{
-    unsigned int expire = lua_tonumber(L,1);
-    int times = lua_tonumber(L,2);
-	unsigned int timerID = PlatformServer::getInstance()->addTimer( expire, times );
-    lua_pushinteger( L, timerID );
-	return 1;
-}
-
-static int lua_delTimer(lua_State *L)
-{
-    unsigned int timerID = lua_tonumber(L,1);
-	PlatformServer::getInstance()->delTimer( timerID );
-	return 0;
-}
 
 void *PlatformServerConnectCenterWorker( void *arg )
 {
@@ -105,8 +61,6 @@ void PlatformServer::oninit()
 	int         dbaport  = getConfig()->getAttributeInt("config/dba/listen", "port");
 	m_DBAgent.init( &m_Epoll, dbaip, dbaport );
 
-	luaStateInit();
-
 	connectCenterServer();
 }
 
@@ -118,26 +72,18 @@ void PlatformServer::onuninit()
 		delete m_pIdbcRedis;
 		m_pIdbcRedis = NULL;
 	}
-
-	lua_close( m_LuaState );
 }
 
 void PlatformServer::handleTimerMsg( unsigned int id )
 {
-	lua_getglobal( m_LuaState, "handleTimerMsg" );
-	lua_pushinteger( m_LuaState, id );
-	lua_pcall( m_LuaState, 1, 0, 0 );
+	//TODO:处理定时器消息
 }
 
 void PlatformServer::onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
 {
-	m_LuaStateLocker.lock();
-
 	if( TIMER_DATA == type )
 	{
 		handleTimerMsg( id );
-
-		luaStateError();
 	}
 	else if( NETWORK_DATA == type )
 	{
@@ -148,8 +94,6 @@ void PlatformServer::onMsg( unsigned int id, KernalMessageType type, const char 
 		DealMsg( id, PlatformGameServerMsg,    buff );
         DealMsg( id, CenterNotifyServerInfo,   buff );
 		DealEnd();
-
-		luaStateError();
 	}
 	else if( NETWORK_CLOSE == type )
 	{
@@ -163,7 +107,6 @@ void PlatformServer::onMsg( unsigned int id, KernalMessageType type, const char 
 
 		}
 	}
-	m_LuaStateLocker.unlock();
 }
 
 void PlatformServer::onProcess()
@@ -184,15 +127,6 @@ void PlatformServer::onExit()
 void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, int datalen )
 {
 	//TODO:处理客户端消息
-
-	lua_getglobal( m_LuaState, "handleMsg" );
-	lua_pushinteger( m_LuaState, session );
-    lua_pushinteger( m_LuaState, clientID );
-	lua_pushstring( m_LuaState, data );
-    lua_pushinteger( m_LuaState, datalen );
-	lua_pcall( m_LuaState, 4, 0, 0 );
-
-    //lua_pop( m_LuaState, 1 );
 }
 
 void PlatformServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value )
@@ -210,42 +144,12 @@ void PlatformServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value
 void PlatformServer::handleDBMsg( int session, int eventid, int error, char *data, int datalen )
 {
 	//TODO:处理DBA消息
-	//m_DBAgent.handleData( error, eventid, data, datalen );
-
-	if( datalen <= 8 )
-	{
-		return;
-	}
-
-	char *buff = data;
-	int row = *((int*)(buff));
-	buff += 4;
-	int col = *((int*)(buff));
-	buff += 4;
-
-	lua_getglobal( m_LuaState, "handleDBAMsg" );
-	lua_pushinteger( m_LuaState, error );
-    lua_pushinteger( m_LuaState, eventid );
-    lua_pushinteger( m_LuaState, row );
-    lua_pushinteger( m_LuaState, col );
-	lua_pushlightuserdata( m_LuaState, buff );
-    lua_pushinteger( m_LuaState, datalen - 8 );
-
-	lua_pcall( m_LuaState, 6, 0, 0 );
-
-	m_DBAgent.releaseEvent( eventid );
-    //lua_pop( m_LuaState, 1 );
+	m_DBAgent.handleData( error, eventid, data, datalen );
 }
 
 void PlatformServer::handleGameMsg( int serverID, char *data, int datalen )
 {
 	//TODO:处理游戏消息
-
-	lua_getglobal( m_LuaState, "handleGameMsg" );
-    lua_pushinteger( m_LuaState, serverID );
-	lua_pushstring( m_LuaState, data );
-    lua_pushinteger( m_LuaState, datalen );
-	lua_pcall( m_LuaState, 3, 0, 0 );
 }
 
 void PlatformServer::sendMsgToClient( int session, int clientID, char *data, int datalen )
@@ -280,37 +184,6 @@ unsigned int PlatformServer::addTimer( unsigned int expire, int times )
 void PlatformServer::delTimer( unsigned int id )
 {
 	m_Timer.deleteTimer( id );
-}
-
-void PlatformServer::luaStateInit()
-{
-    m_LuaState = luaL_newstate();
-    luaopen_base( m_LuaState );
-    luaL_openlibs( m_LuaState );
-
-    lua_pushcfunction( m_LuaState, lua_sendClientMsg );
-    lua_setglobal( m_LuaState, "sendClientMsg" );
-
-    lua_pushcfunction( m_LuaState, lua_sendGameMsg );
-    lua_setglobal( m_LuaState, "sendGameMsg" );
-
-    lua_pushcfunction( m_LuaState, lua_executeSql );
-    lua_setglobal( m_LuaState, "executeSql" );
-
-    lua_pushcfunction( m_LuaState, lua_addTimer );
-    lua_setglobal( m_LuaState, "addTimer" );
-
-    lua_pushcfunction( m_LuaState, lua_delTimer );
-    lua_setglobal( m_LuaState, "delTimer" );
-
-    loadKernalMutexLocker( m_LuaState );
-    loadDBResult( m_LuaState );
-
-    lua_pop( m_LuaState, 1 );
-
-    luaL_loadfile( m_LuaState, "src/main.lua");
-    lua_pcall( m_LuaState, 0, 0, 0 );
-
 }
 
 void PlatformServer::connectCenterServer()
@@ -409,13 +282,4 @@ void PlatformServer::registerCenterServerInfo()
 	msg.port = port;
 
 	MsgSend( m_Epoll, m_CenterServerID, CenterRegisterServerInfo, 0, msg );
-}
-
-void PlatformServer::luaStateError()
-{
-	const char* err = lua_tostring(m_LuaState, -1);
-	if( err )
-	{
-		printf("Error: %s\n", err);
-	}
 }
