@@ -4,7 +4,7 @@
 运行时需要执行以下命令设置动态库所在路径:
 vim ~/.bash_profile
 export LD_LIBRARY_PATH=~/gameserver/server/Lib:$LD_LIBRARY_PATH
-export LUA_CPATH=/home/workspace/game-code/server/Lib/?.so
+export LUA_CPATH=~/gameserver/server/Lib/?.so
 #LUA_PATH
 
 =========================================================
