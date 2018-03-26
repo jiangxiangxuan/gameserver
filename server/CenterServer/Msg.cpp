@@ -12,7 +12,7 @@ void onCenterUpdateServerInfo(int session, CenterUpdateServerInfo &value)
     CenterServer::getInstance()->handleCenterUpdateServerInfo(session, value);
 }
 
-void onGateWayInternalServerMsg(int session, CenterUpdateServerInfo &value)
+void onGateWayInternalServerMsg(int session, GateWayInternalServerMsg &value)
 {
     CenterServer::getInstance()->handleGateWayMsg( session, value.clientID, value.data, value.datalen );
 }
