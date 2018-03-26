@@ -1,1 +1,0 @@
-protoc -o../bin/protocol/person.pb person.proto
