@@ -4,10 +4,6 @@
 
 #include <string.h>
 #include <vector>
-extern "C"{
-	#include <lua/lua.hpp>
-}
-
 #include "Kernal/KernalObject.h"
 #include "Kernal/KernalMap.h"
 #include "Kernal/KernalLock.h"
@@ -55,20 +51,6 @@ public:
 	{
 		return m_Row;
 	}
-
-
-	int nextRow(lua_State *L)
-	{
-		return 1;
-	}
-	int getData(lua_State *L)
-	{
-		return 1;
-	}
-	int getRow(lua_State *L)
-	{
-		return 1;
-	}
 private:
 	char *m_ResData;
 	char *m_CurRowData;
@@ -103,7 +85,5 @@ private:
 
 	std::vector< DBAServerInfo* > m_Servers;
 };
-
-bool loadDBResult(lua_State* L);
 
 #endif
