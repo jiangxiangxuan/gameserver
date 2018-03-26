@@ -129,6 +129,10 @@ void GateWayServer::sendMsgToClient( int id, char *data, int datalen )
 
 void GateWayServer::sendMsgToCenter( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
 {
+	if( -1 == m_CenterServerID )
+	{
+		return;
+	}
 	GateWayInternalServerMsg msg;
 	msg.clientID = id;
 	msg.initData( (char*)data, size );
