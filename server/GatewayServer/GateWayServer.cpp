@@ -83,6 +83,7 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 	}
 	else if( NETWORK_DATA == type )
 	{
+		
 #if 1
 		char msg[128] = {0};
 		memset(msg,0,sizeof(msg));
