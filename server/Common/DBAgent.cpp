@@ -1,6 +1,5 @@
 
 #include "DBAgent.h"
-#include "Msg.h"
 
 DBResult::DBResult()
 	: m_Row( 0 ),
