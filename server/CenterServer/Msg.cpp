@@ -14,7 +14,7 @@ void onCenterUpdateServerInfo(int session, CenterUpdateServerInfo &value)
 
 void onGateWayInternalServerMsg(int session, CenterUpdateServerInfo &value)
 {
-    CenterServer::getInstance()->handleGateWayMsg(session, value);
+    CenterServer::getInstance()->handleGateWayMsg( session, value.clientID, value.data, value.datalen );
 }
 
 void onPlatformGameServerMsg(int session, PlatformGameServerMsg &value)
