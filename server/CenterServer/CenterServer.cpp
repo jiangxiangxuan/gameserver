@@ -69,6 +69,7 @@ void CenterServer::onMsg( unsigned int id, KernalMessageType type, const char *d
 			DealStart(buff);
 			DealMsg(id, CenterRegisterServerInfo, buff);
 			DealMsg(id, CenterUpdateServerInfo, buff);
+			DealMsg( id, GateWayInternalServerMsg, buff );
 			DealMsg(id, PlatformGameServerMsg, buff);
 			DealEnd();
 		}
@@ -151,6 +152,11 @@ void CenterServer::onRun()
 void CenterServer::onExit()
 {
 
+}
+
+void GameServer::handleGateWayMsg( int session, int clientID, char *data, int datalen )
+{
+	//TODO:处理客户端消息
 }
 
 void CenterServer::handleRegisterServerInfo(int session, CenterRegisterServerInfo &value)

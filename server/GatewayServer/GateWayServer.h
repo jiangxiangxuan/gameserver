@@ -38,6 +38,7 @@ public:
 
 public:
 	void sendMsgToClient( int id, char *data, int datalen );
+	void sendMsgToCenter( unsigned int id, KernalMessageType type, const char *data, unsigned int size );
 	void sendMsgToPlatform( unsigned int id, KernalMessageType type, const char *data, unsigned int size );
 	void sendMsgToGame( unsigned int id, KernalMessageType type, const char *data, unsigned int size );
 	void handleTimerMsg( unsigned int id );

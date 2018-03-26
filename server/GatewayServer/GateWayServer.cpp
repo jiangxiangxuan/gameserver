@@ -90,17 +90,17 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 		{
 			int cmd = 0;
 			memcpy( &cmd, data, 4 );
-			if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_PlatformMinCmd && cmd <= m_PlatformMaxCmd )
+			if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_CenterMinCmd && cmd < m_CenterMaxCmd )
+			{
+				sendMsgToCenter( id, type, data, size );
+			}
+			else if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_PlatformMinCmd && cmd < m_PlatformMaxCmd )
 			{
 				sendMsgToPlatform( id, type, data, size );
 			}
 			else if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_GameMinCmd )
 			{
 				sendMsgToGame( id, type, data, size );
-			}
-			else
-			{
-				sendMsgToPlatform( id, type, data, size );
 			}
 		}
 		else if( data ) // 将消息转发给客户端
@@ -125,6 +125,16 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 void GateWayServer::sendMsgToClient( int id, char *data, int datalen )
 {
 	m_Epoll.send( id, data, datalen );
+}
+
+void GateWayServer::sendMsgToCenter( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
+{
+	GateWayInternalServerMsg msg;
+	msg.clientID = id;
+	msg.initData( (char*)data, size );
+	msg.type = ( NETWORK_DATA == type ) ? MESSAGE_DATA: MESSAGE_CONNECTCLOSE ;
+
+	MsgSend( m_Epoll, m_CenterServerID, GateWayInternalServerMsg, 0, msg );
 }
 
 void GateWayServer::sendMsgToPlatform( unsigned int id, KernalMessageType type, const char *data, unsigned int size )

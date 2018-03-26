@@ -12,6 +12,11 @@ void onCenterUpdateServerInfo(int session, CenterUpdateServerInfo &value)
     CenterServer::getInstance()->handleCenterUpdateServerInfo(session, value);
 }
 
+void onGateWayInternalServerMsg(int session, CenterUpdateServerInfo &value)
+{
+    CenterServer::getInstance()->handleGateWayMsg(session, value);
+}
+
 void onPlatformGameServerMsg(int session, PlatformGameServerMsg &value)
 {
     if( LINETYPE_PLATFORMTOGAME == value.lineType )

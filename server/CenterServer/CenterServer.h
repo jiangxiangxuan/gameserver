@@ -42,6 +42,7 @@ public:
 	void handleTimerMsg( unsigned int id );
 	void handleRegisterServerInfo(int session, CenterRegisterServerInfo &value);
 	void handleCenterUpdateServerInfo(int session, CenterUpdateServerInfo &value);
+	void handleGateWayMsg( int session, int clientID, char *data, int datalen ); // 处理网关数据
 
 	void sendMsgToGameByPlatform(PlatformGameServerMsg &value);
 	void sendMsgToPlatformByGame(PlatformGameServerMsg &value);
