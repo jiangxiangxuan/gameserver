@@ -55,4 +55,17 @@ typedef double         float64;
 								net.send(id,_buf,len);        \
 							}
 
+//序列化protobuf消息
+#define SerializeObjToArray(obj, data, len) {                       \
+								len = obj.ByteSize();               \
+								char *databuff = new char[len + 1]; \
+								memset(databuff,0,len+1);           \
+								obj.SerializeToArray(databuff, len);\
+								data = databuff;                    \
+							}
+//反序列化protobuf消息						
+#define ParseFromArrayToObj(obj, data, len) {                 \
+								obj.ParseFromArray(data, len);\
+							}
+
 #endif
