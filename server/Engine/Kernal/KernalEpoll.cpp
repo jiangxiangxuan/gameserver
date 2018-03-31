@@ -91,9 +91,9 @@ int KernalEpoll::listen( const char *addr, const int port )
         int size = 0;
         char _buf[BUFF_SIZE] = {0};
         char* dataBuf = _buf;
-        WriteInt32(dataBuf, &id);
-        WriteInt32(dataBuf, &socket_listen);
-        WriteInt32(dataBuf, &size);
+        NWriteInt32(dataBuf, &id);
+        NWriteInt32(dataBuf, &socket_listen);
+        NWriteInt32(dataBuf, &size);
         dataBuf = _buf;
         sendMsg( m_ctrlfd[1], dataBuf, size + 12, true );
 #endif
@@ -134,9 +134,9 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
         int size = 0;
         char _buf[BUFF_SIZE] = {0};
         char* dataBuf = _buf;
-        WriteInt32(dataBuf, &id);
-        WriteInt32(dataBuf, &socket_connect);
-        WriteInt32(dataBuf, &size);
+        NWriteInt32(dataBuf, &id);
+        NWriteInt32(dataBuf, &socket_connect);
+        NWriteInt32(dataBuf, &size);
         dataBuf = _buf;
         sendMsg( m_ctrlfd[1], dataBuf, size + 12, true );
 #endif
@@ -160,9 +160,9 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 	    int size = 0;
 	    char _buf[12] = {0};
 	    char* dataBuf = _buf;
-	    WriteInt32(dataBuf, &id);
-	    WriteInt32(dataBuf, &socket_connect);
-	    WriteInt32(dataBuf, &size);
+	    NWriteInt32(dataBuf, &id);
+	    NWriteInt32(dataBuf, &socket_connect);
+	    NWriteInt32(dataBuf, &size);
 	    dataBuf = _buf;
 	    sendMsg( m_ctrlfd[1], dataBuf, size + 12, true );
 	}
@@ -239,9 +239,9 @@ bool KernalEpoll::send( int id, void *data, int size )
     int ret = 0;
     if( KernalNetWorkType_CONNECTED_HTTP != pNetWork->type )
     {
-        WriteInt32(dataBuf, &size);
+        NWriteInt32(dataBuf, &size);
     }
-	WriteBit(dataBuf,data,size);
+	NWriteBit(dataBuf,data,size);
     ret = sendMsg( pNetWork->fd, buffer, dataBuf - buffer );
     free( buffer );
 
@@ -858,9 +858,9 @@ void KernalEpoll::close( int id )
     int size = 0;
     char _buf[12] = {0};
     char* dataBuf = _buf;
-    WriteInt32(dataBuf, &id);
-    WriteInt32(dataBuf, &socket_close);
-    WriteInt32(dataBuf, &size);
+    NWriteInt32(dataBuf, &id);
+    NWriteInt32(dataBuf, &socket_close);
+    NWriteInt32(dataBuf, &size);
     dataBuf = _buf;
     sendMsg( m_ctrlfd[1], dataBuf, size + 12, true );
 }

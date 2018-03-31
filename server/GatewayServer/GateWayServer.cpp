@@ -282,9 +282,9 @@ void GateWayServer::registerCenterServerInfo()
 	int size = 0;
 	char _buf[BUFF_SIZE] = {0};
 	char* dataBuf = _buf;
-	WriteInt32(dataBuf, &m_CenterServerID);
-	WriteInt32(dataBuf, &socket_connect);
-	WriteInt32(dataBuf, &size);
+	NWriteInt32(dataBuf, &m_CenterServerID);
+	NWriteInt32(dataBuf, &socket_connect);
+	NWriteInt32(dataBuf, &size);
 	dataBuf = _buf;
 	m_Epoll.sendToPipe( dataBuf, size + 12 );
 

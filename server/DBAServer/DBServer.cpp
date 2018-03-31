@@ -133,7 +133,7 @@ void DBServer::execute( int session, DBServerReqMsg &value )
 	char dataBuff[65535] = {'\0'};
 	char *data = dataBuff;
 	data += 4;
-	WriteInt32(data,  &colNum);
+	NWriteInt32(data,  &colNum);
 	if( colNum > 0 )
 	{
 		while(row = pDataBase->fetch())
@@ -143,8 +143,8 @@ void DBServer::execute( int session, DBServerReqMsg &value )
 			for( int i = 0; i < colNum; i++ )
 			{
 				int len = strlen(row[i]);
-				WriteInt32(rowdata,  &len);
-				WriteBit(data, row[i], len );
+				NWriteInt32(rowdata,  &len);
+				NWriteBit(data, row[i], len );
 			}
 			++rowNum;
 		}
@@ -152,7 +152,7 @@ void DBServer::execute( int session, DBServerReqMsg &value )
 	pDataBase->freeResult();
 	int datalen = data - dataBuff;
 	data -= datalen;
-	WriteInt32(data,  &rowNum);
+	NWriteInt32(data,  &rowNum);
     DBServerAckMsg ack;
 	ack.eventid = value.eventid;
 	ack.error   = 0;
@@ -243,9 +243,9 @@ void DBServer::registerCenterServerInfo()
     int size = 0;
     char _buf[BUFF_SIZE] = {0};
     char* dataBuf = _buf;
-    WriteInt32(dataBuf, &m_CenterServerID);
-    WriteInt32(dataBuf, &socket_connect);
-    WriteInt32(dataBuf, &size);
+    NWriteInt32(dataBuf, &m_CenterServerID);
+    NWriteInt32(dataBuf, &socket_connect);
+    NWriteInt32(dataBuf, &size);
     dataBuf = _buf;
     m_Epoll.sendToPipe( dataBuf, size + 12 );
 

@@ -23,21 +23,21 @@ typedef unsigned int   uint32;
 typedef float          float32;
 typedef double         float64;
 
-#define ReadInt8(buf,data)   memcpy(data,buf,1); buf += 1;
-#define ReadInt16(buf,data)  memcpy(data,buf,2); buf += 2;
-#define ReadInt32(buf,data)  memcpy(data,buf,4); buf += 4;
-#define ReadInt64(buf,data)	 memcpy(data,buf,8); buf += 8;
-#define ReadString(buf,data) {int len; ReadInt32(buf,&len); char *databuff = new char[len + 1];  memcpy(databuff,buf,len); databuff[len] = '\0'; data.append(databuff); delete databuff; buf += len;}
-#define ReadBit(buf,data,len) memcpy(data,buf,len); buf += len;
+#define NReadInt8(buf,data)   memcpy(data,buf,1); buf += 1;
+#define NReadInt16(buf,data)  memcpy(data,buf,2); buf += 2;
+#define NReadInt32(buf,data)  memcpy(data,buf,4); buf += 4;
+#define NReadInt64(buf,data)  memcpy(data,buf,8); buf += 8;
+#define NReadString(buf,data) {int len; NReadInt32(buf,&len); char *databuff = new char[len + 1];  memcpy(databuff,buf,len); databuff[len] = '\0'; data.append(databuff); delete databuff; buf += len;}
+#define NReadBit(buf,data,len) memcpy(data,buf,len); buf += len;
 
-#define WriteInt8(buf,data)	 memcpy(buf,data,1); buf += 1;
-#define WriteInt16(buf,data) memcpy(buf,data,2); buf += 2;
-#define WriteInt32(buf,data) memcpy(buf,data,4); buf += 4;
-#define WriteInt64(buf,data) memcpy(buf,data,8); buf += 8;
-#define WriteString(buf,data){int len = data.length(); WriteInt32(buf,&len); memcpy(buf,data.c_str(),len); buf += len; }
-#define WriteBit(buf,data,len) memcpy(buf,data,len); buf += len;
+#define NWriteInt8(buf,data)  memcpy(buf,data,1); buf += 1;
+#define NWriteInt16(buf,data) memcpy(buf,data,2); buf += 2;
+#define NWriteInt32(buf,data) memcpy(buf,data,4); buf += 4;
+#define NWriteInt64(buf,data) memcpy(buf,data,8); buf += 8;
+#define NWriteString(buf,data){int len = data.length(); NWriteInt32(buf,&len); memcpy(buf,data.c_str(),len); buf += len; }
+#define NWriteBit(buf,data,len) memcpy(buf,data,len); buf += len;
 
-#define DealStart(data) { int msgcmd = 0; ReadInt32(data,&msgcmd);  int error = 0; ReadInt32(data,&error); switch(msgcmd){
+#define DealStart(data) { int msgcmd = 0; NReadInt32(data,&msgcmd);  int error = 0; NReadInt32(data,&error); switch(msgcmd){
 #define DealMsg(net, cmd, data) case MSG_##cmd:{ cmd val; Read##cmd(val,data); on##cmd(net,val); break; }
 //#define DealMsg(net, cmd, data, userdatas) case MSG_##cmd:{ cmd val; Read##cmd(val,data); on##cmd(net,val, userdatas); break; }
 #define DealEnd()	} }
@@ -46,9 +46,9 @@ typedef double         float64;
 								char _buf[BUFF_SIZE] = {0};   \
 								char* data = _buf;            \
 								int len = 0;                  \
-								WriteInt32(data,&MSG_##cmd);  \
+								NWriteInt32(data,&MSG_##cmd);  \
 								int err = error;              \
-								WriteInt32(data,&err);        \
+								NWriteInt32(data,&err);        \
 								Write##cmd(msg,data);         \
 								len = data - _buf;            \
 								data = _buf;           		  \
