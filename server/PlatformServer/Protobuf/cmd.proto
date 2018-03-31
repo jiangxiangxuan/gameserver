@@ -8,4 +8,3 @@ enum CMD {
 	PLATFORM_VERIFY_TOKEN = 2000; // 登录验证
 
 }
-

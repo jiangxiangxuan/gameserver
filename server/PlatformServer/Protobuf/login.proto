@@ -9,4 +9,3 @@ message CVerifyToken {
 message SVerifyToken {
 	
 }
-
