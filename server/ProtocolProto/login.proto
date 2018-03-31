@@ -2,7 +2,7 @@ package protocol;
 
 // 登录验证
 message CVerifyToken {
-  required string Token = 1;
+	required string Token = 1;
 }
 
 message SVerifyToken {
