@@ -100,7 +100,6 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 		{
 			int cmd = 0;
 			memcpy( &cmd, data, 4 );
-			printf("GateWayServer::onMsg %d %d %d %d %d\n\r",cmd,pNetWork->type,m_PlatformMinCmd,m_PlatformMaxCmd,KernalNetWorkType_CONNECTED);
 			if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_CenterMinCmd && cmd < m_CenterMaxCmd )
 			{
 				sendMsgToCenter( id, type, data, size );
@@ -165,12 +164,13 @@ void GateWayServer::sendMsgToPlatform( unsigned int id, KernalMessageType type, 
 	msg.clientID = id;
 	msg.initData( (char*)data, size );
 	msg.type = ( NETWORK_DATA == type ) ? MESSAGE_DATA: MESSAGE_CONNECTCLOSE ;
-
+	printf("GateWayServer::sendMsgToPlatform 000");
 	auto servers = m_Servers.equal_range( SERVER_PLATFORM );
 	for( auto it = servers.first; it != servers.second; ++it )
 	{
 		if( it->second )
 		{
+			printf("GateWayServer::sendMsgToPlatform 111 %d",it->second->id);
 			MsgSend( m_Epoll, it->second->id, GateWayInternalServerMsg, 0, msg );
 			break;
 		}
