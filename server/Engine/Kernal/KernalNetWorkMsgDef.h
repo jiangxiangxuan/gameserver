@@ -69,13 +69,15 @@ typedef double         float64;
 							}
 
 #define ProtobufMsgSend( net, id, cmd, err, obj ) {                 \
+								int pcmd = cmd;                     \
+								int perr = err;                     \
 								int len = obj.ByteSize();           \
 								char *pdata = new char[len];        \
 								obj.SerializeToArray(pdata, len);   \
 								char *databuff = new char[len + 8]; \
 								char *_buf = databuff;              \
-								NWriteInt32(databuff,&cmd);         \
-								NWriteInt32(databuff,&err);         \
+								NWriteInt32(databuff,&pcmd);         \
+								NWriteInt32(databuff,&perr);         \
 								NWriteBit(databuff,pdata,len);      \
 								net.send(id,_buf,len+8);            \
 								delete []pdata; delete []databuff;\
