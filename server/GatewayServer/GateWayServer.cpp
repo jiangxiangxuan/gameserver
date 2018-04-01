@@ -77,7 +77,6 @@ void GateWayServer::handleTimerMsg( unsigned int id )
 
 void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
 {
-	printf("GateWayServer::onMsg %d %d %d %d\n\r",id,type,size,NETWORK_DATA);
 	if( TIMER_DATA == type )
 	{
 		handleTimerMsg( id );
@@ -164,13 +163,11 @@ void GateWayServer::sendMsgToPlatform( unsigned int id, KernalMessageType type, 
 	msg.clientID = id;
 	msg.initData( (char*)data, size );
 	msg.type = ( NETWORK_DATA == type ) ? MESSAGE_DATA: MESSAGE_CONNECTCLOSE ;
-	printf("GateWayServer::sendMsgToPlatform 000");
 	auto servers = m_Servers.equal_range( SERVER_PLATFORM );
 	for( auto it = servers.first; it != servers.second; ++it )
 	{
 		if( it->second )
 		{
-			printf("GateWayServer::sendMsgToPlatform 111 %d",it->second->id);
 			MsgSend( m_Epoll, it->second->id, GateWayInternalServerMsg, 0, msg );
 			break;
 		}
@@ -358,6 +355,7 @@ void GateWayServer::closeServer( CenterNotifyServerInfo &value )
 
 void GateWayServer::connServer( CenterNotifyServerInfo &value )
 {
+	printf("GateWayServer::connServer %d,%s,%d\n\r",value.type,value.ip.c_str(),value.port);
 	bool isFind = false;
 	auto servers = m_Servers.equal_range( value.type );
 	for( auto it = servers.first; it != servers.second; ++it )
