@@ -84,7 +84,7 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 	else if( NETWORK_DATA == type )
 	{
 		
-#if 1
+#if 0
 		char msg[128] = {0};
 		memset(msg,0,sizeof(msg));
 		sprintf(msg, "{\"state\":1,\"data\":\"error:netid=%d,datasize=%d\"}", id, size);
