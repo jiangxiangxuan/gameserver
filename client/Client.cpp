@@ -151,7 +151,7 @@ void Client::clientWorker()
 #endif
 #if 1
 		platformprotocol::CVerifyToken verifyToken;
-		verifyToken.set_Token("Token"); 
+		verifyToken.set_token("Token"); 
 		
 		ProtobufMsgSend(m_Epoll, serverID, 2000, 0, verifyToken);
 #endif		
