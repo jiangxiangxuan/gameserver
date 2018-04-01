@@ -74,12 +74,13 @@ typedef double         float64;
 								int len = obj.ByteSize();           \
 								char *pdata = new char[len];        \
 								obj.SerializeToArray(pdata, len);   \
-								char *_buff = new char[len+8];      \
+								char *_buff = new char[len+12];      \
 								char *databuff = _buff;             \
 								NWriteInt32(databuff,&pcmd);        \
 								NWriteInt32(databuff,&perr);        \
+								NWriteInt32(databuff,&len);         \
 								NWriteBit(databuff,pdata,len);      \
-								net.send(id,_buff,len+8);            \
+								net.send(id,_buff,len+12);           \
 								delete []pdata; delete []_buff;     \
 							}
 							

@@ -129,9 +129,17 @@ void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, in
 	//TODO:处理客户端消息
 	int cmd = 0;
 	NReadInt32(data,&cmd);
-	printf("handleGateWayMsg %d",cmd);
-	NReadInt32(data,&cmd);
-	printf("handleGateWayMsg %d",cmd);
+	printf("handleGateWayMsg cmd=%d\r\n",cmd);
+	int err = 0;
+	NReadInt32(data,&err);
+	printf("handleGateWayMsg err=%d\r\n",err);
+	int len = 0;
+	NReadInt32(data,&len);
+	printf("handleGateWayMsg len=%d\r\n",len);
+	
+	platformprotocol::CVerifyToken verifyToken;
+	ParseFromArrayToObj( verifyToken, data, len );
+	printf("handleGateWayMsg token=%s\r\n",verifyToken.token());
 }
 
 void PlatformServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value )
