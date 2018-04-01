@@ -154,7 +154,20 @@ void Client::clientWorker()
 		verifyToken.set_token("Token"); 
 		
 		printf("clientWorker 111 %d", serverID);
-		ProtobufMsgSend(m_Epoll, serverID, 2000, 0, verifyToken);
+		//ProtobufMsgSend(m_Epoll, serverID, 2000, 0, verifyToken);
+		
+		int pcmd = 2000;                     
+								int perr = 0;                     
+								int len = verifyToken.ByteSize();           
+								char *pdata = new char[len];        
+								verifyToken.SerializeToArray(pdata, len);   
+								char *databuff = new char[len + 8]; 
+								char *_buf = databuff;              
+								NWriteInt32(databuff,&pcmd);         
+								NWriteInt32(databuff,&perr);         
+								NWriteBit(databuff,pdata,len);      
+								m_Epoll.send(serverID,_buf,len+8);            
+								delete []pdata; delete []databuff;
 #endif		
 #if 0
 		char _buf[BUFF_SIZE] = {0}; 
