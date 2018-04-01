@@ -161,13 +161,14 @@ void Client::clientWorker()
 								int len = verifyToken.ByteSize();           
 								char *pdata = new char[len];        
 								verifyToken.SerializeToArray(pdata, len);   
-								char *databuff = new char[len + 8]; 
+								char *databuff = (char*)malloc(len+8);//new char[len + 8]; 
 								char *_buf = databuff;              
 								NWriteInt32(databuff,&pcmd);         
 								NWriteInt32(databuff,&perr);         
 								NWriteBit(databuff,pdata,len);      
 								m_Epoll.send(serverID,_buf,len+8);            
-								delete []pdata; delete []databuff;
+								delete []pdata; 
+								delete (databuff-8);
 #endif		
 #if 0
 		char _buf[BUFF_SIZE] = {0}; 
