@@ -20,6 +20,7 @@ DIRS := $(shell find $(PRO_SRC) -maxdepth 4 -type d)
 PROTOCOLDIRS := $(shell find $(PRO_SRC)/../server/Protocol -maxdepth 4 -type d)
 
 SRC := $(foreach dir,$(DIRS),$(wildcard $(dir)/*.cpp))
+SRC += $(foreach dir,$(DIRS),$(wildcard $(dir)/*.cc))
 SRC += $(foreach dir,$(PROTOCOLDIRS),$(wildcard $(dir)/*.cpp))
 
 PRO_OBJS := $(patsubst %.cpp,%.o, $(notdir $(SRC) ))
