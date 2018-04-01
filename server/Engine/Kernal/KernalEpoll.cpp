@@ -289,7 +289,8 @@ int KernalEpoll::readMsg( int fd, void *data, int size, bool useRead, bool readO
         }
         if(  ret == -1 && ( errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN) )
         {
-            continue;
+			return readSize;
+            //continue;
         }
 
         if( ret <= 0 )
@@ -334,7 +335,7 @@ int KernalEpoll::readHttpMsg( int fd, void *data, int size )
 
     if( 0 != memcmp( data, "GET", 3 ) && 0 != memcmp( data, "POST", 4 ) )
     {
-				readSize = 0;
+		readSize = 0;
     }
 
     if( readSize > 0 )
