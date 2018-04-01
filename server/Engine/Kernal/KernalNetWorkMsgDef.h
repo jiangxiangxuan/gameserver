@@ -68,4 +68,17 @@ typedef double         float64;
 								obj.ParseFromArray(data, len);\
 							}
 
+#define ProtobufMsgSend( net, id, cmd, err, obj ) {                 \
+								int len = obj.ByteSize();           \
+								char *pdata = new char[len];        \
+								obj.SerializeToArray(pdata, len);   \
+								char *databuff = new char[len + 8]; \
+								char *_buf = databuff;              \
+								NWriteInt32(databuff,&cmd);         \
+								NWriteInt32(databuff,&err);         \
+								NWriteBit(databuff,pdata,len);      \
+								net.send(id,_buf,len+8);            \
+								delete []pdata; delete []databuff;\
+							}
+							
 #endif

@@ -1,0 +1,11 @@
+syntax = "proto3";
+package platformprotocol;
+
+// 登录验证
+message CVerifyToken {
+	string Token = 1;
+}
+
+message SVerifyToken {
+	
+}

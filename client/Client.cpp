@@ -126,9 +126,9 @@ void Client::clientWorker()
 	int size = 0;
 	char _buf[BUFF_SIZE] = {0};
 	char* dataBuf = _buf;
-	WriteInt32(dataBuf, &serverID);
-	WriteInt32(dataBuf, &socket_connect);
-	WriteInt32(dataBuf, &size);
+	NWriteInt32(dataBuf, &serverID);
+	NWriteInt32(dataBuf, &socket_connect);
+	NWriteInt32(dataBuf, &size);
 	dataBuf = _buf;
 	m_Epoll.sendToPipe( dataBuf, size + 12 );
 
@@ -139,6 +139,7 @@ void Client::clientWorker()
 	
 	for( int i = 0; i < 50000; ++i )
 	{
+#if 0		
 		char msg[128];
 		memset(msg,0,sizeof(msg));
 		sprintf(msg, "client test threadid=%ld,i=%d,serverID=%d===",pthread_self(),i,serverID);
@@ -147,13 +148,20 @@ void Client::clientWorker()
 		//m_Epoll.send( serverID, &len, 4 );
 				
 		m_Epoll.send( serverID, msg, len );
+#endif
+#if 1
+		platformprotocol::CVerifyToken verifyToken;
+		verifyToken.set_Token("Token"); 
+		
+		ProtobufMsgSend(m_Epoll, serverID, 2000, 0, verifyToken);
+#endif		
 #if 0
 		char _buf[BUFF_SIZE] = {0}; 
 		char* data = _buf;
 		int len = 0; 
-		WriteInt32(data,len);
+		NWriteInt32(data,len);
 		int err = 0;
-		WriteInt32(data,&err);
+		NWriteInt32(data,&err);
 
 		len = data - _buf;
 		data = _buf; 

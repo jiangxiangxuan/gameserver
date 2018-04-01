@@ -287,10 +287,15 @@ int KernalEpoll::readMsg( int fd, void *data, int size, bool useRead, bool readO
         {
             ret = ::recv( fd, (char*)data + readSize, size - readSize, 0 );
         }
+		
+		if( ret == -1 && errno == EWOULDBLOCK )
+		{
+			return readSize;
+		}
+		
         if(  ret == -1 && ( errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN) )
         {
-			return readSize;
-            //continue;
+            continue;
         }
 
         if( ret <= 0 )
@@ -319,6 +324,12 @@ int KernalEpoll::readHttpMsg( int fd, void *data, int size )
     do
     {
         int ret = ::recv( fd, (char*)data + readSize, size - readSize, 0 );
+		
+		if( ret == -1 && errno == EWOULDBLOCK )
+		{
+			break;
+		}
+		
         if(  ret == -1 && ( errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN) )
         {
             continue;
