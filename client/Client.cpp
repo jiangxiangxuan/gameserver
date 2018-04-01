@@ -153,7 +153,6 @@ void Client::clientWorker()
 		platformprotocol::CVerifyToken verifyToken;
 		verifyToken.set_token("Token"); 
 		
-		printf("clientWorker 111 %d", serverID);
 		ProtobufMsgSend(m_Epoll, serverID, 2000, 0, verifyToken);
 		
 #endif		

@@ -77,6 +77,7 @@ void GateWayServer::handleTimerMsg( unsigned int id )
 
 void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
 {
+	printf("GateWayServer::onMsg ",id,type,size,NETWORK_DATA);
 	if( TIMER_DATA == type )
 	{
 		handleTimerMsg( id );

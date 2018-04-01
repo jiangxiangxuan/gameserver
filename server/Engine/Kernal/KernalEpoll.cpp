@@ -218,12 +218,10 @@ int KernalEpoll::connectHttp( const char *addr, const int port )
 
 bool KernalEpoll::send( int id, void *data, int size )
 {
-	printf("KernalEpoll::send 000 %d %d",id,size);
     if( id < 0 || id >= MAX_NET_WORK_NUM )
     {
         return false;
     }
-	printf("KernalEpoll::send 111 %d %d",id,size);
     struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
     if( KernalNetWorkType_NO == pNetWork->type )
     {
@@ -235,7 +233,6 @@ bool KernalEpoll::send( int id, void *data, int size )
         return false;
     }
 
-	printf("KernalEpoll::send 222 %d %d",id,size);
     char *buffer = (char*)malloc( size + 4 );
     memset( buffer, 0, size + 4 );
     char *dataBuf = buffer;
@@ -258,7 +255,6 @@ bool KernalEpoll::send( int id, void *data, int size )
         close( pNetWork->id );
     }
 
-	printf("KernalEpoll::send 333 %d %d %d",id,size,ret);
     return ( ret > 0 );
 }
 
