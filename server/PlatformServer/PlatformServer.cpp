@@ -139,7 +139,7 @@ void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, in
 	
 	platformprotocol::CVerifyToken verifyToken;
 	ParseFromArrayToObj( verifyToken, data, len );
-	printf("handleGateWayMsg token=%s\r\n",verifyToken.token());
+	printf("handleGateWayMsg token=%s\r\n",verifyToken.token().c_str());
 }
 
 void PlatformServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value )
