@@ -100,7 +100,7 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 		{
 			int cmd = 0;
 			memcpy( &cmd, data, 4 );
-			printf("GateWayServer::onMsg %d\n\r",cmd,pNetWork->type,m_PlatformMinCmd,m_PlatformMaxCmd,KernalNetWorkType_CONNECTED);
+			printf("GateWayServer::onMsg %d %d %d %d %d\n\r",cmd,pNetWork->type,m_PlatformMinCmd,m_PlatformMaxCmd,KernalNetWorkType_CONNECTED);
 			if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_CenterMinCmd && cmd < m_CenterMaxCmd )
 			{
 				sendMsgToCenter( id, type, data, size );
