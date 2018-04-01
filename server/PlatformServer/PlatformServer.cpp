@@ -198,7 +198,7 @@ void PlatformServer::connectCenterServer()
 	centerThread.detach();
 }
 
-void GameServer::registerCenterServerInfo()
+void PlatformServer::registerCenterServerInfo()
 {
 	const char *ip   = getConfig()->getAttributeStr("config/platform/listen", "ip");
 	int         port = getConfig()->getAttributeInt("config/platform/listen", "port");
