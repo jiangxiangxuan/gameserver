@@ -198,7 +198,7 @@ void PlatformServer::connectCenterServer()
 	centerThread.detach();
 }
 
-void PlatformServer::registerCenterServerInfo()
+void GameServer::registerCenterServerInfo()
 {
 	const char *ip   = getConfig()->getAttributeStr("config/platform/listen", "ip");
 	int         port = getConfig()->getAttributeInt("config/platform/listen", "port");
@@ -217,16 +217,16 @@ void PlatformServer::registerCenterServerInfo()
 
 	do
 	{
-		gettimeofday(&now, NULL);
-		delay.tv_sec = now.tv_sec + 2;
-		delay.tv_nsec = now.tv_usec * 1000;
-		pthread_cond_timedwait(&cond, &mutex, &delay);
-
-        //for( int i = 0; i < 200000000; ++i );
-        //pthread_delay_n( &delay );
+    gettimeofday(&now, NULL);
+    delay.tv_sec = now.tv_sec + 2;
+    delay.tv_nsec = now.tv_usec * 1000;
+    pthread_cond_timedwait(&cond, &mutex, &delay);
 
 		m_CenterServerID = connect(serverIP, serverPort, false);
-  	    //m_CenterServerID = m_Epoll.connectSocket( serverIP, serverPort );
+        //m_CenterServerID = m_Epoll.connectSocket( serverIP, serverPort );
+
+		//for( int i = 0; i < 200000000; ++i );
+		//pthread_delay_n( &delay );
 
 		if( m_CenterServerID > 0 && EINPROGRESS == errno )
 		{
@@ -253,7 +253,6 @@ void PlatformServer::registerCenterServerInfo()
 					break;
 				}
 			}
-
 		}
 		else if( m_CenterServerID > 0 )
 		{
@@ -262,10 +261,6 @@ void PlatformServer::registerCenterServerInfo()
 		}
 	}
 	while( true );
-
-    pthread_mutex_unlock(&mutex);
-    pthread_mutex_destroy( &mutex );
-    pthread_cond_destroy( &cond );
 
     int size = 0;
     char _buf[BUFF_SIZE] = {0};
@@ -282,9 +277,14 @@ void PlatformServer::registerCenterServerInfo()
     pthread_cond_timedwait(&cond, &mutex, &delay);
 
 	CenterRegisterServerInfo msg;
-	msg.type = SERVER_PLATFORM;
-	msg.ip.assign( ip );
+	msg.type = SERVER_GAME;
+	msg.ip   = ip;
 	msg.port = port;
 
 	MsgSend( m_Epoll, m_CenterServerID, CenterRegisterServerInfo, 0, msg );
+
+    pthread_mutex_unlock(&mutex);
+    pthread_mutex_destroy( &mutex );
+    pthread_cond_destroy( &cond );
+
 }
