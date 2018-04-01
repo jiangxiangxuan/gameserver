@@ -152,7 +152,7 @@ void Client::clientWorker()
 #if 1
 		platformprotocol::CVerifyToken verifyToken;
 		verifyToken.set_token("Token"); 
-		printf("CVerifyToken len %d",verifyToken.ByteSize())
+		printf("CVerifyToken len %d",verifyToken.ByteSize());
 		ProtobufMsgSend(m_Epoll, serverID, 2000, 0, verifyToken);
 		
 #endif		
