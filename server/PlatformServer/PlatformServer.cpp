@@ -277,7 +277,7 @@ void PlatformServer::registerCenterServerInfo()
     pthread_cond_timedwait(&cond, &mutex, &delay);
 
 	CenterRegisterServerInfo msg;
-	msg.type = SERVER_GAME;
+	msg.type = SERVER_PLATFORM;
 	msg.ip   = ip;
 	msg.port = port;
 
