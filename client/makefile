@@ -25,6 +25,7 @@ SRC += $(foreach dir,$(PROTOCOLDIRS),$(wildcard $(dir)/*.cpp))
 
 PRO_OBJS := $(patsubst %.cpp,%.o, $(notdir $(SRC) ))
 PRO_OBJS := $(patsubst %.cpp,%.o, $(notdir $(PRO_OBJS) ))
+PRO_OBJS := $(patsubst %.pb.cc,%.o, $(notdir $(PRO_OBJS) ))
 PRO_OBJS := $(patsubst %.c,%.o, $(notdir $(PRO_OBJS) ))
 PRO_OBJS := $(addprefix $(PRO_OBJ_DIR)/,$(PRO_OBJS))
 
