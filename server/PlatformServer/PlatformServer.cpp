@@ -127,6 +127,11 @@ void PlatformServer::onExit()
 void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, int datalen )
 {
 	//TODO:处理客户端消息
+	int cmd = 0;
+	NReadInt32(data,&cmd);
+	printf("handleGateWayMsg %d",cmd);
+	NReadInt32(data,&cmd);
+	printf("handleGateWayMsg %d",cmd);
 }
 
 void PlatformServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value )
