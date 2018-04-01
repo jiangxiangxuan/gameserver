@@ -72,6 +72,20 @@ void Client::onMsg( unsigned int id, KernalMessageType type, const char *data, u
 	else
 	{
 		
+		int cmd = 0;
+		NReadInt32(data,&cmd);
+		printf("client onMsg cmd=%d\r\n",cmd);
+		int err = 0;
+		NReadInt32(data,&err);
+		printf("client onMsg err=%d\r\n",err);
+		int len = 0;
+		NReadInt32(data,&len);
+		printf("client onMsg len=%d\r\n",len);
+		
+		platformprotocol::CVerifyToken verifyToken;
+		ParseFromArrayToObj( verifyToken, data, len );
+		printf("client onMsg token=%s\r\n",verifyToken.token().c_str());
+		
 	}
 }
 

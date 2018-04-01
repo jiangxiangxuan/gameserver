@@ -140,6 +140,27 @@ void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, in
 	platformprotocol::CVerifyToken verifyToken;
 	ParseFromArrayToObj( verifyToken, data, len );
 	printf("handleGateWayMsg token=%s\r\n",verifyToken.token().c_str());
+	
+	platformprotocol::CVerifyToken verifyToken111;
+	verifyToken111.set_token("Token Test 111111");
+		
+	
+	int pcmd = cmd;                     
+	int perr = err;                     
+	int len1 = verifyToken111.ByteSize();           
+	char *pdata = new char[len1];        
+	verifyToken111.SerializeToArray(pdata, len1);   
+	char *_buff = new char[len1+12];      
+	char *databuff = _buff;             
+	NWriteInt32(databuff,&pcmd);        
+	NWriteInt32(databuff,&perr);        
+	NWriteInt32(databuff,&len1);         
+	NWriteBit(databuff,pdata,len1);
+	
+	sendMsgToClient(session,clientID,_buff,len1+12);
+	
+	delete []pdata; 
+	delete []_buff; 	
 }
 
 void PlatformServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value )
