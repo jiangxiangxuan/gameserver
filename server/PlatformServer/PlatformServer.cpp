@@ -141,10 +141,10 @@ void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, in
 	ParseFromArrayToObj( verifyToken, data, len );
 	printf("handleGateWayMsg token=%s\r\n",verifyToken.token().c_str());
 	
+	
 	platformprotocol::CVerifyToken verifyToken111;
 	verifyToken111.set_token("Token Test 111111");
 		
-	
 	int pcmd = cmd;                     
 	int perr = err;                     
 	int len1 = verifyToken111.ByteSize();           
