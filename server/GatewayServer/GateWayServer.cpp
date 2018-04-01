@@ -77,7 +77,7 @@ void GateWayServer::handleTimerMsg( unsigned int id )
 
 void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
 {
-	printf("GateWayServer::onMsg %d %d %d %d",id,type,size,NETWORK_DATA);
+	printf("GateWayServer::onMsg %d %d %d %d\n\r",id,type,size,NETWORK_DATA);
 	if( TIMER_DATA == type )
 	{
 		handleTimerMsg( id );
@@ -100,6 +100,7 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 		{
 			int cmd = 0;
 			memcpy( &cmd, data, 4 );
+			printf("GateWayServer::onMsg %d\n\r",cmd);
 			if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_CenterMinCmd && cmd < m_CenterMaxCmd )
 			{
 				sendMsgToCenter( id, type, data, size );
