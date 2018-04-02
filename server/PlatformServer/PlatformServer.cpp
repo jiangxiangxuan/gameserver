@@ -128,6 +128,14 @@ void VerifyToken(int session, int clientid, char *data, int msglen)
 {
     platformprotocol::CVerifyToken verifyToken;
     ParseFromArrayToObj(verifyToken, data, msglen);
+	
+	printf("platform VerifyToken token=%s\r\n",verifyToken.token().c_str());
+	
+	platformprotocol::CVerifyToken verifyToken111;
+	verifyToken111.set_token("Token Test 111111");
+	
+	ProtobufMsgSendToClientByGateWay(m_Epoll,session,clientID,cmd,err,verifyToken111);
+		
 }
 
 void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, int datalen )
