@@ -144,43 +144,6 @@ void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, in
     DealProtobufStart(data)
     DealProtobufMsg(session, clientID, 2000, VerifyToken)
     DealProtobufEnd()
-    return;
-	int cmd = 0;
-	NReadInt32(data,&cmd);
-	printf("platform handleGateWayMsg cmd=%d\r\n",cmd);
-	int err = 0;
-	NReadInt32(data,&err);
-	printf("platform handleGateWayMsg err=%d\r\n",err);
-	int len = 0;
-	NReadInt32(data,&len);
-	printf("platform handleGateWayMsg len=%d\r\n",len);
-	
-	platformprotocol::CVerifyToken verifyToken;
-	ParseFromArrayToObj( verifyToken, data, len );
-	printf("platform handleGateWayMsg token=%s\r\n",verifyToken.token().c_str());
-	
-	
-	platformprotocol::CVerifyToken verifyToken111;
-	verifyToken111.set_token("Token Test 111111");
-	
-	ProtobufMsgSendToClientByGateWay(m_Epoll,session,clientID,cmd,err,verifyToken111);
-		
-	/*int pcmd = cmd;                     
-	int perr = err;                     
-	int len1 = verifyToken111.ByteSize();           
-	char *pdata = new char[len1];        
-	verifyToken111.SerializeToArray(pdata, len1);   
-	char *_buff = new char[len1+12];      
-	char *databuff = _buff;             
-	NWriteInt32(databuff,&pcmd);        
-	NWriteInt32(databuff,&perr);        
-	NWriteInt32(databuff,&len1);         
-	NWriteBit(databuff,pdata,len1);
-	
-	sendMsgToClient(session,clientID,_buff,len1+12);
-	
-	delete []pdata; 
-	delete []_buff; 	*/
 }
 
 void PlatformServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value )
