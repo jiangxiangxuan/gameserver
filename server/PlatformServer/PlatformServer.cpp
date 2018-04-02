@@ -134,7 +134,7 @@ void PlatformServer::VerifyToken(int session, int clientid, char *data, int msgl
 	platformprotocol::CVerifyToken verifyToken111;
 	verifyToken111.set_token("Token Test 111111");
 	
-	ProtobufMsgSendToClientByGateWay(m_Epoll,session,clientID,2000,0,verifyToken111);
+	ProtobufMsgSendToClientByGateWay(m_Epoll,session,clientid,2000,0,verifyToken111);
 		
 }
 
