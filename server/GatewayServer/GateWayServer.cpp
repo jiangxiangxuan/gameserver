@@ -355,6 +355,7 @@ void GateWayServer::closeServer( CenterNotifyServerInfo &value )
 
 void GateWayServer::connServer( CenterNotifyServerInfo &value )
 {
+	printf("GateWayServer connServer  %d  %s  %d\n\r",value.type,value.ip.c_str(),value.port);
 	bool isFind = false;
 	auto servers = m_Servers.equal_range( value.type );
 	for( auto it = servers.first; it != servers.second; ++it )
