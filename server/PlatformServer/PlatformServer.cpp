@@ -124,7 +124,7 @@ void PlatformServer::onExit()
 	m_pIdbcRedis->close();
 }
 
-void VerifyToken(int session, int clientid, char *data, int msglen)
+void PlatformServer::VerifyToken(int session, int clientid, char *data, int msglen)
 {
     platformprotocol::CVerifyToken verifyToken;
     ParseFromArrayToObj(verifyToken, data, msglen);
@@ -134,7 +134,7 @@ void VerifyToken(int session, int clientid, char *data, int msglen)
 	platformprotocol::CVerifyToken verifyToken111;
 	verifyToken111.set_token("Token Test 111111");
 	
-	ProtobufMsgSendToClientByGateWay(m_Epoll,session,clientID,cmd,err,verifyToken111);
+	ProtobufMsgSendToClientByGateWay(m_Epoll,session,clientID,2000,0,verifyToken111);
 		
 }
 

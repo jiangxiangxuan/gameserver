@@ -49,6 +49,8 @@ public:
 	void handleTimerMsg( unsigned int id );
 
 	void registerCenterServerInfo();
+public:
+	void VerifyToken(int session, int clientid, char *data, int msglen)	
 protected:
 	void connectCenterServer();
 private:
