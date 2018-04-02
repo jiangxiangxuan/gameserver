@@ -55,6 +55,11 @@ typedef double         float64;
 								net.send(id,_buf,len);        \
 							}
 
+//处理protobuf消息
+#define DealProtobufStart(data){ int msgcmd = 0; NReadInt32(data, &msgcmd); int err = 0; NReadInt32(data, &err); int msglen = 0 ; NReadInt32(data, &msglen); switch(msgcmd) {
+#define DealProtobufMsg(session, clientid, cmd, func) case cmd:{ func(session, clientid, data, msglen);break;}
+#define DealProtobufEnd() }}
+
 //序列化protobuf消息
 #define SerializeObjToArray(obj, data, len) {                       \
 								len = obj.ByteSize();               \

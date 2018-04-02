@@ -124,22 +124,32 @@ void PlatformServer::onExit()
 	m_pIdbcRedis->close();
 }
 
+void VerifyToken(int session, int clientid, char *data, int msglen)
+{
+    platformprotocol::CVerifyToken verifyToken;
+    ParseFromArrayToObj(verifyToken, data, msglen);
+}
+
 void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, int datalen )
 {
 	//TODO:处理客户端消息
+    DealProtobufStart(data)
+    DealProtobufMsg(session, clientID, 2000, VerifyToken)
+    DealProtobufEnd()
+    return;
 	int cmd = 0;
 	NReadInt32(data,&cmd);
-	printf("handleGateWayMsg cmd=%d\r\n",cmd);
+	printf("platform handleGateWayMsg cmd=%d\r\n",cmd);
 	int err = 0;
 	NReadInt32(data,&err);
-	printf("handleGateWayMsg err=%d\r\n",err);
+	printf("platform handleGateWayMsg err=%d\r\n",err);
 	int len = 0;
 	NReadInt32(data,&len);
-	printf("handleGateWayMsg len=%d\r\n",len);
+	printf("platform handleGateWayMsg len=%d\r\n",len);
 	
 	platformprotocol::CVerifyToken verifyToken;
 	ParseFromArrayToObj( verifyToken, data, len );
-	printf("handleGateWayMsg token=%s\r\n",verifyToken.token().c_str());
+	printf("platform handleGateWayMsg token=%s\r\n",verifyToken.token().c_str());
 	
 	
 	platformprotocol::CVerifyToken verifyToken111;
