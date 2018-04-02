@@ -151,7 +151,7 @@ void Client::clientWorker()
 	delay.tv_nsec = now.tv_usec * 1000;
 	pthread_cond_timedwait(&cond, &mutex, &delay);
 	printf("clientWorker 000");
-	for( int i = 0; i < 1; ++i )
+	for( int i = 0; i < 10; ++i )
 	{
 #if 0		
 		char msg[128];
