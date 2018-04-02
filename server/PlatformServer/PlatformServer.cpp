@@ -154,8 +154,10 @@ void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, in
 	
 	platformprotocol::CVerifyToken verifyToken111;
 	verifyToken111.set_token("Token Test 111111");
+	
+	ProtobufMsgSendToClientByGateWay(m_Epoll,session,clientID,cmd,err,verifyToken111);
 		
-	int pcmd = cmd;                     
+	/*int pcmd = cmd;                     
 	int perr = err;                     
 	int len1 = verifyToken111.ByteSize();           
 	char *pdata = new char[len1];        
@@ -167,7 +169,7 @@ void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, in
 	NWriteInt32(databuff,&len1);         
 	NWriteBit(databuff,pdata,len1);
 	
-	sendMsgToClient(session,clientID,_buff,len1+12);
+	sendMsgToClient(session,clientID,_buff,len1+12);*/
 	
 	delete []pdata; 
 	delete []_buff; 	

@@ -88,5 +88,26 @@ typedef double         float64;
 								net.send(id,_buff,len+12);           \
 								delete []pdata; delete []_buff;     \
 							}
+
+//通过网关发送消息给客户端
+#define ProtobufMsgSendToClientByGateWay( net, session, clientid, cmd, err, protomsg ) {              \
+											int pcmd = cmd;                                           \
+											int perr = err;                                           \
+											int len1 = protomsg.ByteSize();                           \
+											char *pdata = new char[len1];                             \
+											protomsg.SerializeToArray(pdata, len1);                   \
+											char *_buff = new char[len1+12];                          \
+											char *databuff = _buff;                                   \
+											NWriteInt32(databuff,&pcmd);                              \
+											NWriteInt32(databuff,&perr);                              \
+											NWriteInt32(databuff,&len1);                              \
+											NWriteBit(databuff,pdata,len1);                           \
+											GateWayInternalServerMsg msg;                             \
+											msg.clientID = clientid;                                  \
+											msg.type     = MESSAGE_DATA;                              \
+											msg.initData( _buff, len1+12 );                           \
+											MsgSend( net, session, GateWayInternalServerMsg, 0, msg );\
+											delete []pdata; delete []_buff;                           \
+										}
 							
 #endif
