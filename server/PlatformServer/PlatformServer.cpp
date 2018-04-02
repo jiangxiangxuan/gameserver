@@ -169,10 +169,10 @@ void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, in
 	NWriteInt32(databuff,&len1);         
 	NWriteBit(databuff,pdata,len1);
 	
-	sendMsgToClient(session,clientID,_buff,len1+12);*/
+	sendMsgToClient(session,clientID,_buff,len1+12);
 	
 	delete []pdata; 
-	delete []_buff; 	
+	delete []_buff; 	*/
 }
 
 void PlatformServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value )
