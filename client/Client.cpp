@@ -150,8 +150,8 @@ void Client::clientWorker()
 	delay.tv_sec = now.tv_sec + 2;
 	delay.tv_nsec = now.tv_usec * 1000;
 	pthread_cond_timedwait(&cond, &mutex, &delay);
-	printf("clientWorker 000");
-	for( int i = 0; i < 10; ++i )
+	printf("clientWorker start %ld \n\r",getCurrentTime());
+	for( int i = 0; i < 1000; ++i )
 	{
 #if 0		
 		char msg[128];
@@ -166,7 +166,7 @@ void Client::clientWorker()
 #if 1
 		platformprotocol::CVerifyToken verifyToken;
 		verifyToken.set_token("Token Test"); 
-		printf("CVerifyToken len %d",verifyToken.ByteSize());
+		printf("CVerifyToken len %d\r\n",verifyToken.ByteSize());
 		ProtobufMsgSend(m_Epoll, serverID, 2000, 0, verifyToken);
 		
 #endif		
@@ -184,6 +184,7 @@ void Client::clientWorker()
 #endif
 		//usleep(20);
 	}
+	printf("clientWorker end %ld \n\r",getCurrentTime());
 	//m_Epoll.closeSocket(serverID);
 }
 
