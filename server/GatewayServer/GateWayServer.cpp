@@ -77,7 +77,7 @@ void GateWayServer::handleTimerMsg( unsigned int id )
 
 void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
 {
-	printf("GateWayServer::onMsg %d %d\n\r\n\r",id, size);
+	printf("GateWayServer::onMsg %d %d %d %d\n\r\n\r",id, size,NETWORK_DATA , type);
 	if( TIMER_DATA == type )
 	{
 		handleTimerMsg( id );
@@ -160,6 +160,7 @@ void GateWayServer::sendMsgToCenter( unsigned int id, KernalMessageType type, co
 
 void GateWayServer::sendMsgToPlatform( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
 {
+	printf("GateWayServer::sendMsgToPlatform %d %d %d %d\n\r\n\r",id, size,NETWORK_DATA , type);
 	GateWayInternalServerMsg msg;
 	msg.clientID = id;
 	msg.initData( (char*)data, size );
@@ -169,6 +170,8 @@ void GateWayServer::sendMsgToPlatform( unsigned int id, KernalMessageType type, 
 	{
 		if( it->second )
 		{
+			printf("GateWayServer::sendMsgToPlatform 111 %d %d %d %d\n\r\n\r",id, size,NETWORK_DATA , type);
+
 			MsgSend( m_Epoll, it->second->id, GateWayInternalServerMsg, 0, msg );
 			break;
 		}
