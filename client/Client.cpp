@@ -39,7 +39,7 @@ Client *Client::getInstance()
 
 void Client::oninit()
 {
-	m_threadNum = 1;
+	m_threadNum = 1000;
 
 	for( int i = 0; i < m_threadNum; ++i )
 	{
@@ -151,7 +151,7 @@ void Client::clientWorker()
 	delay.tv_nsec = now.tv_usec * 1000;
 	pthread_cond_timedwait(&cond, &mutex, &delay);
 	printf("clientWorker start %ld \n\r",getCurrentTime());
-	for( int i = 0; i < 1000; ++i )
+	for( int i = 0; i < 100; ++i )
 	{
 #if 0		
 		char msg[128];
@@ -164,10 +164,13 @@ void Client::clientWorker()
 		m_Epoll.send( serverID, msg, len );
 #endif
 #if 1
+        char token[128] = {0};
+        memset(token, 0, sizeof(token));
+        sprintf(token,"Token Test %d", i);
 		platformprotocol::CVerifyToken verifyToken;
-		verifyToken.set_token("Token Test"); 
-		printf("CVerifyToken len %d\r\n",verifyToken.ByteSize());
-		ProtobufMsgSend(m_Epoll, serverID, 2000, 0, verifyToken);
+		verifyToken.set_token(token); 
+		//printf("CVerifyToken len %d\r\n",verifyToken.ByteSize());
+		ProtobufMsgSend(m_Epoll, serverID, platformprotocol::PLATFORM_VERIFY_TOKEN, 0, verifyToken);
 		
 #endif		
 #if 0

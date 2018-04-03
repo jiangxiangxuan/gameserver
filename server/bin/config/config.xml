@@ -8,10 +8,10 @@
 	<gateway>
 		<thread>8</thread>
 		<listen ip="127.0.0.1" port="8010"/>
-		<http ip="127.0.0.1" port="8011"/>
+		<http ip="0.0.0.0" port="8011"/>
 		<centercmd min="1000" max="2000"/>
 		<platformcmd min="2000" max="3000"/>
-		<gamecmd min="10000" max="-1"/>
+		<gamecmd min="100000" max="-1"/>
 	</gateway>
 	<platform>
 		<thread>8</thread>
@@ -19,7 +19,7 @@
 		<http ip="127.0.0.1" port="8021"/>
 		<redis ip="127.0.0.1" port="6379"/>
 	</platform>
-	<game>
+	<game appid="100">
 		<thread>8</thread>
 		<listen ip="127.0.0.1" port="8030"/>
 		<http ip="127.0.0.1" port="8031"/>

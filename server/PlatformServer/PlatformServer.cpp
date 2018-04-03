@@ -132,9 +132,9 @@ void PlatformServer::VerifyToken(int session, int clientid, char *data, int msgl
 	printf("platform VerifyToken token=%s\r\n",verifyToken.token().c_str());
 	
 	platformprotocol::CVerifyToken verifyToken111;
-	verifyToken111.set_token("Token Test 111111");
+	verifyToken111.set_token(verifyToken.token());
 	
-	ProtobufMsgSendToClientByGateWay(m_Epoll,session,clientid,2000,0,verifyToken111);
+	ProtobufMsgSendToClientByGateWay(m_Epoll,session,clientid, platformprotocol::PLATFORM_VERIFY_TOKEN,0,verifyToken111);
 		
 }
 
@@ -142,7 +142,7 @@ void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, in
 {
 	//TODO:处理客户端消息
     DealProtobufStart(data)
-    DealProtobufMsg(session, clientID, 2000, VerifyToken)
+    DealProtobufMsg(session, clientID, platformprotocol::PLATFORM_VERIFY_TOKEN, VerifyToken)
     DealProtobufEnd()
 }
 
