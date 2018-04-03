@@ -15,6 +15,7 @@
 #include "KernalHash.h"
 #include "KernalTimer.h"
 #include "KernalUtil.h"
+#include "KernalHttpRequest.h"
 
 enum KernalMessageType
 {

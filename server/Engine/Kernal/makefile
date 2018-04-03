@@ -15,7 +15,7 @@ PRO_EXTERNAL_INC=$(PRO_DIR)/../../External
 PRO_SRC=$(PRO_DIR)
 
 CFLAGS := -g -I$(PRO_SRC) -I$(PRO_DIR)/../../External -I$(PRO_DIR)/../../Engine -fPIC -shared  -std=c++11
-LIBS := -lpthread -L$(PRO_DIR)/../../Lib   #-lluajit
+LIBS := -lpthread -L$(PRO_DIR)/../../Lib -lcurl  #-lluajit
 
 DIRS := $(shell find $(PRO_SRC) -maxdepth 4 -type d)
 EXTERNAL_DIRS := $(shell find $(PRO_EXTERNAL_INC) -maxdepth 4 -type d)
