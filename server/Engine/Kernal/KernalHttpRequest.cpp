@@ -26,7 +26,7 @@ KernalHttpRequest::~KernalHttpRequest()
 bool KernalHttpRequest::init()
 {
     m_pCurl = curl_easy_init();
-    // 设置回掉函数
+    // 设置回调函数
     curl_easy_setopt( m_pCurl, CURLOPT_WRITEFUNCTION, http_data_writer );
     curl_easy_setopt( m_pCurl, CURLOPT_WRITEDATA, (void*)&m_httpData );
 }
