@@ -57,7 +57,7 @@ typedef double         float64;
 
 //处理protobuf消息
 #define DealProtobufStart(data){ int msgcmd = 0; NReadInt32(data, &msgcmd); int err = 0; NReadInt32(data, &err); int msglen = 0 ; NReadInt32(data, &msglen); switch(msgcmd) {
-#define DealProtobufMsg(session, clientid, cmd, func) case cmd:{func(session, clientid, data, msglen);break;}
+#define DealProtobufMsg(net, session, clientid, cmd, obj, func) case cmd:{(obj)->func(net, session, clientid, data, msglen);break;}
 #define DealProtobufEnd() }}
 
 //序列化protobuf消息

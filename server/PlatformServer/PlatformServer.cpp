@@ -124,25 +124,11 @@ void PlatformServer::onExit()
 	m_pIdbcRedis->close();
 }
 
-void PlatformServer::VerifyToken(int session, int clientid, char *data, int msglen)
-{
-    platformprotocol::CVerifyToken verifyToken;
-    ParseFromArrayToObj(verifyToken, data, msglen);
-	
-	printf("platform VerifyToken token=%s\r\n",verifyToken.token().c_str());
-	
-	platformprotocol::CVerifyToken verifyToken111;
-	verifyToken111.set_token(verifyToken.token());
-	
-	ProtobufMsgSendToClientByGateWay(m_Epoll,session,clientid, platformprotocol::PLATFORM_VERIFY_TOKEN,0,verifyToken111);
-		
-}
-
 void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, int datalen )
 {
 	//TODO:处理客户端消息
     DealProtobufStart(data)
-    DealProtobufMsg(session, clientID, platformprotocol::PLATFORM_VERIFY_TOKEN, VerifyToken)
+    DealProtobufMsg(&m_Epoll, session, clientID, platformprotocol::PLATFORM_VERIFY_TOKEN, (&m_PlatformLogin), VerifyToken)
     DealProtobufEnd()
 }
 

@@ -7,6 +7,7 @@
 #include "Idbc/redis/idbc_redis_noncluster.h"
 #include "Msg.h"
 #include "DBAgent.h"
+#include "PlatformLogin.h"
 
 class PlatformServer : public KernalServerBase
 {
@@ -49,8 +50,6 @@ public:
 	void handleTimerMsg( unsigned int id );
 
 	void registerCenterServerInfo();
-public:
-	void VerifyToken(int session, int clientid, char *data, int msglen);
 protected:
 	void connectCenterServer();
 private:
@@ -60,7 +59,8 @@ private:
 	DBAgent            m_DBAgent;
 	KernalThread       m_CenterThread;//连接中心服务器 线程
 	int                m_CenterServerID;
-
+private:
+    PlatformLogin      m_PlatformLogin;
 };
 
 #endif
