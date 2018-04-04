@@ -112,22 +112,29 @@ void Client::clientWorker()
 
 		serverID = connect(serverIP, serverPort);
 		
+		if( serverID <= 0 )
+		{
+			continue;
+		}
+		
+		struct KernalNetWork *pNet = m_Epoll.getNetWork(serverID);
+		
 		struct timeval tm = {2, 0};
 		fd_set wset, rset;
 		FD_ZERO( &wset );
 		FD_ZERO( &rset );
-		FD_SET( serverID, &wset );
-		FD_SET( serverID, &rset );
-		int res = select( serverID + 1, &rset, &wset, NULL, &tm );
-		if( res > 0 && FD_ISSET(serverID, &wset)  )
+		FD_SET( pNet->fd, &wset );
+		FD_SET( pNet->fd, &rset );
+		int res = select( pNet->fd + 1, &rset, &wset, NULL, &tm );
+		if( res > 0 && FD_ISSET(pNet->fd, &wset)  )
 		{
 				int error, code;
 				socklen_t len;
 				len = sizeof(error);
-				code = getsockopt(serverID, SOL_SOCKET, SO_ERROR, &error, &len);
+				code = getsockopt(pNet->fd, SOL_SOCKET, SO_ERROR, &error, &len);
 				if (code < 0 || error)
 				{
-					::close( serverID );
+					::close( pNet->fd );
 				}
 				else
 				{
