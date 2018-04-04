@@ -111,6 +111,7 @@ void Client::clientWorker()
 		pthread_cond_timedwait(&cond, &mutex, &delay);
 
 		serverID = connect(serverIP, serverPort);
+		printf("clientWorker connect %s %d %d\n\r", serverIP,serverPort,serverID);
 		
 		if( serverID <= 0 )
 		{
