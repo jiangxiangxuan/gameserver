@@ -47,7 +47,7 @@ bool KernalEpoll::create()
         return false;
     }
 
-    int id = m_ctrlfd[0]; //getSocketID();
+    int id =  getSocketID();//m_ctrlfd[0]; //getSocketID();
     struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
     pNetWork->init();
     pNetWork->type = KernalNetWorkType_CONNECTED;
@@ -75,7 +75,7 @@ int KernalEpoll::listen( const char *addr, const int port )
 	int ret = bind( fd, ( struct sockaddr * )&addrin, sizeof(addrin) );
 	ret = ::listen( fd, 5 );
 
-    int id = fd; //getSocketID();
+    int id =  getSocketID();//fd; //getSocketID();
     if( id > 0 )
     {
 #if 1
@@ -117,7 +117,7 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 	addrin.sin_port = htons( port );
 	inet_pton(AF_INET, addr, (void *)&addrin.sin_addr);
 	int ret = ::connect( fd, ( struct sockaddr * )&addrin, sizeof(addrin) );
-    int id = fd; //getSocketID();
+    int id =  getSocketID();//fd; //getSocketID();
 #if 0
     if( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) )
     {
@@ -182,7 +182,7 @@ int KernalEpoll::connectSocket( const char *addr, const int port )
 	addrin.sin_port = htons( port );
 	inet_pton(AF_INET, addr, (void *)&addrin.sin_addr);
 	int ret = ::connect( fd, ( struct sockaddr * )&addrin, sizeof(addrin) );
-    int id = fd; //getSocketID();
+    int id =  getSocketID();//fd; //getSocketID();
     if( !( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) ) )
     {
         ::close( fd );
@@ -218,12 +218,12 @@ int KernalEpoll::connectHttp( const char *addr, const int port )
 
 bool KernalEpoll::send( int id, void *data, int size )
 {
-    if( id < 0 || id >= MAX_NET_WORK_NUM )
+    if( id < 0 || id > MAX_NET_WORK_NUM )
     {
         return false;
     }
     struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
-    if( KernalNetWorkType_NO == pNetWork->type )
+    if( KernalNetWorkType_NO == pNetWork->type || pNetWork->id != id )
     {
         if( data )
         {
@@ -483,6 +483,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
             if( pNetWork->readBuffersLen - 12 >= size )
             {
                 struct KernalNetWork *pNet = &m_NetWorks[ HASH_ID( id ) ];
+				
                 if( type == socket_close )  // 关闭连接
                 {
                     if( KernalNetWorkType_NO != pNet->type )
@@ -514,7 +515,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                     setnonblocking( id );
                     epollAdd( id );
                 }
-                else  // 发送数据
+                else if( pNet->id == id )  // 发送数据
                 {
                     if( KernalNetWorkType_CONNECTED == pNet->type || KernalNetWorkType_CONNECTED_HTTP == pNet->type )
                     {
@@ -526,6 +527,12 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                         pNet->isWrite = true;
                     }
                 }
+				else if( pNet->id != id ) 
+				{
+					closeSocket( id );
+                    result.id = id;
+                    msgType = KernalSocketMessageType_SOCKET_CLOSE;
+				}
 
                 pNetWork->readBuffersLen -= size + 12;
                 memmove( pNetWork->readBuffers, pNetWork->readBuffers + size + 12, pNetWork->readBuffersLen );
@@ -606,7 +613,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 	    struct sockaddr_in addr;
 	    socklen_t addrLen = sizeof( addr );
         int fd = accept( pNetWork->fd, (struct sockaddr *)&addr, &addrLen );
-        int id = fd; //getSocketID();
+        int id = getSocketID();//fd; //getSocketID();
 
         if( id > 0 )
         {

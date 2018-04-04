@@ -21,8 +21,8 @@
 #define MAX_NET_WORK_NUM  65535 //最多接收连接数
 #define RECV_BUFFER_SIZE  1024  // 接收数据缓冲区大小
 
-//#define HASH_ID(id) (((unsigned)id) % MAX_NET_WORK_NUM)
-#define HASH_ID(id) (((unsigned)id))
+#define HASH_ID(id) (((unsigned)id) % MAX_NET_WORK_NUM)
+//#define HASH_ID(id) (((unsigned)id))
 
 const int socket_data    = 0;    // 发送数据
 const int socket_connect = 1;    // 建立连接
