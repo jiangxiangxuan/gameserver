@@ -839,7 +839,7 @@ void KernalEpoll::release()
     for( int i = 0; i < MAX_NET_WORK_NUM; ++i )
     {
         struct KernalNetWork *pNetWork = &m_NetWorks[ i ];
-        if( pNetWork->id != m_ctrlfd[0] && pNetWork->type != KernalNetWorkType_NO )
+        if( pNetWork->fd != m_ctrlfd[0] && pNetWork->type != KernalNetWorkType_NO )
         {
             closeSocket( pNetWork->id );
         }
@@ -926,7 +926,7 @@ void KernalEpoll::heartbeat()
     for( int i = 0; i < MAX_NET_WORK_NUM; ++i )
     {
         struct KernalNetWork *pNetWork = &m_NetWorks[ i ];
-        if( pNetWork->id != 0 && pNetWork->fd != 0 && pNetWork->id != m_ctrlfd[0] && pNetWork->type == KernalNetWorkType_CONNECTED )
+        if( pNetWork->id != 0 && pNetWork->fd != 0 && pNetWork->fd != m_ctrlfd[0] && pNetWork->type == KernalNetWorkType_CONNECTED )
         {
             int ret = ::send( pNetWork->fd, buff, 4, 0 );
             if( ret <= 0 )
