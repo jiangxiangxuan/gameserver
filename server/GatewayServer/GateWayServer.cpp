@@ -77,6 +77,7 @@ void GateWayServer::handleTimerMsg( unsigned int id )
 
 void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
 {
+	printf("GateWayServer::onMsg \r\n");
 	if( TIMER_DATA == type )
 	{
 		handleTimerMsg( id );
@@ -312,6 +313,7 @@ void GateWayServer::registerCenterServerInfo()
 
 void GateWayServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value )
 {
+	printf("GateWayServer::handleCenterNotifyServerInfo %d %d\r\n",value.state,SERVERSTATE_RUN);
 	if( SERVERSTATE_RUN == value.state )
 	{
 		connServer( value );
@@ -374,7 +376,7 @@ void GateWayServer::connServer( CenterNotifyServerInfo &value )
 	{
 		return;
 	}
-
+	printf("GateWayServer::connServer %s  %d\r\n",value.ip.c_str(), value.port)
 	int id = m_Epoll.connect( value.ip.c_str(), value.port );
 	if( id > 0 )
 	{
