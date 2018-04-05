@@ -206,7 +206,7 @@ void GameServer::registerCenterServerInfo()
 
 		if( m_CenterServerID > 0 && EINPROGRESS == errno )
 		{
-			struct KernalNetWork *pNet = m_Epoll.getNetWork(serverID);
+			struct KernalNetWork *pNet = m_Epoll.getNetWork(m_CenterServerID);
 		
 			struct timeval tm = {2, 0};
 			fd_set wset, rset;
