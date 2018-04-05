@@ -239,6 +239,11 @@ void PlatformServer::registerCenterServerInfo()
 			int res = select( pNet->fd + 1, &rset, &wset, NULL, &tm );
 			if( res > 0 && FD_ISSET(pNet->fd, &wset)  )
 			{
+				gettimeofday(&now, NULL);
+				delay.tv_sec = now.tv_sec + 5;
+				delay.tv_nsec = now.tv_usec * 1000;
+				pthread_cond_timedwait(&cond, &mutex, &delay);
+
 				int error, code;
 				socklen_t len;
 				len = sizeof(error);
