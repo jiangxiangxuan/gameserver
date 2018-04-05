@@ -215,10 +215,10 @@ void PlatformServer::registerCenterServerInfo()
 
 	do
 	{
-    gettimeofday(&now, NULL);
-    delay.tv_sec = now.tv_sec + 2;
-    delay.tv_nsec = now.tv_usec * 1000;
-    pthread_cond_timedwait(&cond, &mutex, &delay);
+		gettimeofday(&now, NULL);
+		delay.tv_sec = now.tv_sec + 2;
+		delay.tv_nsec = now.tv_usec * 1000;
+		pthread_cond_timedwait(&cond, &mutex, &delay);
 
 		m_CenterServerID = connect(serverIP, serverPort, false);
         //m_CenterServerID = m_Epoll.connectSocket( serverIP, serverPort );
@@ -228,23 +228,25 @@ void PlatformServer::registerCenterServerInfo()
 
 		if( m_CenterServerID > 0 && EINPROGRESS == errno )
 		{
+			struct KernalNetWork *pNet = m_Epoll.getNetWork(serverID);
+		
 			struct timeval tm = {2, 0};
 			fd_set wset, rset;
 			FD_ZERO( &wset );
 			FD_ZERO( &rset );
-			FD_SET( m_CenterServerID, &wset );
-			FD_SET( m_CenterServerID, &rset );
-			int res = select( m_CenterServerID + 1, &rset, &wset, NULL, &tm );
-			if( res > 0 && FD_ISSET(m_CenterServerID, &wset)  )
+			FD_SET( pNet->fd, &wset );
+			FD_SET( pNet->fd, &rset );
+			int res = select( pNet->fd + 1, &rset, &wset, NULL, &tm );
+			if( res > 0 && FD_ISSET(pNet->fd, &wset)  )
 			{
 				int error, code;
 				socklen_t len;
 				len = sizeof(error);
-				code = getsockopt(m_CenterServerID, SOL_SOCKET, SO_ERROR, &error, &len);
+				code = getsockopt(pNet->fd, SOL_SOCKET, SO_ERROR, &error, &len);
 				if (code < 0 || error)
 				{
-					//m_Epoll.close( m_CenterServerID );
-                    ::close( m_CenterServerID );
+					m_Epoll.close( m_CenterServerID );
+                    //::close( m_CenterServerID );
 				}
 				else
 				{
@@ -254,8 +256,8 @@ void PlatformServer::registerCenterServerInfo()
 		}
 		else if( m_CenterServerID > 0 )
 		{
-			//m_Epoll.close( m_CenterServerID );
-            ::close( m_CenterServerID );
+			m_Epoll.close( m_CenterServerID );
+            //::close( m_CenterServerID );
 		}
 	}
 	while( true );
