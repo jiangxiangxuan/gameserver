@@ -16,10 +16,10 @@ pkill -9 gateway
 kill -s 9 `ps -aux | grep gateway | awk '{print $2}'`
 setsid ./gateway &
 
-cd $curdir/platform
-pkill -9 platformserver
-kill -s 9 `ps -aux | grep platformserver | awk '{print $2}'`
-setsid ./platformserver &
+cd $curdir/login
+pkill -9 loginserver
+kill -s 9 `ps -aux | grep loginserver | awk '{print $2}'`
+setsid ./loginserver &
 
 cd $curdir/game
 pkill -9 gameserver
