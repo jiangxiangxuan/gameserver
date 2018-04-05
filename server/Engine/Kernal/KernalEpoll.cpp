@@ -256,7 +256,7 @@ bool KernalEpoll::send( int id, void *data, int size )
 	NWriteBit(dataBuf,data,size);
     ret = sendMsg( pNetWork->fd, buffer, dataBuf - buffer );
     free( buffer );
-	printf("KernalEpoll::send 222 %d  %d  %d\r\n",id,ret,dataBuf - buffer);
+	printf("KernalEpoll::send 222 %d %d  %d  %d\r\n",id,pNetWork->fd,ret,dataBuf - buffer);
 
     if( KernalNetWorkType_CONNECTED_HTTP == pNetWork->type )
     {
