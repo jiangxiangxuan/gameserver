@@ -261,11 +261,13 @@ bool KernalEpoll::send( int id, void *data, int size )
     if( KernalNetWorkType_CONNECTED_HTTP == pNetWork->type )
     {
         closeSocket( pNetWork->id );
+		printf("KernalEpoll::send 333");
     }
 
     if( KernalNetWorkType_CONNECTED_HTTP != pNetWork->type && ret <= 0 )
     {
         close( pNetWork->id );
+		printf("KernalEpoll::send 444");
     }
 
 	//m_locker.unlock();
