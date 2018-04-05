@@ -163,6 +163,7 @@ void KernalServerBase::epollWroker()
 		{
 			case KernalSocketMessageType_SOCKET_DATA: // 如果接收到数据则加入到队列中
 			{
+				printf("KernalServerBase::epollWroker  %d  %d\n\r",result.size, result.id);
 				pushMsg( NETWORK_DATA, result.data, result.size, result.id );
 				m_MessageCond.broadcast();
 				break;
