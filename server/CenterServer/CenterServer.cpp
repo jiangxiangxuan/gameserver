@@ -65,7 +65,6 @@ void CenterServer::onMsg( unsigned int id, KernalMessageType type, const char *d
 		struct KernalNetWork *pNetWork = m_Epoll.getNetWork( id );
 		if( KernalNetWorkType_CONNECTED == pNetWork->type )
 		{
-			printf("CenterServer::onMsg  %d\n\r",id);
 			char *buff = (char*)data;
 			DealStart(buff);
 			DealMsg(id, CenterRegisterServerInfo, buff);
