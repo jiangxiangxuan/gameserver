@@ -39,7 +39,7 @@ Client *Client::getInstance()
 
 void Client::oninit()
 {
-	m_threadNum = 100;
+	m_threadNum = 50;
 
 	for( int i = 0; i < m_threadNum; ++i )
 	{
