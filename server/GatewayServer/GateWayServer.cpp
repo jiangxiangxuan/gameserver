@@ -304,6 +304,7 @@ void GateWayServer::registerCenterServerInfo()
 
 	printf("GateWayServer::registerCenterServerInfo 111 %d\r\n",m_CenterServerID);
 	MsgSend( m_Epoll, m_CenterServerID, CenterRegisterServerInfo, 0, msg );
+	printf("GateWayServer::registerCenterServerInfo 222 %d\r\n",m_CenterServerID);
 
 	pthread_mutex_unlock(&mutex);
     pthread_mutex_destroy( &mutex );
