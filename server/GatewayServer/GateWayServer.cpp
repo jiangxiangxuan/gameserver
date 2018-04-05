@@ -99,15 +99,15 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 		{
 			int cmd = 0;
 			memcpy( &cmd, data, 4 );
-			if( /*KernalNetWorkType_CONNECTED == pNetWork->type &&*/ cmd >= m_CenterMinCmd && cmd < m_CenterMaxCmd )
+			if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_CenterMinCmd && cmd < m_CenterMaxCmd )
 			{
 				sendMsgToCenter( id, type, data, size );
 			}
-			else if( /*KernalNetWorkType_CONNECTED == pNetWork->type &&*/ cmd >= m_PlatformMinCmd && cmd < m_PlatformMaxCmd )
+			else if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_PlatformMinCmd && cmd < m_PlatformMaxCmd )
 			{
 				sendMsgToPlatform( id, type, data, size );
 			}
-			else if( /*KernalNetWorkType_CONNECTED == pNetWork->type &&*/ cmd >= m_GameMinCmd )
+			else if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_GameMinCmd )
 			{
 				sendMsgToGame( id, type, data, size );
 			}

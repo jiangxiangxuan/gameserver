@@ -62,8 +62,8 @@ void CenterServer::onMsg( unsigned int id, KernalMessageType type, const char *d
 	else if( NETWORK_DATA == type )
 	{
 		// 中心服务器无网关 直接和客户端通信
-		//struct KernalNetWork *pNetWork = m_Epoll.getNetWork( id );
-		//if( KernalNetWorkType_CONNECTED == pNetWork->type )
+		struct KernalNetWork *pNetWork = m_Epoll.getNetWork( id );
+		if( KernalNetWorkType_CONNECTED == pNetWork->type )
 		{
 			printf("CenterServer::onMsg  %d\n\r",id);
 			char *buff = (char*)data;
