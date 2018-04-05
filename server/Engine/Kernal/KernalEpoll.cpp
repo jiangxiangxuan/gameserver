@@ -414,7 +414,9 @@ int KernalEpoll::sendMsg( int fd, const void *data, int size, bool useWrite )
 
 KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 {
+	printf("KernalEpoll::handleMessage 000\r\n");
 	m_locker.lock();
+	printf("KernalEpoll::handleMessage 111\r\n");
 
     result.init();
     if( m_eventNum == m_eventIndex )
