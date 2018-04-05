@@ -507,12 +507,12 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 		printf("KernalEpoll::handleMessage 111 %d %d %d\r\n",pNetWork->fd,m_ctrlfd[0],pNetWork->readBuffersLen);
         if( pNetWork->readBuffersLen >= 16 )
         {
+			int fd = *( (int*)(pNetWork->readBuffers + 12) );
             int size = *( (int*)(pNetWork->readBuffers + 8) );
             int type = *( (int*)(pNetWork->readBuffers + 4) );
             int id = *( (int*)(pNetWork->readBuffers) );
-			int fd = *( (int*)(pNetWork->readBuffers + 12) );
 			
-			printf("KernalEpoll::handleMessage 222 %d %d %d %d %d\r\n",size,type,id,fd,socket_connect);
+			printf("KernalEpoll::handleMessage 222 %d %d %d %d %d\r\n",id,size,fd,type,socket_connect);
 
             if( pNetWork->readBuffersLen - 16 >= size )
             {
@@ -555,7 +555,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                     {
                         void *buffer = malloc( size );
                         memset( buffer, 0, size );
-                        memcpy( buffer, pNetWork->readBuffers + 12, size );
+                        memcpy( buffer, pNetWork->readBuffers + 16, size );
                         pNet->buffers.appendBuffer( buffer, size );
                         epollMod( pNet->fd, EPOLLOUT, pNet );
                         pNet->isWrite = true;
@@ -568,8 +568,8 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                     msgType = KernalSocketMessageType_SOCKET_CLOSE;
 				}
 
-                pNetWork->readBuffersLen -= size + 12;
-                memmove( pNetWork->readBuffers, pNetWork->readBuffers + size + 12, pNetWork->readBuffersLen );
+                pNetWork->readBuffersLen -= size + 16;
+                memmove( pNetWork->readBuffers, pNetWork->readBuffers + size + 16, pNetWork->readBuffersLen );
             }
         }
 #if 0
@@ -622,7 +622,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 #endif
 
 #if 1
-        if( pNetWork->readBuffersLen < 12 )
+        if( pNetWork->readBuffersLen < 16 )
         {
             pNetWork->isRead = false;
         }
