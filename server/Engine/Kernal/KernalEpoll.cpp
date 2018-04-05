@@ -108,7 +108,7 @@ int KernalEpoll::listen( const char *addr, const int port )
 
 int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 {
-	m_locker.lock();
+	//m_locker.lock();
 	int fd = socket( AF_INET, SOCK_STREAM, 0 );
 
 	setnonblocking( fd );
@@ -119,7 +119,7 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 	inet_pton(AF_INET, addr, (void *)&addrin.sin_addr);
 	int ret = ::connect( fd, ( struct sockaddr * )&addrin, sizeof(addrin) );
     int id =  getSocketID();//fd; //getSocketID();
-#if 1
+#if 0
     if( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) )
     {
 #if 1
@@ -149,7 +149,7 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 
         id = -1;
     }
-	m_locker.unlock();
+	//m_locker.unlock();
     return id;
 #endif
 	if( !( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) ) )
@@ -170,7 +170,7 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 	    sendMsg( m_ctrlfd[1], dataBuf, size + 12, true );
 	}
 
-	m_locker.unlock();
+	//m_locker.unlock();
     return id;
 }
 
@@ -223,11 +223,11 @@ int KernalEpoll::connectHttp( const char *addr, const int port )
 bool KernalEpoll::send( int id, void *data, int size )
 {
 	printf("KernalEpoll::send 000 %d  %d\r\n",id,size);
-	m_locker.lock();
+	//m_locker.lock();
     if( id < 0 || id > MAX_NET_WORK_NUM )
     {
 		printf("KernalEpoll::send 000-111 %d  %d\r\n",id,size);
-		m_locker.unlock();
+		//m_locker.unlock();
         return false;
     }
 	printf("KernalEpoll::send 111 %d  %d\r\n",id,size);
@@ -239,7 +239,7 @@ bool KernalEpoll::send( int id, void *data, int size )
             //free( data );
             //data = NULL;
         }
-		m_locker.unlock();
+		//m_locker.unlock();
         return false;
     }
 
@@ -266,7 +266,7 @@ bool KernalEpoll::send( int id, void *data, int size )
         close( pNetWork->id );
     }
 
-	m_locker.unlock();
+	//m_locker.unlock();
     return ( ret > 0 );
 }
 
