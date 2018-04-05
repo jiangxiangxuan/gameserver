@@ -222,12 +222,14 @@ int KernalEpoll::connectHttp( const char *addr, const int port )
 
 bool KernalEpoll::send( int id, void *data, int size )
 {
+	printf("KernalEpoll::send 000 %d  %d\r\n",id,size);
 	m_locker.lock();
     if( id < 0 || id > MAX_NET_WORK_NUM )
     {
 		m_locker.unlock();
         return false;
     }
+	printf("KernalEpoll::send 111 %d  %d\r\n",id,size);
     struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
     if( KernalNetWorkType_NO == pNetWork->type || pNetWork->id != id )
     {
@@ -240,6 +242,7 @@ bool KernalEpoll::send( int id, void *data, int size )
         return false;
     }
 
+	printf("KernalEpoll::send 222 %d  %d  %d\r\n",id,size,pNetWork->fd);
     char *buffer = (char*)malloc( size + 4 );
     memset( buffer, 0, size + 4 );
     char *dataBuf = buffer;
