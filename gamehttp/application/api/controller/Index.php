@@ -1,6 +1,8 @@
 <?php
 namespace app\api\controller;
 
+use app\api\model;
+
 class Index extends Base
 {
     public function index()
@@ -11,6 +13,8 @@ class Index extends Base
 	// 登录
     public function login($username,$userpasswd)
     {
+		$user = new GameUser();
+		$userinfo = $user->getUserInfoByUserName($username);
         return '{"state":0,"token":""}';
     }
 	
