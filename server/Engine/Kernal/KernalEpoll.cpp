@@ -108,6 +108,7 @@ int KernalEpoll::listen( const char *addr, const int port )
 
 int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 {
+	m_locker.lock();
 	int fd = socket( AF_INET, SOCK_STREAM, 0 );
 
 	setnonblocking( fd );
@@ -148,6 +149,7 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 
         id = -1;
     }
+	m_locker.unlock();
     return id;
 #endif
 	if( !( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) ) )
@@ -168,6 +170,7 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 	    sendMsg( m_ctrlfd[1], dataBuf, size + 12, true );
 	}
 
+	m_locker.unlock();
     return id;
 }
 
@@ -219,8 +222,10 @@ int KernalEpoll::connectHttp( const char *addr, const int port )
 
 bool KernalEpoll::send( int id, void *data, int size )
 {
+	m_locker.lock();
     if( id < 0 || id > MAX_NET_WORK_NUM )
     {
+		m_locker.unlock();
         return false;
     }
     struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
@@ -231,6 +236,7 @@ bool KernalEpoll::send( int id, void *data, int size )
             //free( data );
             //data = NULL;
         }
+		m_locker.unlock();
         return false;
     }
 
@@ -256,6 +262,7 @@ bool KernalEpoll::send( int id, void *data, int size )
         close( pNetWork->id );
     }
 
+	m_locker.unlock();
     return ( ret > 0 );
 }
 
@@ -407,6 +414,8 @@ int KernalEpoll::sendMsg( int fd, const void *data, int size, bool useWrite )
 
 KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 {
+	m_locker.lock();
+
     result.init();
     if( m_eventNum == m_eventIndex )
     {
@@ -415,6 +424,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 		if( m_eventNum <= 0)
     	{
 		    m_eventNum = 0;
+			m_locker.unlock();
 		    return KernalSocketMessageType_NO;
 		}
 
@@ -442,6 +452,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
     struct KernalNetWork *pNetWork = ( struct KernalNetWork * )(pEvent->data.ptr);
     if( !pNetWork )
     {
+		m_locker.unlock();
         return KernalSocketMessageType_NO;
     }
 
@@ -449,6 +460,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
     {
         epollDel( pNetWork->id );
         ::close( pNetWork->fd );
+		m_locker.unlock();
         return KernalSocketMessageType_NO;
     }
 
@@ -606,6 +618,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         {
             --m_eventIndex;
         }
+		m_locker.unlock();
         return msgType;
     }
 
@@ -640,11 +653,13 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         {
             ::close( fd );
         }
+		m_locker.unlock();
         return KernalSocketMessageType_NO;
     }
     else if( KernalNetWorkType_NO == pNetWork->type )
     {
         closeSocket( pNetWork->id );
+		m_locker.unlock();
         return KernalSocketMessageType_NO;
     }
     KernalSocketMessageType msgType = KernalSocketMessageType_NO;
@@ -746,6 +761,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         {
             --m_eventIndex;
         }
+		m_locker.unlock();
         return msgType;
     }
 
@@ -792,9 +808,11 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         {
             --m_eventIndex;
         }
+		m_locker.unlock();
         return msgType;
     }
 
+	m_locker.unlock();
     return msgType;
 }
 

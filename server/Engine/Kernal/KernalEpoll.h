@@ -13,7 +13,9 @@
 #include <malloc.h>
 #include <string.h>
 #include <string>
-#include "Kernal/KernalNetWorkMsgDef.h"
+
+#include "KernalNetWorkMsgDef.h"
+#include "KernalLock.h"
 
 #define HTTP_BUFFER_SIZE  1024  // http 请求数据大小
 
@@ -228,6 +230,7 @@ private:
     struct epoll_event   m_events[ MAX_EVENTS ];
     int                  m_eventNum;
     int                  m_eventIndex;
+	KernalMutexLocker    m_locker;
 
     int                  m_SocketID; //当前socket id
 
