@@ -99,16 +99,15 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 		{
 			int cmd = 0;
 			memcpy( &cmd, data, 4 );
-			printf("GateWayServer::onMsg  %d \n\r",cmd);
-			if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_CenterMinCmd && cmd < m_CenterMaxCmd )
+			if( /*KernalNetWorkType_CONNECTED == pNetWork->type &&*/ cmd >= m_CenterMinCmd && cmd < m_CenterMaxCmd )
 			{
 				sendMsgToCenter( id, type, data, size );
 			}
-			else if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_PlatformMinCmd && cmd < m_PlatformMaxCmd )
+			else if( /*KernalNetWorkType_CONNECTED == pNetWork->type &&*/ cmd >= m_PlatformMinCmd && cmd < m_PlatformMaxCmd )
 			{
 				sendMsgToPlatform( id, type, data, size );
 			}
-			else if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_GameMinCmd )
+			else if( /*KernalNetWorkType_CONNECTED == pNetWork->type &&*/ cmd >= m_GameMinCmd )
 			{
 				sendMsgToGame( id, type, data, size );
 			}
@@ -160,6 +159,7 @@ void GateWayServer::sendMsgToCenter( unsigned int id, KernalMessageType type, co
 
 void GateWayServer::sendMsgToPlatform( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
 {
+	printf("GateWayServer::sendMsgToPlatform  %d %d %d\n\r",id,type,size);
 	GateWayInternalServerMsg msg;
 	msg.clientID = id;
 	msg.initData( (char*)data, size );
@@ -169,6 +169,7 @@ void GateWayServer::sendMsgToPlatform( unsigned int id, KernalMessageType type, 
 	{
 		if( it->second )
 		{
+			printf("GateWayServer::sendMsgToPlatform 111  %d %d %d %d\n\r",id,type,size,it->second->id );
 			MsgSend( m_Epoll, it->second->id, GateWayInternalServerMsg, 0, msg );
 			break;
 		}
