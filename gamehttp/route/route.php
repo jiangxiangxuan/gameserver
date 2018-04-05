@@ -15,6 +15,12 @@ Route::get('think', function () {
 
 Route::get('hello/:name', 'index/hello');
 
+// 别名路由
+Route::alias('platform','api/platform');
+
+//全局MISS路由
+Route::miss('api/Index/index');
+
 return [
 
 ];

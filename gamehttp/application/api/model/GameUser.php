@@ -10,6 +10,6 @@ class GameUser extends Model
 	
 	public function getUserInfoByUserName($username)
 	{
-		Db::query('select * from gameuser where username="'..$username.'"');
+		return Db::query('select * from gameuser where username="'.$username.'" limit 1;');
 	}
 }

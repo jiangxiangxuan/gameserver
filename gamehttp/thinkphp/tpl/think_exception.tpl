@@ -75,6 +75,7 @@
         }
     }
 ?>
+<?php if(\think\facade\App::isDebug()) { ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -286,6 +287,7 @@
     <div class="echo">
         <?php echo $echo;?>
     </div>
+<?php }?>
     <?php if(\think\facade\App::isDebug()) { ?>
     <div class="exception">
     <div class="message">
@@ -332,11 +334,7 @@
         </div>
     </div>
     <?php } else { ?>
-    <div class="exception">
-        
-            <div class="info"><h1><?php echo htmlentities($message); ?></h1></div>
-        
-    </div>
+    <?php echo ($message); ?>
     <?php } ?>
     
     <?php if(!empty($datas)){ ?>
@@ -409,11 +407,6 @@
     </div>
     <?php } ?>
 
-    <div class="copyright">
-        <a title="官方网站" href="http://www.thinkphp.cn">ThinkPHP</a> 
-        <span>V<?php echo \think\facade\App::version(); ?></span> 
-        <span>{ 十年磨一剑-为API开发设计的高性能框架 }</span>
-    </div>
     <?php if(\think\facade\App::isDebug()) { ?>
     <script>
         var LINE = <?php echo $line; ?>;
@@ -503,5 +496,9 @@
         })();
     </script>
     <?php } ?>
-</body>
+
+	
+<?php if(\think\facade\App::isDebug()) { ?>
+	</body>
 </html>
+<?php } ?>
