@@ -240,7 +240,7 @@ void GateWayServer::registerCenterServerInfo()
 
 		m_CenterServerID = connect(serverIP, serverPort, false);
 		//m_CenterServerID = m_Epoll.connectSocket( serverIP, serverPort );
-		printf("GateWayServer::registerCenterServerInfo %d\r\n",m_CenterServerID);
+		printf("GateWayServer::registerCenterServerInfo %d  %d  %d\r\n",m_CenterServerID,errno,EINPROGRESS);
 		//for( int i = 0; i < 200000000; ++i );
 		//pthread_delay_n( &delay );
 		if( m_CenterServerID > 0 && EINPROGRESS == errno )
