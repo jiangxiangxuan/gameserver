@@ -226,6 +226,7 @@ bool KernalEpoll::send( int id, void *data, int size )
 	m_locker.lock();
     if( id < 0 || id > MAX_NET_WORK_NUM )
     {
+		printf("KernalEpoll::send 000-111 %d  %d\r\n",id,size);
 		m_locker.unlock();
         return false;
     }
