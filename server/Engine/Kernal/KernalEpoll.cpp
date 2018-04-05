@@ -232,7 +232,7 @@ bool KernalEpoll::send( int id, void *data, int size )
         return false;
     }
     struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
-    /*if( KernalNetWorkType_NO == pNetWork->type || pNetWork->id != id )
+    if( KernalNetWorkType_NO == pNetWork->type || pNetWork->id != id )
     {
         if( data )
         {
@@ -241,7 +241,7 @@ bool KernalEpoll::send( int id, void *data, int size )
         }
 		//m_locker.unlock();
         return false;
-    }*/
+    }
 
     char *buffer = (char*)malloc( size + 4 );
     memset( buffer, 0, size + 4 );
