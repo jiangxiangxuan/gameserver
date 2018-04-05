@@ -176,7 +176,7 @@ void CenterServer::handleRegisterServerInfo(int session, CenterRegisterServerInf
 	}
 	if( isFind )
 	{
-		return;
+		//return;
 	}
 	printf("CenterServer::handleRegisterServerInfo  111 \r\n");
 
@@ -185,9 +185,11 @@ void CenterServer::handleRegisterServerInfo(int session, CenterRegisterServerInf
 	pServer->id   = session;
 	memcpy( pServer->ip, value.ip.c_str(), value.ip.length() );
 	pServer->port = value.port;
-
-	m_Servers.insert( std::pair<ServerType, ServerInfo*>( value.type, pServer) );
-
+	if( !isFind )
+	{
+		m_Servers.insert( std::pair<ServerType, ServerInfo*>( value.type, pServer) );
+	}
+	
 	// 通知相关服务器变化信息
 	//notifyServerInfo( SERVER_GATEWAY, pServer->ip, pServer->port, value.type, SERVERSTATE_RUN );
 
