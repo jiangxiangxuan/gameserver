@@ -264,7 +264,7 @@ void GateWayServer::registerCenterServerInfo()
 				socklen_t len;
 				len = sizeof(error);
 				code = getsockopt(pNet->fd, SOL_SOCKET, SO_ERROR, &error, &len);
-				printf("GateWayServer::registerCenterServerInfo 000-111 %d  %d \r\n",code,error);
+				printf("GateWayServer::registerCenterServerInfo 000-111 %d  %d   %d \r\n",code,error,errno);
 				if (code < 0 || error)
 				{
 					m_Epoll.close( m_CenterServerID );
