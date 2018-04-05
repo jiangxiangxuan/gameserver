@@ -39,7 +39,7 @@ Client *Client::getInstance()
 
 void Client::oninit()
 {
-	m_threadNum = 1;
+	m_threadNum = 100;
 
 	for( int i = 0; i < m_threadNum; ++i )
 	{
@@ -164,7 +164,7 @@ void Client::clientWorker()
 	delay.tv_nsec = now.tv_usec * 1000;
 	pthread_cond_timedwait(&cond, &mutex, &delay);
 	printf("clientWorker start %ld \n\r",getCurrentTime());
-	for( int i = 0; i < 1; ++i )
+	for( int i = 0; i < 100; ++i )
 	{
 #if 0		
 		char msg[128];
