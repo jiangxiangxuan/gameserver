@@ -140,7 +140,7 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
         NWriteInt32(dataBuf, &socket_connect);
         NWriteInt32(dataBuf, &size);
         dataBuf = _buf;
-        sendMsg( m_ctrlfd[1], dataBuf, size + 12, true );
+        sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
 #endif
 
     }
@@ -474,7 +474,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
     if(  pNetWork->fd == m_ctrlfd[0] && pNetWork->isRead )
     {
         KernalSocketMessageType msgType = KernalSocketMessageType_NO;
-        if( pNetWork->readBuffersLen < 12 )
+        if( pNetWork->readBuffersLen < 16 )
         {
             int ret = readMsg( pNetWork->fd, pNetWork->readBuffers + pNetWork->readBuffersLen, RECV_BUFFER_SIZE - pNetWork->readBuffersLen, true, true );
             if( ret > 0 )
@@ -485,7 +485,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         else
         {
             int size = *( (int*)(pNetWork->readBuffers + 8) );
-            if( size > pNetWork->readBuffersLen - 12 )
+            if( size > pNetWork->readBuffersLen - 16 )
             {
                 int ret = readMsg( pNetWork->fd, pNetWork->readBuffers + pNetWork->readBuffersLen, RECV_BUFFER_SIZE - pNetWork->readBuffersLen, true, true );
                 if( ret > 0 )
@@ -496,15 +496,16 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         }
 
 		printf("KernalEpoll::handleMessage 111 %d %d %d\r\n",pNetWork->fd,m_ctrlfd[0],pNetWork->readBuffersLen);
-        if( pNetWork->readBuffersLen >= 12 )
+        if( pNetWork->readBuffersLen >= 16 )
         {
             int size = *( (int*)(pNetWork->readBuffers + 8) );
             int type = *( (int*)(pNetWork->readBuffers + 4) );
             int id = *( (int*)(pNetWork->readBuffers) );
+			int fd = *( (int*)(pNetWork->readBuffers + 12) );
 			
-			printf("KernalEpoll::handleMessage 222 %d %d %d %d\r\n",size,type,id,socket_connect);
+			printf("KernalEpoll::handleMessage 222 %d %d %d %d %d\r\n",size,type,id,fd,socket_connect);
 
-            if( pNetWork->readBuffersLen - 12 >= size )
+            if( pNetWork->readBuffersLen - 16 >= size )
             {
                 struct KernalNetWork *pNet = &m_NetWorks[ HASH_ID( id ) ];
 				
@@ -517,10 +518,8 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                         msgType = KernalSocketMessageType_SOCKET_CLOSE;
                     }
                 }
-                else if( type == socket_connect && pNetWork->readBuffersLen >= 16 )
+                else if( type == socket_connect )
                 {
-					int fd = *( (int*)(pNetWork->readBuffers + 12) );
-					printf("KernalEpoll::handleMessage 333 %d %d %d %d\r\n",size,type,id,fd);
 					struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
                     pNetWork->init();
 
@@ -531,9 +530,8 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                     setnonblocking( fd );
                     epollAdd( id );
                 }
-                else if( type == socket_listen && pNetWork->readBuffersLen >= 16 )
+                else if( type == socket_listen )
                 {
-					int fd = *( (int*)(pNetWork->readBuffers + 12) );
                     struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
                     pNetWork->type = KernalNetWorkType_LISTEN;
                     pNetWork->fd   = fd;
@@ -908,13 +906,15 @@ void KernalEpoll::close( int id )
         return;
     }
     int size = 0;
-    char _buf[12] = {0};
+    char _buf[16] = {0};
     char* dataBuf = _buf;
+	int fd = 0;
     NWriteInt32(dataBuf, &id);
     NWriteInt32(dataBuf, &socket_close);
     NWriteInt32(dataBuf, &size);
+    NWriteInt32(dataBuf, &fd);
     dataBuf = _buf;
-    sendMsg( m_ctrlfd[1], dataBuf, size + 12, true );
+    sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
 }
 
 int KernalEpoll::getSocketID()
