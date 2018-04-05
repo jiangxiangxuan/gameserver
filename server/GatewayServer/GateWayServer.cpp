@@ -301,6 +301,7 @@ void GateWayServer::registerCenterServerInfo()
 	msg.ip   = ip;
 	msg.port = port;
 
+	printf("GateWayServer::registerCenterServerInfo 111 %d\r\n",m_CenterServerID);
 	MsgSend( m_Epoll, m_CenterServerID, CenterRegisterServerInfo, 0, msg );
 
 	pthread_mutex_unlock(&mutex);
