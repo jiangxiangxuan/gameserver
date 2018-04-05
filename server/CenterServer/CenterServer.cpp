@@ -54,6 +54,7 @@ void CenterServer::handleTimerMsg( unsigned int id )
 
 void CenterServer::onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
 {
+	printf("CenterServer::onMsg  %d %d %d\n\r",id,type,NETWORK_DATA);
 	m_Locker.lock();
 	if( TIMER_DATA == type )
 	{
