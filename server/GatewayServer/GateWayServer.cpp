@@ -280,17 +280,17 @@ void GateWayServer::registerCenterServerInfo()
 	}
 	while( true );
 
-	int size = 0;
+	/*int size = 0;
 	char _buf[BUFF_SIZE] = {0};
 	char* dataBuf = _buf;
 	NWriteInt32(dataBuf, &m_CenterServerID);
 	NWriteInt32(dataBuf, &socket_connect);
 	NWriteInt32(dataBuf, &size);
 	dataBuf = _buf;
-	m_Epoll.sendToPipe( dataBuf, size + 12 );
+	m_Epoll.sendToPipe( dataBuf, size + 12 );*/
 
 	gettimeofday(&now, NULL);
-	delay.tv_sec = now.tv_sec + 2;
+	delay.tv_sec = now.tv_sec + 5;
 	delay.tv_nsec = now.tv_usec * 1000;
 	pthread_cond_timedwait(&cond, &mutex, &delay);
 
