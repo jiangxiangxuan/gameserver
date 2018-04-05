@@ -171,6 +171,8 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
         NWriteInt32(dataBuf, &fd);
 	    dataBuf = _buf;
 	    sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
+		
+		printf("KernalEpoll::connect   %d  %d  %d  %d \r\n",id,size,fd,socket_connect);
 	}
 
 	//m_locker.unlock();
