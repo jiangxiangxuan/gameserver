@@ -17,7 +17,7 @@ then
     make
     cd $projectDir/GatewayServer
     make
-    cd $projectDir/PlatformServer
+    cd $projectDir/LoginServer
     make
 	echo "build end ..."	
 elif [[ "$1" = "clean" ]]
@@ -37,7 +37,7 @@ then
     make clean
     cd $projectDir/GatewayServer
     make clean
-    cd $projectDir/PlatformServer
+    cd $projectDir/LoginServer
     make clean
     echo "clean end ..."
 else

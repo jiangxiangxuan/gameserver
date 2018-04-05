@@ -53,8 +53,8 @@ void GameServer::oninit()
 	m_pIdbcRedis = new IdbcRedisNonCluster();
 	m_pIdbcRedis->loadLib();
 
-	const char *redisip    = getConfig()->getAttributeStr("config/game/redis", "ip");
-	int         redisport  = getConfig()->getAttributeInt("config/game/redis", "port");
+	const char *redisip    = getConfig()->getAttributeStr("config/common/redis", "ip");
+	int         redisport  = getConfig()->getAttributeInt("config/common/redis", "port");
 	m_pIdbcRedis->connect( redisip, redisport );
 
 	connectCenterServer();

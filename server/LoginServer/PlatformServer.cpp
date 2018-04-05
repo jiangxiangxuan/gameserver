@@ -40,21 +40,21 @@ PlatformServer *PlatformServer::getInstance()
 
 void PlatformServer::oninit()
 {
-	m_threadNum = atoi(getConfig()->getText("config/platform/thread"));
+	m_threadNum = atoi(getConfig()->getText("config/login/thread"));
 
-	const char *ip    = getConfig()->getAttributeStr("config/platform/listen", "ip");
-	int         port  = getConfig()->getAttributeInt("config/platform/listen", "port");
+	const char *ip    = getConfig()->getAttributeStr("config/login/listen", "ip");
+	int         port  = getConfig()->getAttributeInt("config/login/listen", "port");
 	listen(ip, port);
 
-	const char *httpIP   = getConfig()->getAttributeStr("config/platform/http", "ip");
-	int         httpPort = getConfig()->getAttributeInt("config/platform/http", "port");
+	const char *httpIP   = getConfig()->getAttributeStr("config/login/http", "ip");
+	int         httpPort = getConfig()->getAttributeInt("config/login/http", "port");
 	listenHttp(httpIP, httpPort);
 
 	m_pIdbcRedis = new IdbcRedisNonCluster();
 	m_pIdbcRedis->loadLib();
 
-	const char *redisip    = getConfig()->getAttributeStr("config/platform/redis", "ip");
-	int         redisport  = getConfig()->getAttributeInt("config/platform/redis", "port");
+	const char *redisip    = getConfig()->getAttributeStr("config/common/redis", "ip");
+	int         redisport  = getConfig()->getAttributeInt("config/common/redis", "port");
 	m_pIdbcRedis->connect( redisip, redisport );
 
 	const char *dbaip    = getConfig()->getAttributeStr("config/dba/listen", "ip");
@@ -198,8 +198,8 @@ void PlatformServer::connectCenterServer()
 
 void PlatformServer::registerCenterServerInfo()
 {
-	const char *ip   = getConfig()->getAttributeStr("config/platform/listen", "ip");
-	int         port = getConfig()->getAttributeInt("config/platform/listen", "port");
+	const char *ip   = getConfig()->getAttributeStr("config/login/listen", "ip");
+	int         port = getConfig()->getAttributeInt("config/login/listen", "port");
 
 	const char *serverIP   = getConfig()->getAttributeStr("config/center/listen", "ip");
 	int         serverPort = getConfig()->getAttributeInt("config/center/listen", "port");

@@ -1,5 +1,9 @@
 <?xml version="1.0"  standalone='no' >
 <config>
+	<common>
+		<redis ip="127.0.0.1" port="6379"/>	
+		<platform httpaddr="http://127.0.0.1/"/>	
+	</common>
 	<center>
 		<thread>8</thread>
 		<listen ip="127.0.0.1" port="8000"/>
@@ -13,17 +17,15 @@
 		<platformcmd min="2000" max="3000"/>
 		<gamecmd min="100000" max="-1"/>
 	</gateway>
-	<platform>
+	<login>
 		<thread>8</thread>
 		<listen ip="127.0.0.1" port="8020"/>
 		<http ip="127.0.0.1" port="8021"/>
-		<redis ip="127.0.0.1" port="6379"/>
-	</platform>
+	</login>
 	<game appid="100">
 		<thread>8</thread>
 		<listen ip="127.0.0.1" port="8030"/>
 		<http ip="127.0.0.1" port="8031"/>
-		<redis ip="127.0.0.1" port="6379"/>
 	</game>
 	<dba>
 		<thread>8</thread>

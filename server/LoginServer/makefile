@@ -5,10 +5,10 @@ export LC_ALL="zh_CN.utf8"
 CC=gcc
 CXX=g++
 
-TARGET=platformserver
+TARGET=loginserver
 
 PRO_DIR=$(shell cd ./; pwd)
-PRO_BIN=$(PRO_DIR)/../bin/platform
+PRO_BIN=$(PRO_DIR)/../bin/login
 PRO_OBJ_DIR=$(PRO_DIR)/objs
 
 PRO_SRC=$(PRO_DIR)
