@@ -470,6 +470,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         return KernalSocketMessageType_NO;
     }
 
+	printf("KernalEpoll::handleMessage 000 %d %d\r\n",pNetWork->fd,m_ctrlfd[0]);
     if(  pNetWork->fd == m_ctrlfd[0] && pNetWork->isRead )
     {
         KernalSocketMessageType msgType = KernalSocketMessageType_NO;
@@ -494,11 +495,15 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
             }
         }
 
+		printf("KernalEpoll::handleMessage 111 %d %d %d\r\n",pNetWork->fd,m_ctrlfd[0],pNetWork->readBuffersLen);
         if( pNetWork->readBuffersLen >= 12 )
         {
             int size = *( (int*)(pNetWork->readBuffers + 8) );
             int type = *( (int*)(pNetWork->readBuffers + 4) );
             int id = *( (int*)(pNetWork->readBuffers) );
+			
+			printf("KernalEpoll::handleMessage 222 %d %d %d %d\r\n",size,type,id,socket_connect);
+
             if( pNetWork->readBuffersLen - 12 >= size )
             {
                 struct KernalNetWork *pNet = &m_NetWorks[ HASH_ID( id ) ];
@@ -515,7 +520,8 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                 else if( type == socket_connect && pNetWork->readBuffersLen >= 16 )
                 {
 					int fd = *( (int*)(pNetWork->readBuffers + 12) );
-                    struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
+					printf("KernalEpoll::handleMessage 333 %d %d %d %d\r\n",size,type,id,fd);
+					struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
                     pNetWork->init();
 
                     pNetWork->type = KernalNetWorkType_CONNECTED;
