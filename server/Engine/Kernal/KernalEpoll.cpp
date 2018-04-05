@@ -412,7 +412,7 @@ int KernalEpoll::sendMsg( int fd, const void *data, int size, bool useWrite )
         }
 
     }while( sendSize < size );
-	printf("KernalEpoll::sendMsg %d %d %d %d\n\r",ret, sendSize, size,errno)
+	printf("KernalEpoll::sendMsg %d %d %d %d\n\r",ret, sendSize, size,errno);
     if( ret > 0 )
     {
         ret = size;
