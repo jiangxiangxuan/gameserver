@@ -420,9 +420,7 @@ int KernalEpoll::sendMsg( int fd, const void *data, int size, bool useWrite )
 
 KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 {
-	printf("KernalEpoll::handleMessage 000\r\n");
-	m_locker.lock();
-	printf("KernalEpoll::handleMessage 111\r\n");
+	//m_locker.lock();
 
     result.init();
     if( m_eventNum == m_eventIndex )
@@ -432,7 +430,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 		if( m_eventNum <= 0)
     	{
 		    m_eventNum = 0;
-			m_locker.unlock();
+			//m_locker.unlock();
 		    return KernalSocketMessageType_NO;
 		}
 
@@ -460,7 +458,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
     struct KernalNetWork *pNetWork = ( struct KernalNetWork * )(pEvent->data.ptr);
     if( !pNetWork )
     {
-		m_locker.unlock();
+		//m_locker.unlock();
         return KernalSocketMessageType_NO;
     }
 
@@ -468,7 +466,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
     {
         epollDel( pNetWork->id );
         ::close( pNetWork->fd );
-		m_locker.unlock();
+		//m_locker.unlock();
         return KernalSocketMessageType_NO;
     }
 
@@ -628,7 +626,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         {
             --m_eventIndex;
         }
-		m_locker.unlock();
+		//m_locker.unlock();
         return msgType;
     }
 
@@ -663,13 +661,13 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         {
             ::close( fd );
         }
-		m_locker.unlock();
+		//m_locker.unlock();
         return KernalSocketMessageType_NO;
     }
     else if( KernalNetWorkType_NO == pNetWork->type )
     {
         closeSocket( pNetWork->id );
-		m_locker.unlock();
+		//m_locker.unlock();
         return KernalSocketMessageType_NO;
     }
     KernalSocketMessageType msgType = KernalSocketMessageType_NO;
@@ -771,7 +769,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         {
             --m_eventIndex;
         }
-		m_locker.unlock();
+		//m_locker.unlock();
         return msgType;
     }
 
@@ -818,11 +816,11 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         {
             --m_eventIndex;
         }
-		m_locker.unlock();
+		//m_locker.unlock();
         return msgType;
     }
 
-	m_locker.unlock();
+	//m_locker.unlock();
     return msgType;
 }
 
