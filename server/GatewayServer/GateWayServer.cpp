@@ -237,7 +237,7 @@ void GateWayServer::registerCenterServerInfo()
 	do
 	{
 		gettimeofday(&now, NULL);
-		delay.tv_sec = now.tv_sec + 50;
+		delay.tv_sec = now.tv_sec + 5;
 		delay.tv_nsec = now.tv_usec * 1000;
 		pthread_cond_timedwait(&cond, &mutex, &delay);
 
@@ -250,13 +250,14 @@ void GateWayServer::registerCenterServerInfo()
 		{
 			struct KernalNetWork *pNet = m_Epoll.getNetWork(m_CenterServerID);
 		
-			struct timeval tm = {50, 0};
+			struct timeval tm = {5, 0};
 			fd_set wset, rset;
 			FD_ZERO( &wset );
 			FD_ZERO( &rset );
 			FD_SET( pNet->fd, &wset );
 			FD_SET( pNet->fd, &rset );
 			int res = select( pNet->fd + 1, &rset, &wset, NULL, &tm );
+			printf("GateWayServer::registerCenterServerInfo 000 %d  %d \r\n",res,errno);
 			if( res > 0 && FD_ISSET(pNet->fd, &wset)  )
 			{
 				int error, code;
@@ -293,7 +294,7 @@ void GateWayServer::registerCenterServerInfo()
 	m_Epoll.sendToPipe( dataBuf, size + 12 );*/
 
 	gettimeofday(&now, NULL);
-	delay.tv_sec = now.tv_sec + 50;
+	delay.tv_sec = now.tv_sec + 5;
 	delay.tv_nsec = now.tv_usec * 1000;
 	pthread_cond_timedwait(&cond, &mutex, &delay);
 
