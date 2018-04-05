@@ -376,7 +376,7 @@ void GateWayServer::connServer( CenterNotifyServerInfo &value )
 	{
 		return;
 	}
-	printf("GateWayServer::connServer %s  %d\r\n",value.ip.c_str(), value.port)
+	printf("GateWayServer::connServer %s  %d\r\n",value.ip.c_str(), value.port);
 	int id = m_Epoll.connect( value.ip.c_str(), value.port );
 	if( id > 0 )
 	{
