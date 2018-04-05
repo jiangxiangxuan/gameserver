@@ -134,11 +134,12 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
         epollAdd( id );
 #else
         int size = 0;
-        char _buf[BUFF_SIZE] = {0};
+        char _buf[16] = {0};
         char* dataBuf = _buf;
         NWriteInt32(dataBuf, &id);
         NWriteInt32(dataBuf, &socket_connect);
         NWriteInt32(dataBuf, &size);
+        NWriteInt32(dataBuf, &fd);
         dataBuf = _buf;
         sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
 #endif

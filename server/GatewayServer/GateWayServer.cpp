@@ -400,7 +400,7 @@ void GateWayServer::connServer( CenterNotifyServerInfo &value )
 	delay.tv_nsec = now.tv_usec * 1000;
 	pthread_cond_timedwait(&cond, &mutex, &delay);
 
-	int id = m_Epoll.connect( value.ip.c_str(), value.port );
+	int id = connect( value.ip.c_str(), value.port );
 	
 	printf("GateWayServer::connServer %d  %d  %d\r\n",id,errno,EINPROGRESS);
 		
@@ -419,6 +419,11 @@ void GateWayServer::connServer( CenterNotifyServerInfo &value )
 
 		m_Servers.insert( std::pair<ServerType, ServerInfo*>( value.type, pServer) );
 	}
+	
+    pthread_mutex_unlock(&mutex);
+    pthread_mutex_destroy( &mutex );
+    pthread_cond_destroy( &cond );
+
 }
 
 bool GateWayServer::isInternalServer( unsigned int id )
