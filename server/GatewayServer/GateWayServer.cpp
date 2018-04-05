@@ -385,7 +385,23 @@ void GateWayServer::connServer( CenterNotifyServerInfo &value )
 		return;
 	}
 	printf("GateWayServer::connServer %s  %d\r\n",value.ip.c_str(), value.port);
+	
 	int id = m_Epoll.connect( value.ip.c_str(), value.port );
+	
+	pthread_cond_t  cond;
+	pthread_mutex_t mutex;
+	pthread_mutex_init(&mutex, NULL);
+	pthread_cond_init(&cond, NULL);
+    pthread_mutex_lock(&mutex);
+
+	struct timespec delay;
+	struct timeval now;
+
+	gettimeofday(&now, NULL);
+	delay.tv_sec = now.tv_sec + 5;
+	delay.tv_nsec = now.tv_usec * 1000;
+	pthread_cond_timedwait(&cond, &mutex, &delay);
+
 	if( id > 0 )
 	{
 		ServerInfo *pServer = new ServerInfo();
