@@ -13,7 +13,7 @@ public:
     KernalHttpRequest();
     ~KernalHttpRequest();
     
-    std::string Request(char *url);
+    std::string Request(const char *url);
 private:
     bool init();
     void uninit();

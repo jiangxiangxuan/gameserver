@@ -23,6 +23,7 @@ KernalHttpRequest::~KernalHttpRequest()
 
 }
 
+
 bool KernalHttpRequest::init()
 {
     m_pCurl = curl_easy_init();
@@ -36,7 +37,7 @@ void KernalHttpRequest::uninit()
     curl_easy_cleanup( m_pCurl );  
 }
 
-std::string KernalHttpRequest::Request( char *url )
+std::string KernalHttpRequest::Request( const char *url )
 {
     init();
 
