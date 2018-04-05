@@ -39,7 +39,7 @@ Client *Client::getInstance()
 
 void Client::oninit()
 {
-	m_threadNum = 10;
+	m_threadNum = 100;
 
 	for( int i = 0; i < m_threadNum; ++i )
 	{
@@ -74,17 +74,17 @@ void Client::onMsg( unsigned int id, KernalMessageType type, const char *data, u
 		
 		int cmd = 0;
 		NReadInt32(data,&cmd);
-		printf("client onMsg cmd=%d\r\n",cmd);
+		//printf("client onMsg cmd=%d\r\n",cmd);
 		int err = 0;
 		NReadInt32(data,&err);
-		printf("client onMsg err=%d\r\n",err);
+		//printf("client onMsg err=%d\r\n",err);
 		int len = 0;
 		NReadInt32(data,&len);
-		printf("client onMsg len=%d\r\n",len);
+		//printf("client onMsg len=%d\r\n",len);
 		
 		platformprotocol::CVerifyToken verifyToken;
 		ParseFromArrayToObj( verifyToken, data, len );
-		printf("client onMsg token=%s\r\n",verifyToken.token().c_str());
+		printf("client onMsg cmd=%d err=%d len=%d token=%s\r\n",cmd,err,len,verifyToken.token().c_str());
 		
 	}
 }
@@ -111,7 +111,6 @@ void Client::clientWorker()
 		pthread_cond_timedwait(&cond, &mutex, &delay);
 
 		serverID = connect(serverIP, serverPort);
-		printf("clientWorker connect %s %d %d %d %d %d\n\r", serverIP,serverPort,serverID,ECONNREFUSED,EINPROGRESS, errno);
 		
 		if( serverID <= 0 )
 		{
@@ -163,7 +162,7 @@ void Client::clientWorker()
 	delay.tv_sec = now.tv_sec + 5;
 	delay.tv_nsec = now.tv_usec * 1000;
 	pthread_cond_timedwait(&cond, &mutex, &delay);
-	printf("clientWorker start %ld \n\r",getCurrentTime());
+
 	for( int i = 0; i < 10; ++i )
 	{
 #if 0		
@@ -200,7 +199,6 @@ void Client::clientWorker()
 #endif
 		//usleep(20);
 	}
-	printf("clientWorker end %ld \n\r",getCurrentTime());
 	//m_Epoll.closeSocket(serverID);
 }
 
