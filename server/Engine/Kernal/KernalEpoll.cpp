@@ -94,8 +94,9 @@ int KernalEpoll::listen( const char *addr, const int port )
         NWriteInt32(dataBuf, &id);
         NWriteInt32(dataBuf, &socket_listen);
         NWriteInt32(dataBuf, &size);
+        NWriteInt32(dataBuf, &fd);
         dataBuf = _buf;
-        sendMsg( m_ctrlfd[1], dataBuf, size + 12, true );
+        sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
 #endif
 
     }
@@ -166,8 +167,9 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 	    NWriteInt32(dataBuf, &id);
 	    NWriteInt32(dataBuf, &socket_connect);
 	    NWriteInt32(dataBuf, &size);
+        NWriteInt32(dataBuf, &fd);
 	    dataBuf = _buf;
-	    sendMsg( m_ctrlfd[1], dataBuf, size + 12, true );
+	    sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
 	}
 
 	//m_locker.unlock();
@@ -512,26 +514,28 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                         msgType = KernalSocketMessageType_SOCKET_CLOSE;
                     }
                 }
-                else if( type == socket_connect )
+                else if( type == socket_connect && pNetWork->readBuffersLen >= 16 )
                 {
+					int fd = *( (int*)(pNetWork->readBuffers + 12) );
                     struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
                     pNetWork->init();
 
                     pNetWork->type = KernalNetWorkType_CONNECTED;
-                    pNetWork->fd   = id;
+                    pNetWork->fd   = fd;
                     pNetWork->id   = id;
 
-                    setnonblocking( id );
+                    setnonblocking( fd );
                     epollAdd( id );
                 }
-                else if( type == socket_listen )
+                else if( type == socket_listen && pNetWork->readBuffersLen >= 16 )
                 {
+					int fd = *( (int*)(pNetWork->readBuffers + 12) );
                     struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
                     pNetWork->type = KernalNetWorkType_LISTEN;
-                    pNetWork->fd   = id;
+                    pNetWork->fd   = fd;
                     pNetWork->id   = id;
 
-                    setnonblocking( id );
+                    setnonblocking( fd );
                     epollAdd( id );
                 }
                 else if( pNet->id == id )  // 发送数据
