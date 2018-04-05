@@ -163,7 +163,7 @@ void CenterServer::handleGateWayMsg( int session, int clientID, char *data, int 
 
 void CenterServer::handleRegisterServerInfo(int session, CenterRegisterServerInfo &value)
 {
-	printf("CenterServer::handleRegisterServerInfo  %d  %s  %d \r\n",session,value.ip.c_str(),value.port);
+	printf("CenterServer::handleRegisterServerInfo  %d  %s  %d \r\n",value.type,value.ip.c_str(),value.port);
 	bool isFind = false;
 	auto servers = m_Servers.equal_range( value.type );
 	for( auto it = servers.first; it != servers.second; ++it )
@@ -178,6 +178,7 @@ void CenterServer::handleRegisterServerInfo(int session, CenterRegisterServerInf
 	{
 		return;
 	}
+	printf("CenterServer::handleRegisterServerInfo  111 \r\n");
 
 	ServerInfo *pServer = new ServerInfo();
 	pServer->type = value.type;
