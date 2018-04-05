@@ -89,7 +89,7 @@ int KernalEpoll::listen( const char *addr, const int port )
         epollAdd( id );
 #else
         int size = 0;
-        char _buf[BUFF_SIZE] = {0};
+        char _buf[16] = {0};
         char* dataBuf = _buf;
         NWriteInt32(dataBuf, &id);
         NWriteInt32(dataBuf, &socket_listen);
@@ -162,7 +162,7 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 	else if ( addToEpoll && ( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) ) )
 	{
 	    int size = 0;
-	    char _buf[12] = {0};
+	    char _buf[16] = {0};
 	    char* dataBuf = _buf;
 	    NWriteInt32(dataBuf, &id);
 	    NWriteInt32(dataBuf, &socket_connect);
