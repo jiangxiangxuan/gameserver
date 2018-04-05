@@ -81,7 +81,6 @@ void PlatformServer::handleTimerMsg( unsigned int id )
 
 void PlatformServer::onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
 {
-	printf("PlatformServer::onMsg  %d %d %d \r\n",id,type,size);
 	if( TIMER_DATA == type )
 	{
 		handleTimerMsg( id );
@@ -127,7 +126,6 @@ void PlatformServer::onExit()
 
 void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, int datalen )
 {
-	printf("PlatformServer::handleGateWayMsg %d %d %d\r\n",session,clientID,datalen);
 	//TODO:处理客户端消息
     DealProtobufStart(data)
     DealProtobufMsg(&m_Epoll, session, clientID, platformprotocol::PLATFORM_VERIFY_TOKEN, (&m_PlatformLogin), VerifyToken)

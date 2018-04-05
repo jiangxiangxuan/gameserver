@@ -160,7 +160,6 @@ void GateWayServer::sendMsgToCenter( unsigned int id, KernalMessageType type, co
 
 void GateWayServer::sendMsgToPlatform( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
 {
-	printf("GateWayServer::sendMsgToPlatform  %d %d %d\n\r",id,type,size);
 	GateWayInternalServerMsg msg;
 	msg.clientID = id;
 	msg.initData( (char*)data, size );
@@ -170,7 +169,6 @@ void GateWayServer::sendMsgToPlatform( unsigned int id, KernalMessageType type, 
 	{
 		if( it->second )
 		{
-			printf("GateWayServer::sendMsgToPlatform 111  %d %d %d %d\n\r",id,type,size,it->second->id );
 			MsgSend( m_Epoll, it->second->id, GateWayInternalServerMsg, 0, msg );
 			break;
 		}
@@ -243,7 +241,6 @@ void GateWayServer::registerCenterServerInfo()
 
 		m_CenterServerID = connect(serverIP, serverPort, false);
 		//m_CenterServerID = m_Epoll.connectSocket( serverIP, serverPort );
-		printf("GateWayServer::registerCenterServerInfo %d  %d  %d\r\n",m_CenterServerID,errno,EINPROGRESS);
 		//for( int i = 0; i < 200000000; ++i );
 		//pthread_delay_n( &delay );
 		if( m_CenterServerID > 0 && EINPROGRESS == errno )
@@ -257,7 +254,6 @@ void GateWayServer::registerCenterServerInfo()
 			FD_SET( pNet->fd, &wset );
 			FD_SET( pNet->fd, &rset );
 			int res = select( pNet->fd + 1, &rset, &wset, NULL, &tm );
-			printf("GateWayServer::registerCenterServerInfo 000 %d  %d \r\n",res,errno);
 			if( res > 0 && FD_ISSET(pNet->fd, &wset)  )
 			{
 				gettimeofday(&now, NULL);
@@ -269,7 +265,6 @@ void GateWayServer::registerCenterServerInfo()
 				socklen_t len;
 				len = sizeof(error);
 				code = getsockopt(pNet->fd, SOL_SOCKET, SO_ERROR, &error, &len);
-				printf("GateWayServer::registerCenterServerInfo 000-111 %d  %d   %d \r\n",code,error,errno);
 				if (code < 0 || error)
 				{
 					m_Epoll.close( m_CenterServerID );
@@ -309,9 +304,7 @@ void GateWayServer::registerCenterServerInfo()
 	msg.ip   = ip;
 	msg.port = port;
 
-	printf("GateWayServer::registerCenterServerInfo 111 %d\r\n",m_CenterServerID);
 	MsgSend( m_Epoll, m_CenterServerID, CenterRegisterServerInfo, 0, msg );
-	printf("GateWayServer::registerCenterServerInfo 222 %d\r\n",m_CenterServerID);
 
 	pthread_mutex_unlock(&mutex);
     pthread_mutex_destroy( &mutex );
@@ -321,7 +314,6 @@ void GateWayServer::registerCenterServerInfo()
 
 void GateWayServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value )
 {
-	printf("GateWayServer::handleCenterNotifyServerInfo %d %d\r\n",value.state,SERVERSTATE_RUN);
 	if( SERVERSTATE_RUN == value.state )
 	{
 		connServer( value );
@@ -393,8 +385,6 @@ void GateWayServer::connServer( CenterNotifyServerInfo &value )
 	struct timespec delay;
 	struct timeval now;
 
-	printf("GateWayServer::connServer %s  %d\r\n",value.ip.c_str(), value.port);
-	
 	gettimeofday(&now, NULL);
 	delay.tv_sec = now.tv_sec + 5;
 	delay.tv_nsec = now.tv_usec * 1000;
@@ -402,8 +392,6 @@ void GateWayServer::connServer( CenterNotifyServerInfo &value )
 
 	int id = connect( value.ip.c_str(), value.port );
 	
-	printf("GateWayServer::connServer %d  %d  %d\r\n",id,errno,EINPROGRESS);
-		
 	gettimeofday(&now, NULL);
 	delay.tv_sec = now.tv_sec + 5;
 	delay.tv_nsec = now.tv_usec * 1000;
