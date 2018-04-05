@@ -118,10 +118,10 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 	inet_pton(AF_INET, addr, (void *)&addrin.sin_addr);
 	int ret = ::connect( fd, ( struct sockaddr * )&addrin, sizeof(addrin) );
     int id =  getSocketID();//fd; //getSocketID();
-#if 0
+#if 1
     if( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) )
     {
-#if 0
+#if 1
         struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
         pNetWork->init();
 
@@ -148,6 +148,7 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 
         id = -1;
     }
+    return id;
 #endif
 	if( !( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) ) )
 	{
