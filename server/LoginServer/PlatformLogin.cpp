@@ -13,7 +13,7 @@ PlatformLogin::~PlatformLogin()
 
 void PlatformLogin::setPlatformAddr( const char *addr )
 {
-	memset(m_platformAddr m_platformAddr, 0, sizeof(m_platformAddr) );
+	memset(m_platformAddr, 0, sizeof(m_platformAddr) );
 	sprintf( m_platformAddr, "%s", addr );
 }
 
