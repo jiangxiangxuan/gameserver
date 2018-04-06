@@ -55,6 +55,7 @@ protected:
 	bool isInternalServer( unsigned int id );
 	
 	int getUidByClientID( int id );
+	void offlineByClientID( int id );
 private:
 	static GateWayServer *ms_pGateWayServer;
 	int                   m_CenterServerID;

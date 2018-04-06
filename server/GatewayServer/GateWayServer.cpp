@@ -135,13 +135,7 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 			m_CenterServerID = -1;
 			connectCenterServer();
 		}
-		
-		// 如果是客户端断开连接
-		int uid = getUidByClientID( id );
-		if( 0 != uid )
-		{
-			m_Players.erase( id );
-		}
+		offlineByClientID( id );
 	}
 }
 
@@ -461,4 +455,13 @@ int GateWayServer::getUidByClientID( int id )
 		return iter->second;
 	}
 	return 0;
+}
+
+void GateWayServer::offlineByClientID( int id )
+{
+	std::map< int, int >::iterator iter = m_Players.find( id );
+	if( iter != m_Players.end() )
+	{
+		m_Players.erase( iter );  
+	}
 }
