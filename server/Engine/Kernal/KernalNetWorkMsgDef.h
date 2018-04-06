@@ -90,7 +90,7 @@ typedef double         float64;
 							}
 
 //通过网关发送消息给客户端
-#define ProtobufMsgSendToClientByGateWay( net, session, clientid, cmd, err, protomsg ) {              \
+#define ProtobufMsgSendToClientByGateWay( net, session, clientid, uid, cmd, err, protomsg ) {              \
 											int pcmd = cmd;                                           \
 											int perr = err;                                           \
 											int len1 = protomsg.ByteSize();                           \
@@ -103,6 +103,7 @@ typedef double         float64;
 											NWriteInt32(databuff,&len1);                              \
 											NWriteBit(databuff,pdata,len1);                           \
 											GateWayInternalServerMsg msg;                             \
+											msg.UID      = uid;                                       \
 											msg.clientID = clientid;                                  \
 											msg.type     = MESSAGE_DATA;                              \
 											msg.initData( _buff, len1+12 );                           \

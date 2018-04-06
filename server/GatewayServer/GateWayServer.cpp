@@ -88,7 +88,7 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 		char msg[128] = {0};
 		memset(msg,0,sizeof(msg));
 		sprintf(msg, "{\"state\":1,\"data\":\"error:netid=%d,datasize=%d\"}", id, size);
-		sendMsgToClient(id,msg,strlen(msg));
+		sendMsgToClient( id, 0, msg, strlen(msg) );
 		return;
 #endif	
 	
@@ -116,7 +116,7 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 				char msg[128] = {0};
 				memset(msg,0,sizeof(msg));
 				sprintf(msg, "{\"state\":1,\"data\":\"error:netid=%d,datasize=%d\"}", id, size);
-				sendMsgToClient(id,msg,strlen(msg));
+				sendMsgToClient( id, 0, msg, strlen(msg) );
 			}
 		}
 		else if( data ) // 将消息转发给客户端
@@ -135,11 +135,25 @@ void GateWayServer::onMsg( unsigned int id, KernalMessageType type, const char *
 			m_CenterServerID = -1;
 			connectCenterServer();
 		}
+		
+		// 如果是客户端断开连接
+		int uid = getUidByClientID( id );
+		if( 0 != uid )
+		{
+			m_Players.erase( id );
+		}
 	}
 }
 
-void GateWayServer::sendMsgToClient( int id, char *data, int datalen )
+void GateWayServer::sendMsgToClient( int id, int uid, char *data, int datalen )
 {
+	// 如果是登录验证
+	int cmd = 0;
+	memcpy( &cmd, data, 4 );
+	if( 2000 == cmd && 0 != uid )
+	{
+		m_Players.insert( std::pair< int, int >( id, uid ) );
+	}
 	m_Epoll.send( id, data, datalen );
 }
 
@@ -150,9 +164,10 @@ void GateWayServer::sendMsgToCenter( unsigned int id, KernalMessageType type, co
 		return;
 	}
 	GateWayInternalServerMsg msg;
+	msg.UID      = getUidByClientID( id );
 	msg.clientID = id;
+	msg.type     = ( NETWORK_DATA == type ) ? MESSAGE_DATA: MESSAGE_CONNECTCLOSE ;
 	msg.initData( (char*)data, size );
-	msg.type = ( NETWORK_DATA == type ) ? MESSAGE_DATA: MESSAGE_CONNECTCLOSE ;
 
 	MsgSend( m_Epoll, m_CenterServerID, GateWayInternalServerMsg, 0, msg );
 }
@@ -161,8 +176,9 @@ void GateWayServer::sendMsgToPlatform( unsigned int id, KernalMessageType type, 
 {
 	GateWayInternalServerMsg msg;
 	msg.clientID = id;
+	msg.type     = ( NETWORK_DATA == type ) ? MESSAGE_DATA: MESSAGE_CONNECTCLOSE ;
 	msg.initData( (char*)data, size );
-	msg.type = ( NETWORK_DATA == type ) ? MESSAGE_DATA: MESSAGE_CONNECTCLOSE ;
+	
 	auto servers = m_Servers.equal_range( SERVER_PLATFORM );
 	for( auto it = servers.first; it != servers.second; ++it )
 	{
@@ -176,20 +192,21 @@ void GateWayServer::sendMsgToPlatform( unsigned int id, KernalMessageType type, 
 
 void GateWayServer::sendMsgToGame( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
 {
-        GateWayInternalServerMsg msg;
-        msg.clientID = id;
-        msg.initData( (char*)data, size );
-        msg.type = ( NETWORK_DATA == type ) ? MESSAGE_DATA: MESSAGE_CONNECTCLOSE ;
+    GateWayInternalServerMsg msg;
+	msg.UID      = getUidByClientID( id );
+    msg.clientID = id;
+	msg.type     = ( NETWORK_DATA == type ) ? MESSAGE_DATA: MESSAGE_CONNECTCLOSE ;
+	msg.initData( (char*)data, size );
 
-        auto servers = m_Servers.equal_range( SERVER_GAME );
-        for( auto it = servers.first; it != servers.second; ++it )
-        {
-            if( it->second )
-            {
-                MsgSend( m_Epoll, it->second->id, GateWayInternalServerMsg, 0, msg );
-                break;
-            }
-        }
+	auto servers = m_Servers.equal_range( SERVER_GAME );
+	for( auto it = servers.first; it != servers.second; ++it )
+	{
+		if( it->second )
+		{
+			MsgSend( m_Epoll, it->second->id, GateWayInternalServerMsg, 0, msg );
+			break;
+		}
+	}
 }
 
 void GateWayServer::onProcess()
@@ -434,4 +451,14 @@ bool GateWayServer::isInternalServer( unsigned int id )
 	}
 
 	return isFind;
+}
+
+int GateWayServer::getUidByClientID( int id )
+{
+	std::map< int, int >::iterator iter = m_Players.find( id );
+	if( iter != m_Players.end() )
+	{
+		return iter->second;
+	}
+	return 0;
 }

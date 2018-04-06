@@ -4,7 +4,7 @@
 
 void onGateWayInternalServerMsg(int session, GateWayInternalServerMsg &value)
 {
-	GateWayServer::getInstance()->sendMsgToClient( value.clientID, value.data, value.datalen );
+	GateWayServer::getInstance()->sendMsgToClient( value.clientID, value.UID, value.data, value.datalen );
 }
 
 void onCenterNotifyServerInfo(int session, CenterNotifyServerInfo &value)

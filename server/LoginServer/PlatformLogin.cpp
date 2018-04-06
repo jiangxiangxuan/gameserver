@@ -34,10 +34,11 @@ void PlatformLogin::VerifyToken( KernalEpoll *pEpoll, int session, int clientid,
     printf("platform login http request state=%d data=%s \r\n", jvalue["state"].asInt(),httpdata.c_str());
 	
 	int state = jvalue["state"].asInt();
+	int uid   = jvalue["data"]["uid"].asInt();
 	
     platformprotocol::SVerifyToken sverifyToken;
     protocol::PlayerInfo* playerInfo = sverifyToken.mutable_playerinfo();
-	playerInfo->set_uid(jvalue["data"]["uid"].asInt());
+	playerInfo->set_uid( uid );
     
-	ProtobufMsgSendToClientByGateWay((*pEpoll),session,clientid, platformprotocol::PLATFORM_VERIFY_TOKEN,0,sverifyToken);
+	ProtobufMsgSendToClientByGateWay( (*pEpoll), session, clientid, uid, platformprotocol::PLATFORM_VERIFY_TOKEN, 0, sverifyToken );
 }

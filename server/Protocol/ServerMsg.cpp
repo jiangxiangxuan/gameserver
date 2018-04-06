@@ -36,6 +36,7 @@ void ReadDBServerAckMsg(DBServerAckMsg &value,char *data)
 
 void WriteGateWayInternalServerMsg(GateWayInternalServerMsg &value,char *&data)
 {
+	NWriteInt32(data,&value.UID);
 	NWriteInt32(data,&value.clientID);
 	NWriteInt32(data,&value.datalen);
 	NWriteBit(data,value.data,value.datalen);
@@ -44,6 +45,7 @@ void WriteGateWayInternalServerMsg(GateWayInternalServerMsg &value,char *&data)
 
 void ReadGateWayInternalServerMsg(GateWayInternalServerMsg &value,char *data)
 {
+	NReadInt32(data,&value.UID);
 	NReadInt32(data,&value.clientID);
 	NReadInt32(data,&value.datalen);
 

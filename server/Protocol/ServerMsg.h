@@ -56,6 +56,7 @@ enum MessageType
 //网关和内部服务器
 struct GateWayInternalServerMsg
 {
+	int   UID;
 	int   clientID;
 	int   datalen;
 	char *data;
@@ -68,7 +69,9 @@ struct GateWayInternalServerMsg
 		datalen = size;
 	}
 	GateWayInternalServerMsg()
-		:data( NULL )
+		:UID( 0 )
+		,clientID( 0 )
+		,data( NULL )
 		,type( MESSAGE_NO )
 	{
 
