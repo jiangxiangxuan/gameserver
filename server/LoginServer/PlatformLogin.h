@@ -11,9 +11,13 @@ public:
     PlatformLogin();
     ~PlatformLogin();
 public:
+	void setPlatformAddr( const char *addr );
+public:
 	void VerifyToken( KernalEpoll *pEpoll, int session, int clientid, char *data, int msglen );
 private:
     KernalJson m_Json;
+	
+	char m_platformAddr[128]; // 平台http接口地址
 };
 
 #endif

@@ -1,0 +1,9 @@
+syntax = "proto3";
+package protocol;
+
+// 玩家信息
+message PlayerInfo {
+	int32  Uid      = 1;
+	string UserName = 2;
+	string NickName = 3;
+}

@@ -1,13 +1,14 @@
 <?php
 namespace app\api\controller;
 
+use think\Controller;
 use think\facade\Cache;
 use think\facade\Session;
 
 use app\api\model;
 use app\api\model\GameUser;
 
-class Index extends Base
+class Index extends Controller
 {
     public function index()
     {

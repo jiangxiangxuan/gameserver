@@ -1,7 +1,0 @@
-package protocol;
-
-enum CMD{
-
-	// 大厅协议
-	PLATFORM_VERIFY_TOKEN = 2000; // 登录验证
-}
