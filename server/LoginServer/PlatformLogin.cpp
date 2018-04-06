@@ -39,5 +39,5 @@ void PlatformLogin::VerifyToken( KernalEpoll *pEpoll, int session, int clientid,
     protocol::PlayerInfo* playerInfo = sverifyToken.mutable_playerinfo();
 	playerInfo->set_uid(jvalue["data"]["uid"].asInt());
     
-	ProtobufMsgSendToClientByGateWay((*pEpoll),session,clientid, platformprotocol::PLATFORM_VERIFY_TOKEN,0,verifyToken1);
+	ProtobufMsgSendToClientByGateWay((*pEpoll),session,clientid, platformprotocol::PLATFORM_VERIFY_TOKEN,0,sverifyToken);
 }

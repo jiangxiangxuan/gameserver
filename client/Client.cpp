@@ -82,10 +82,12 @@ void Client::onMsg( unsigned int id, KernalMessageType type, const char *data, u
 		NReadInt32(data,&len);
 		//printf("client onMsg len=%d\r\n",len);
 		
-		platformprotocol::CVerifyToken verifyToken;
+		platformprotocol::SVerifyToken verifyToken;
 		ParseFromArrayToObj( verifyToken, data, len );
-		printf("client onMsg cmd=%d err=%d len=%d token=%s\r\n",cmd,err,len,verifyToken.token().c_str());
-		
+		if( verifyToken.has_playerinfo() )
+		{
+			printf("client onMsg cmd=%d err=%d len=%d uid=%d\r\n",cmd,err,len,verifyToken.playerinfo().uid());
+		}
 	}
 }
 
