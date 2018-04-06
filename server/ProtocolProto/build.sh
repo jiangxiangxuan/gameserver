@@ -1,1 +1,1 @@
-protoc --cpp_out=../ProtocolMsg/ player.proto
+protoc --cpp_out=./ player.proto
