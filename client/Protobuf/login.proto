@@ -1,11 +1,13 @@
 syntax = "proto3";
 package platformprotocol;
 
+import "player.proto";
+
 // 登录验证
 message CVerifyToken {
 	string Token = 1;
 }
 
 message SVerifyToken {
-	
+	protocol.PlayerInfo PlayerInfo = 1;
 }

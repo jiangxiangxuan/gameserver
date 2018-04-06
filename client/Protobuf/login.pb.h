@@ -29,6 +29,7 @@
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
+#include "player.pb.h"
 // @@protoc_insertion_point(includes)
 
 namespace protobuf_login_2eproto {
@@ -266,10 +267,20 @@ class SVerifyToken : public ::google::protobuf::Message /* @@protoc_insertion_po
 
   // accessors -------------------------------------------------------
 
+  // .protocol.PlayerInfo PlayerInfo = 1;
+  bool has_playerinfo() const;
+  void clear_playerinfo();
+  static const int kPlayerInfoFieldNumber = 1;
+  const ::protocol::PlayerInfo& playerinfo() const;
+  ::protocol::PlayerInfo* release_playerinfo();
+  ::protocol::PlayerInfo* mutable_playerinfo();
+  void set_allocated_playerinfo(::protocol::PlayerInfo* playerinfo);
+
   // @@protoc_insertion_point(class_scope:platformprotocol.SVerifyToken)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::protocol::PlayerInfo* playerinfo_;
   mutable int _cached_size_;
   friend struct ::protobuf_login_2eproto::TableStruct;
   friend void ::protobuf_login_2eproto::InitDefaultsSVerifyTokenImpl();
@@ -341,6 +352,51 @@ inline void CVerifyToken::set_allocated_token(::std::string* token) {
 // -------------------------------------------------------------------
 
 // SVerifyToken
+
+// .protocol.PlayerInfo PlayerInfo = 1;
+inline bool SVerifyToken::has_playerinfo() const {
+  return this != internal_default_instance() && playerinfo_ != NULL;
+}
+inline const ::protocol::PlayerInfo& SVerifyToken::playerinfo() const {
+  const ::protocol::PlayerInfo* p = playerinfo_;
+  // @@protoc_insertion_point(field_get:platformprotocol.SVerifyToken.PlayerInfo)
+  return p != NULL ? *p : *reinterpret_cast<const ::protocol::PlayerInfo*>(
+      &::protocol::_PlayerInfo_default_instance_);
+}
+inline ::protocol::PlayerInfo* SVerifyToken::release_playerinfo() {
+  // @@protoc_insertion_point(field_release:platformprotocol.SVerifyToken.PlayerInfo)
+  
+  ::protocol::PlayerInfo* temp = playerinfo_;
+  playerinfo_ = NULL;
+  return temp;
+}
+inline ::protocol::PlayerInfo* SVerifyToken::mutable_playerinfo() {
+  
+  if (playerinfo_ == NULL) {
+    playerinfo_ = ::google::protobuf::Arena::Create< ::protocol::PlayerInfo >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:platformprotocol.SVerifyToken.PlayerInfo)
+  return playerinfo_;
+}
+inline void SVerifyToken::set_allocated_playerinfo(::protocol::PlayerInfo* playerinfo) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(playerinfo_);
+  }
+  if (playerinfo) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      playerinfo = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, playerinfo, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  playerinfo_ = playerinfo;
+  // @@protoc_insertion_point(field_set_allocated:platformprotocol.SVerifyToken.PlayerInfo)
+}
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop

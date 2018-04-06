@@ -61,6 +61,7 @@ void InitDefaultsSVerifyTokenImpl() {
 #else
   ::google::protobuf::internal::InitProtobufDefaults();
 #endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  protobuf_player_2eproto::InitDefaultsPlayerInfo();
   {
     void* ptr = &::platformprotocol::_SVerifyToken_default_instance_;
     new (ptr) ::platformprotocol::SVerifyToken();
@@ -88,6 +89,7 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::platformprotocol::SVerifyToken, playerinfo_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::platformprotocol::CVerifyToken)},
@@ -121,14 +123,16 @@ void protobuf_RegisterTypes(const ::std::string&) {
 void AddDescriptorsImpl() {
   InitDefaults();
   static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\013login.proto\022\020platformprotocol\"\035\n\014CVeri"
-      "fyToken\022\r\n\005Token\030\001 \001(\t\"\016\n\014SVerifyTokenb\006"
-      "proto3"
+      "\n\013login.proto\022\020platformprotocol\032\014player."
+      "proto\"\035\n\014CVerifyToken\022\r\n\005Token\030\001 \001(\t\"8\n\014"
+      "SVerifyToken\022(\n\nPlayerInfo\030\001 \001(\0132\024.proto"
+      "col.PlayerInfob\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 86);
+      descriptor, 142);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "login.proto", &protobuf_RegisterTypes);
+  ::protobuf_player_2eproto::AddDescriptors();
 }
 
 void AddDescriptors() {
@@ -396,8 +400,17 @@ void CVerifyToken::InternalSwap(CVerifyToken* other) {
 // ===================================================================
 
 void SVerifyToken::InitAsDefaultInstance() {
+  ::platformprotocol::_SVerifyToken_default_instance_._instance.get_mutable()->playerinfo_ = const_cast< ::protocol::PlayerInfo*>(
+      ::protocol::PlayerInfo::internal_default_instance());
+}
+void SVerifyToken::clear_playerinfo() {
+  if (GetArenaNoVirtual() == NULL && playerinfo_ != NULL) {
+    delete playerinfo_;
+  }
+  playerinfo_ = NULL;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int SVerifyToken::kPlayerInfoFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 SVerifyToken::SVerifyToken()
@@ -413,10 +426,16 @@ SVerifyToken::SVerifyToken(const SVerifyToken& from)
       _internal_metadata_(NULL),
       _cached_size_(0) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  if (from.has_playerinfo()) {
+    playerinfo_ = new ::protocol::PlayerInfo(*from.playerinfo_);
+  } else {
+    playerinfo_ = NULL;
+  }
   // @@protoc_insertion_point(copy_constructor:platformprotocol.SVerifyToken)
 }
 
 void SVerifyToken::SharedCtor() {
+  playerinfo_ = NULL;
   _cached_size_ = 0;
 }
 
@@ -426,6 +445,7 @@ SVerifyToken::~SVerifyToken() {
 }
 
 void SVerifyToken::SharedDtor() {
+  if (this != internal_default_instance()) delete playerinfo_;
 }
 
 void SVerifyToken::SetCachedSize(int size) const {
@@ -450,6 +470,10 @@ void SVerifyToken::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  if (GetArenaNoVirtual() == NULL && playerinfo_ != NULL) {
+    delete playerinfo_;
+  }
+  playerinfo_ = NULL;
   _internal_metadata_.Clear();
 }
 
@@ -462,12 +486,29 @@ bool SVerifyToken::MergePartialFromCodedStream(
     ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
-  handle_unusual:
-    if (tag == 0) {
-      goto success;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // .protocol.PlayerInfo PlayerInfo = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(10u /* 10 & 0xFF */)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_playerinfo()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
     }
-    DO_(::google::protobuf::internal::WireFormat::SkipField(
-          input, tag, _internal_metadata_.mutable_unknown_fields()));
   }
 success:
   // @@protoc_insertion_point(parse_success:platformprotocol.SVerifyToken)
@@ -484,6 +525,12 @@ void SVerifyToken::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  // .protocol.PlayerInfo PlayerInfo = 1;
+  if (this->has_playerinfo()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, *playerinfo_, output);
+  }
+
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()), output);
@@ -497,6 +544,13 @@ void SVerifyToken::SerializeWithCachedSizes(
   // @@protoc_insertion_point(serialize_to_array_start:platformprotocol.SVerifyToken)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
+
+  // .protocol.PlayerInfo PlayerInfo = 1;
+  if (this->has_playerinfo()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        1, *playerinfo_, deterministic, target);
+  }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
@@ -515,6 +569,13 @@ size_t SVerifyToken::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
         (::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()));
   }
+  // .protocol.PlayerInfo PlayerInfo = 1;
+  if (this->has_playerinfo()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *playerinfo_);
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = cached_size;
@@ -544,6 +605,9 @@ void SVerifyToken::MergeFrom(const SVerifyToken& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.has_playerinfo()) {
+    mutable_playerinfo()->::protocol::PlayerInfo::MergeFrom(from.playerinfo());
+  }
 }
 
 void SVerifyToken::CopyFrom(const ::google::protobuf::Message& from) {
@@ -570,6 +634,7 @@ void SVerifyToken::Swap(SVerifyToken* other) {
 }
 void SVerifyToken::InternalSwap(SVerifyToken* other) {
   using std::swap;
+  swap(playerinfo_, other->playerinfo_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(_cached_size_, other->_cached_size_);
 }
