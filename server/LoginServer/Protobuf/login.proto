@@ -1,7 +1,7 @@
 syntax = "proto3";
 package platformprotocol;
 
-import "../../ProtocolProto/player.proto";
+import "player.proto";
 
 // 登录验证
 message CVerifyToken {
@@ -9,5 +9,5 @@ message CVerifyToken {
 }
 
 message SVerifyToken {
-	
+	protocol.PlayerInfo PlayerInfo = 1;
 }
