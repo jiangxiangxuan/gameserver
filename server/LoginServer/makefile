@@ -13,15 +13,19 @@ PRO_OBJ_DIR=$(PRO_DIR)/objs
 
 PRO_SRC=$(PRO_DIR)
 
-CFLAGS := -g -I$(PRO_SRC) -I$(PRO_DIR)/../ -I$(PRO_DIR)/../Engine -I$(PRO_DIR)/../External -I$(PRO_DIR)/../External/protobuf -I$(PRO_DIR)/../Common -I$(PRO_DIR)/../Protocol -std=c++11 #-fPIC -shared  #-std=c++11
+COMMONPROTOCOLDIR := ../ProtocolProto
+
+CFLAGS := -g -I$(PRO_SRC) -I$(PRO_DIR)/../ -I$(PRO_DIR)/../Engine -I$(PRO_DIR)/../External -I$(PRO_DIR)/../External/protobuf -I$(PRO_DIR)/../Common -I$(PRO_DIR)/../Protocol -I$(COMMONPROTOCOLDIR) -std=c++11 #-fPIC -shared  #-std=c++11
 LIBS := -lpthread -L$(PRO_DIR)/../Lib -ldl -lm -lprotobuf -lkernal -lidbc -lcommon #-llua
 
 DIRS := $(shell find $(PRO_SRC) -maxdepth 4 -type d)
 PROTOCOLDIRS := $(shell find $(PRO_SRC)/../Protocol -maxdepth 4 -type d)
+COMMONPROTOCOLDIRS := $(shell find $(COMMONPROTOCOLDIR) -maxdepth 4 -type d)
 
 SRC := $(foreach dir,$(DIRS),$(wildcard $(dir)/*.cpp))
 SRC += $(foreach dir,$(DIRS),$(wildcard $(dir)/*.cc))
 SRC += $(foreach dir,$(PROTOCOLDIRS),$(wildcard $(dir)/*.cpp))
+SRC += $(foreach dir,$(COMMONPROTOCOLDIRS),$(wildcard $(dir)/*.cc))
 
 PRO_OBJS := $(patsubst %.cpp,%.o, $(notdir $(SRC) ))
 PRO_OBJS := $(patsubst %.cpp,%.o, $(notdir $(PRO_OBJS) ))
