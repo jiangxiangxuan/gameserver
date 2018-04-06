@@ -24,16 +24,20 @@ void PlatformLogin::VerifyToken( KernalEpoll *pEpoll, int session, int clientid,
 
     printf("platform login verify token = %s \r\n", verifyToken.token().c_str());
     
-	char url[256] = { 0 };
+	char url[256] = { 0 };	
+	verifyToken.set_token("213a2261e396a75259e191b3737d58aea626dea3");
 	sprintf( url, "%s/platform/verifytoken?token=%s", m_platformAddr, verifyToken.token().c_str() );
 	
     KernalHttpRequest httpRequest;
     std::string httpdata = httpRequest.Request( url );
     Json::Value jvalue = m_Json.parseJson(httpdata.c_str());
     printf("platform login http request state=%d data=%s \r\n", jvalue["state"].asInt(),httpdata.c_str());
-
-    platformprotocol::CVerifyToken verifyToken1;
-    verifyToken1.set_token(verifyToken.token());
+	
+	int state = jvalue["state"].asInt();
+	
+    platformprotocol::SVerifyToken sverifyToken;
+    protocol::PlayerInfo* playerInfo = sverifyToken.mutable_playerinfo();
+	playerInfo->set_uid(jvalue["data"]["uid"].asInt());
     
 	ProtobufMsgSendToClientByGateWay((*pEpoll),session,clientid, platformprotocol::PLATFORM_VERIFY_TOKEN,0,verifyToken1);
 }
