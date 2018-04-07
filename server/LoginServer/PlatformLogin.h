@@ -4,6 +4,7 @@
 #include "Kernal/KernalEpoll.h"
 #include "Kernal/KernalHttpRequest.h"
 #include "Kernal/KernalJson.h"
+#include "Idbc/redis/idbc_redis_noncluster.h"
 #include "Msg.h"
 
 class PlatformLogin {
@@ -13,7 +14,7 @@ public:
 public:
 	void setPlatformAddr( const char *addr );
 public:
-	void VerifyToken( KernalEpoll *pEpoll, int session, int clientid, char *data, int msglen );
+	void VerifyToken( KernalEpoll *pEpoll, IdbcRedis *pIdbcRedis, int session, int clientid, char *data, int msglen );
 private:
     KernalJson m_Json;
 	

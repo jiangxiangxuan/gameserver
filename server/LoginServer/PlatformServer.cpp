@@ -130,7 +130,7 @@ void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, in
 {
 	//TODO:处理客户端消息
     DealProtobufStart(data)
-    DealProtobufMsg(&m_Epoll, session, clientID, platformprotocol::PLATFORM_VERIFY_TOKEN, (&m_PlatformLogin), VerifyToken)
+    DealProtobufMsg(&m_Epoll, m_pIdbcRedis, session, clientID, platformprotocol::PLATFORM_VERIFY_TOKEN, (&m_PlatformLogin), VerifyToken)
     DealProtobufEnd()
 }
 

@@ -17,7 +17,7 @@ void PlatformLogin::setPlatformAddr( const char *addr )
 	sprintf( m_platformAddr, "%s", addr );
 }
 
-void PlatformLogin::VerifyToken( KernalEpoll *pEpoll, int session, int clientid, char *data, int msglen )
+void PlatformLogin::VerifyToken( KernalEpoll *pEpoll, IdbcRedis *pIdbcRedis, int session, int clientid, char *data, int msglen )
 {
     platformprotocol::CVerifyToken verifyToken;
     ParseFromArrayToObj(verifyToken, data, msglen);
