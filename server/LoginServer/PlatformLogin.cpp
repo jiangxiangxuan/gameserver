@@ -34,10 +34,13 @@ void PlatformLogin::VerifyToken( KernalEpoll *pEpoll, IdbcRedis *pIdbcRedis, int
     Json::Value jvalue = m_Json.parseJson(httpdata.c_str());
     printf("platform login http request state=%d data=%s \r\n", jvalue["state"].asInt(),httpdata.c_str());
 	
+    platformprotocol::SVerifyToken sverifyToken;
+	
 	int state = jvalue["state"].asInt();
-	int uid   = jvalue["data"]["uid"].asInt();
 	if( 0 == state )
 	{
+		int uid   = jvalue["data"]["uid"].asInt();
+		
 		char userkey[128] = { 0 };
 		sprintf( userkey, g_GameUserInfo, uid );
 		
@@ -46,11 +49,10 @@ void PlatformLogin::VerifyToken( KernalEpoll *pEpoll, IdbcRedis *pIdbcRedis, int
 		pIdbcRedis->sethmkey( userkey, "uid", cuid );
 		pIdbcRedis->sethmkey( userkey, "nickname", jvalue["data"]["nickname"].asString().c_str() );
 		pIdbcRedis->sethmkey( userkey, "username", jvalue["data"]["username"].asString().c_str() );
-	}
-	
-    platformprotocol::SVerifyToken sverifyToken;
-    protocol::PlayerInfo* playerInfo = sverifyToken.mutable_playerinfo();
-	playerInfo->set_uid( uid );
+		
+		protocol::PlayerInfo* playerInfo = sverifyToken.mutable_playerinfo();
+		playerInfo->set_uid( uid );
+	}	
     
 	ProtobufMsgSendToClientByGateWay( (*pEpoll), session, clientid, uid, platformprotocol::PLATFORM_VERIFY_TOKEN, 0, sverifyToken );
 }
