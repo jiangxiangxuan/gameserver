@@ -37,9 +37,10 @@ void PlatformLogin::VerifyToken( KernalEpoll *pEpoll, IdbcRedis *pIdbcRedis, int
     platformprotocol::SVerifyToken sverifyToken;
 	
 	int state = jvalue["state"].asInt();
+	int uid   = 0;
 	if( 0 == state )
 	{
-		int uid   = jvalue["data"]["uid"].asInt();
+		uid = jvalue["data"]["uid"].asInt();
 		
 		char userkey[128] = { 0 };
 		sprintf( userkey, g_GameUserInfo, uid );
