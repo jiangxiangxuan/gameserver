@@ -1,5 +1,6 @@
 
 #include "PlatformLogin.h"
+#include "Common/CacheKey.h"
 
 PlatformLogin::PlatformLogin()
 {
@@ -35,6 +36,17 @@ void PlatformLogin::VerifyToken( KernalEpoll *pEpoll, IdbcRedis *pIdbcRedis, int
 	
 	int state = jvalue["state"].asInt();
 	int uid   = jvalue["data"]["uid"].asInt();
+	if( 0 == state )
+	{
+		char userkey[128] = { 0 };
+		sprintf( userkey, g_GameUserInfo, uid );
+		
+		char cuid[8] = { 0 };
+		sprintf( cuid, "%d", uid );
+		pIdbcRedis->sethmkey( userkey, "uid", cuid );
+		pIdbcRedis->sethmkey( userkey, "nickname", jvalue["data"]["nickname"].asString().c_str() );
+		pIdbcRedis->sethmkey( userkey, "username", jvalue["data"]["username"].asString().c_str() );
+	}
 	
     platformprotocol::SVerifyToken sverifyToken;
     protocol::PlayerInfo* playerInfo = sverifyToken.mutable_playerinfo();
