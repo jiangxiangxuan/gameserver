@@ -45,11 +45,15 @@ void PlatformLogin::VerifyToken( KernalEpoll *pEpoll, IdbcRedis *pIdbcRedis, int
 		char userkey[128] = { 0 };
 		sprintf( userkey, g_GameUserInfo, uid );
 		
-		char cuid[8] = { 0 };
-		sprintf( cuid, "%d", uid );
-		pIdbcRedis->sethmkey( userkey, "uid", cuid );
-		pIdbcRedis->sethmkey( userkey, "nickname", jvalue["data"]["nickname"].asString().c_str() );
-		pIdbcRedis->sethmkey( userkey, "username", jvalue["data"]["username"].asString().c_str() );
+		char tmp[8] = { 0 };
+		sprintf( tmp, "%d", uid );
+		pIdbcRedis->sethmkey( userkey, g_GameUserInfo_Uid, tmp );
+		
+		sprintf( tmp, "%d", session );
+		pIdbcRedis->sethmkey( userkey, g_GameUserInfo_GateWay, tmp );
+		
+		pIdbcRedis->sethmkey( userkey, g_GameUserInfo_NickName, jvalue["data"]["nickname"].asString().c_str() );
+		pIdbcRedis->sethmkey( userkey, g_GameUserInfo_UserName, jvalue["data"]["username"].asString().c_str() );
 		
 		protocol::PlayerInfo* playerInfo = sverifyToken.mutable_playerinfo();
 		playerInfo->set_uid( uid );
