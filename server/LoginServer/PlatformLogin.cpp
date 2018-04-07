@@ -26,7 +26,7 @@ void PlatformLogin::VerifyToken( KernalEpoll *pEpoll, IdbcRedis *pIdbcRedis, int
     printf("platform login verify token = %s \r\n", verifyToken.token().c_str());
     
 	char url[256] = { 0 };	
-	verifyToken.set_token("213a2261e396a75259e191b3737d58aea626dea3");
+	verifyToken.set_token("0e5c4f65c9ea990c36c41439aca88aef8d7e0ab1");
 	sprintf( url, "%s/platform/verifytoken?token=%s", m_platformAddr, verifyToken.token().c_str() );
 	
     KernalHttpRequest httpRequest;
