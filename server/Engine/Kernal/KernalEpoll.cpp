@@ -800,12 +800,28 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
             msgType = KernalSocketMessageType_NO;
             struct KernalNetWorkBuffer *tmp = pNetWork->buffers.head;
             int ret = 0;
+#if 0			
             if( KernalNetWorkType_CONNECTED_HTTP != pNetWork->type )
             {
                 ret = sendMsg( pNetWork->fd, &tmp->size, 4 );
             }
             ret = sendMsg( pNetWork->fd, tmp->data, tmp->size );
-
+#endif			
+#if 1		
+			char *buffer = (char*)malloc( tmp->size + 4 );
+			memset( buffer, 0, tmp->size + 4 );
+			char *dataBuf = buffer;
+			int ret = 0;
+			if( KernalNetWorkType_CONNECTED_HTTP != pNetWork->type )
+			{
+				NWriteInt32(dataBuf, &tmp->size);
+			}
+			NWriteBit(dataBuf,data,tmp->size);
+			ret = sendMsg( pNetWork->fd, buffer, dataBuf - buffer );
+			free( buffer );
+#endif
+			printf("KernalEpoll::handleMessage 777 %d  %d  %d  %d  \n\r",m_eventNum,m_eventIndex,pNetWork->fd,ret);
+            
             pNetWork->buffers.head = tmp->next;
             free(tmp->data);
             free(tmp);
