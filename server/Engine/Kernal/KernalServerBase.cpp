@@ -132,7 +132,7 @@ void KernalServerBase::timerWroker()
 			{
 				break;
 			}
-			pushMsg( TIMER_DATA, NULL, 0, id );
+			pushMsg( TIMER_DATA, 0, NULL, 0, id );
 			m_MessageCond.broadcast();
 		}while( true );
 
@@ -163,13 +163,13 @@ void KernalServerBase::epollWroker()
 		{
 			case KernalSocketMessageType_SOCKET_DATA: // 如果接收到数据则加入到队列中
 			{
-				pushMsg( NETWORK_DATA, result.data, result.size, result.id );
+				pushMsg( NETWORK_DATA, result.netType, result.data, result.size, result.id );
 				m_MessageCond.broadcast();
 				break;
 			}
 			case KernalSocketMessageType_SOCKET_CLOSE: // 关闭连接
 			{
-				pushMsg( NETWORK_CLOSE, NULL, 0, result.id );
+				pushMsg( NETWORK_CLOSE, result.netType, NULL, 0, result.id );
 				m_MessageCond.broadcast();
 				break;
 			}
@@ -265,10 +265,11 @@ void KernalServerBase::flush()
 
 }
 
-void KernalServerBase::pushMsg( KernalMessageType type, void *data, unsigned int size, unsigned int id )
+void KernalServerBase::pushMsg( KernalMessageType type, KernalNetWorkType netType, void *data, unsigned int size, unsigned int id )
 {
 	KernalMessage *pMsg = new KernalMessage();
 	pMsg->type     = type;
+	pMsg->netType  = netType;
 	pMsg->data     = data;
 	pMsg->size     = size;
 	pMsg->id       = id;

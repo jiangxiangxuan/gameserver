@@ -71,7 +71,7 @@ public:
 
 	void quit();//退出
 	void flush();
-	void pushMsg( KernalMessageType type, void *data, unsigned int size, unsigned int id );
+	void pushMsg( KernalMessageType type, KernalNetWorkType netType, void *data, unsigned int size, unsigned int id );
 	KernalConfig *getConfig()
 	{
 		return &m_Config;
