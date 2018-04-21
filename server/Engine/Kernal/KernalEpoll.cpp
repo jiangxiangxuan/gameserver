@@ -551,6 +551,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                 }
                 else if( pNet->id == id )  // 发送数据
                 {
+					printf("KernalEpoll::handleMessage 333 %d  %d  %d \n\r",m_eventNum,m_eventIndex,pNet->type);
                     if( KernalNetWorkType_CONNECTED == pNet->type || KernalNetWorkType_CONNECTED_HTTP == pNet->type )
                     {
                         void *buffer = malloc( size );
