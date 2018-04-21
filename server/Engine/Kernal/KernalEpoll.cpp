@@ -225,10 +225,8 @@ int KernalEpoll::connectHttp( const char *addr, const int port )
 
 bool KernalEpoll::send( int id, void *data, int size )
 {
-	//m_locker.lock();
     if( id < 0 || id > MAX_NET_WORK_NUM )
     {
-		//m_locker.unlock();
         return false;
     }
 	
@@ -279,7 +277,6 @@ bool KernalEpoll::send( int id, void *data, int size )
     {
         close( pNetWork->id );
     }
-	//m_locker.unlock();
     return ( ret > 0 );
 #endif
 	return true;
