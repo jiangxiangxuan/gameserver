@@ -132,7 +132,7 @@ void KernalServerBase::timerWroker()
 			{
 				break;
 			}
-			pushMsg( TIMER_DATA, 0, NULL, 0, id );
+			pushMsg( TIMER_DATA, KernalNetWorkType_NO, NULL, 0, id );
 			m_MessageCond.broadcast();
 		}while( true );
 
