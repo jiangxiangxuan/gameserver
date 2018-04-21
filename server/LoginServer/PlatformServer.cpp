@@ -81,7 +81,7 @@ void PlatformServer::handleTimerMsg( unsigned int id )
 	//TODO:处理定时器消息
 }
 
-void PlatformServer::onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
+void PlatformServer::onMsg( unsigned int id, KernalNetWorkType netTyp, KernalMessageType type, const char *data, unsigned int size )
 {
 	if( TIMER_DATA == type )
 	{

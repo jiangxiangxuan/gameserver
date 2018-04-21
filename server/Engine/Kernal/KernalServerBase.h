@@ -40,7 +40,8 @@ public:
 		}
 	}
 public:
-	KernalMessageType  type;
+	KernalMessageType  type;    // 消息类型
+    KernalNetWorkType  netType; // 如果是网络数据网络连接类型
 	void              *data;
 	unsigned int       size;
 	unsigned int       id;
@@ -78,7 +79,7 @@ public:
 
 	void sendMsg( int fd, char *buff, int len );
 
-	virtual void onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size ) = 0;
+	virtual void onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size ) = 0;
 	virtual void onProcess() = 0;
 	virtual void onRun() = 0;
 	virtual void onExit() = 0;

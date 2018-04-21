@@ -2,6 +2,7 @@
 #include "KernalBuffer.h"
 
 KernalBuffer::KernalBuffer( char *buff, int size )
+    : m_Pos( 0  )
 {
 	m_Size  = size;
 	m_pBuff = ( char * )malloc( size );

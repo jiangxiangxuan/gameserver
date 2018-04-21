@@ -17,7 +17,7 @@ public:
 	static void destroyInstance();
 	static GameServer *getInstance();
 
-	virtual void onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size );
+	virtual void onMsg( unsigned int id, KernalNetWorkType netTyp, KernalMessageType type, const char *data, unsigned int size );
 	virtual void onProcess();
 	virtual void onRun();
 	virtual void onExit();

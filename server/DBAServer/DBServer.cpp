@@ -84,7 +84,7 @@ void DBServer::handleTimerMsg( unsigned int id )
 
 }
 
-void DBServer::onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
+void DBServer::onMsg( unsigned int id, KernalNetWorkType netTyp, KernalMessageType type, const char *data, unsigned int size )
 {
 	if( TIMER_DATA == type )
 	{

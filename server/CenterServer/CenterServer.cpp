@@ -52,7 +52,7 @@ void CenterServer::handleTimerMsg( unsigned int id )
 
 }
 
-void CenterServer::onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
+void CenterServer::onMsg( unsigned int id, KernalNetWorkType netTyp, KernalMessageType type, const char *data, unsigned int size )
 {
 	m_Locker.lock();
 	if( TIMER_DATA == type )

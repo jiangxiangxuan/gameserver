@@ -200,7 +200,7 @@ void KernalServerBase::worker()
 				case TIMER_DATA:
 				case NETWORK_CLOSE:
 				{
-					onMsg(  pMsg->id, pMsg->type, (const char *)pMsg->data, pMsg->size );
+					onMsg(  pMsg->id, pMsg->netType, pMsg->type, (const char *)pMsg->data, pMsg->size );
 					break;
 				}
 				default:

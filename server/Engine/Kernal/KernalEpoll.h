@@ -31,6 +31,15 @@ const int socket_connect = 1;    // 建立连接
 const int socket_listen  = 2;    // 监听连接
 const int socket_close   = 3;    // 关闭连接
 
+enum KernalNetWorkType
+{
+    KernalNetWorkType_NO,
+    KernalNetWorkType_CONNECTED,
+    KernalNetWorkType_LISTEN,
+    KernalNetWorkType_CONNECTED_HTTP,
+    KernalNetWorkType_LISTEN_HTTP,
+};
+
 struct KernalNetWorkBuffer
 {
     struct KernalNetWorkBuffer *next;
@@ -100,10 +109,10 @@ struct KernalResponseMsg
 // 接收
 struct KernalRequestMsg
 {
-    unsigned int   id;
-    unsigned int   size;
-    char          *data;
-
+    unsigned int       id;
+    unsigned int       size;
+    char              *data;
+    KernalNetWorkType  netType; 
 public:
     KernalRequestMsg()
     {
@@ -116,15 +125,6 @@ public:
         size = 0;
         data = NULL;
     }
-};
-
-enum KernalNetWorkType
-{
-    KernalNetWorkType_NO,
-    KernalNetWorkType_CONNECTED,
-    KernalNetWorkType_LISTEN,
-    KernalNetWorkType_CONNECTED_HTTP,
-    KernalNetWorkType_LISTEN_HTTP,
 };
 
 struct KernalNetWork

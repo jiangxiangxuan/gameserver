@@ -16,13 +16,31 @@ public:
 	{
 		return m_pBuff;
 	};
+
 	int size()
 	{
 		return m_Size;
 	};
+    
+    int getPos() 
+    {
+        return m_Pos;
+    }
+
+    void setPos( int pos )
+    {
+        m_Pos = pos;
+    }
+
+    void addPos( int pos )
+    {
+        m_Pos += pos;
+    }
+
 private:
 	char *m_pBuff;
-	int   m_Size;	
+	int   m_Size;
+    int   m_Pos;
 };
 
 #endif
