@@ -93,7 +93,7 @@ void GateWayServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMes
 #endif	
 	
 		// 将消息转发给内部服务器
-		if(  id != m_CenterServerID && !isInternalServer( id ) && ( KernalNetWorkType_CONNECTED == netType || KernalNetWorkType_CONNECTED_HTTP == pNetWork->type ) )
+		if(  id != m_CenterServerID && !isInternalServer( id ) && ( KernalNetWorkType_CONNECTED == netType || KernalNetWorkType_CONNECTED_HTTP == netType ) )
 		{
 			int cmd = 0;
 			memcpy( &cmd, data, 4 );
