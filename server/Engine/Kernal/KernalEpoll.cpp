@@ -790,11 +790,13 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 
     if( pNetWork->isWrite /*pEvent->events & EPOLLOUT*/ ) //发送数据
     {
+		printf("KernalEpoll::handleMessage 555 %d  %d  %d  \n\r",m_eventNum,m_eventIndex,pNetWork->id);
         pNetWork->isWrite = false;
         result.id = pNetWork->id;
 
         while( pNetWork->buffers.head )
         {
+			printf("KernalEpoll::handleMessage 666 %d  %d  %d  \n\r",m_eventNum,m_eventIndex,pNetWork->type);
             msgType = KernalSocketMessageType_NO;
             struct KernalNetWorkBuffer *tmp = pNetWork->buffers.head;
             int ret = 0;
