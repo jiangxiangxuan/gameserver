@@ -231,7 +231,7 @@ bool KernalEpoll::send( int id, void *data, int size )
     }
 	
     int size = 0;
-    char _buf = ( char * )malloc( size + 16 );
+    char *_buf = ( char * )malloc( size + 16 );
 	memset( _buf, 0, size + 16 );
     char* dataBuf = _buf;
 	int fd = 0;
