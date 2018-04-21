@@ -62,7 +62,7 @@ void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMess
 	else if( NETWORK_DATA == type )
 	{
 		// 中心服务器无网关 直接和客户端通信
-		if( KernalNetWorkType_CONNECTED == netTyp )
+		if( KernalNetWorkType_CONNECTED == netType )
 		{
 			char *buff = (char*)data;
 			DealStart(buff);
@@ -72,7 +72,7 @@ void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMess
 			DealMsg( id, PlatformGameServerMsg, buff );
 			DealEnd();
 		}
-		else if( KernalNetWorkType_CONNECTED_HTTP == netTyp )
+		else if( KernalNetWorkType_CONNECTED_HTTP == netType )
 		{
 			char buff[50];
 			memset( buff, 0, sizeof(buff) );
