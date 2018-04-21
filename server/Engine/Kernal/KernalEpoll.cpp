@@ -231,6 +231,22 @@ bool KernalEpoll::send( int id, void *data, int size )
 		//m_locker.unlock();
         return false;
     }
+	
+    int size = 0;
+    //char _buf[16] = {0};
+    char _buf = new char[size + 16];
+	memset( _buf, 0, size + 16 );
+    char* dataBuf = _buf;
+	int fd = 0;
+    NWriteInt32(dataBuf, &id);
+    NWriteInt32(dataBuf, &socket_data);
+    NWriteInt32(dataBuf, &size);
+    NWriteInt32(dataBuf, &fd);
+    dataBuf = _buf;
+    sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
+	free( _buf );
+
+#if 0
     struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
     if( KernalNetWorkType_NO == pNetWork->type || pNetWork->id != id )
     {
@@ -264,9 +280,10 @@ bool KernalEpoll::send( int id, void *data, int size )
     {
         close( pNetWork->id );
     }
-
 	//m_locker.unlock();
     return ( ret > 0 );
+#endif
+	return true;
 }
 
 bool KernalEpoll::sendToPipe( void *data, int size )
