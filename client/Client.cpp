@@ -63,7 +63,7 @@ void Client::handleTimerMsg( unsigned int id )
 	
 }
 
-void Client::onMsg( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
+void Client::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size )
 {
 	if( TIMER_DATA == type )
 	{
