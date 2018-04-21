@@ -75,7 +75,7 @@ void GateWayServer::handleTimerMsg( unsigned int id )
 
 }
 
-void GateWayServer::onMsg( unsigned int id, KernalNetWorkType netTyp, KernalMessageType type, const char *data, unsigned int size )
+void GateWayServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size )
 {
 	if( TIMER_DATA == type )
 	{
@@ -92,22 +92,20 @@ void GateWayServer::onMsg( unsigned int id, KernalNetWorkType netTyp, KernalMess
 		return;
 #endif	
 	
-		struct KernalNetWork *pNetWork = m_Epoll.getNetWork( id );
-
 		// 将消息转发给内部服务器
 		if(  id != m_CenterServerID && !isInternalServer( id ) && ( KernalNetWorkType_CONNECTED == pNetWork->type || KernalNetWorkType_CONNECTED_HTTP == pNetWork->type ) )
 		{
 			int cmd = 0;
 			memcpy( &cmd, data, 4 );
-			if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_CenterMinCmd && cmd < m_CenterMaxCmd )
+			if( KernalNetWorkType_CONNECTED == netType && cmd >= m_CenterMinCmd && cmd < m_CenterMaxCmd )
 			{
 				sendMsgToCenter( id, type, data, size );
 			}
-			else if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_PlatformMinCmd && cmd < m_PlatformMaxCmd )
+			else if( KernalNetWorkType_CONNECTED == netType && cmd >= m_PlatformMinCmd && cmd < m_PlatformMaxCmd )
 			{
 				sendMsgToPlatform( id, type, data, size );
 			}
-			else if( KernalNetWorkType_CONNECTED == pNetWork->type && cmd >= m_GameMinCmd )
+			else if( KernalNetWorkType_CONNECTED == netType && cmd >= m_GameMinCmd )
 			{
 				sendMsgToGame( id, type, data, size );
 			}

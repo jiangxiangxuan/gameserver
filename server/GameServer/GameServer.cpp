@@ -75,7 +75,7 @@ void GameServer::handleTimerMsg( unsigned int id )
 	//TODO:处理定时器消息	
 }
 
-void GameServer::onMsg( unsigned int id, KernalNetWorkType netTyp, KernalMessageType type, const char *data, unsigned int size )
+void GameServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size )
 {
 	if( TIMER_DATA == type )
 	{

@@ -84,7 +84,7 @@ void DBServer::handleTimerMsg( unsigned int id )
 
 }
 
-void DBServer::onMsg( unsigned int id, KernalNetWorkType netTyp, KernalMessageType type, const char *data, unsigned int size )
+void DBServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size )
 {
 	if( TIMER_DATA == type )
 	{
@@ -94,7 +94,7 @@ void DBServer::onMsg( unsigned int id, KernalNetWorkType netTyp, KernalMessageTy
 	{
 		char *buff = (char*)data;
 		DealStart(buff);
-		DealMsg(id, DBServerReqMsg, buff);
+		DealMsg( id, DBServerReqMsg, buff );
 		DealEnd();
 	}
 	else if( NETWORK_CLOSE == type )

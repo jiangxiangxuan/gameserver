@@ -52,7 +52,7 @@ void CenterServer::handleTimerMsg( unsigned int id )
 
 }
 
-void CenterServer::onMsg( unsigned int id, KernalNetWorkType netTyp, KernalMessageType type, const char *data, unsigned int size )
+void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size )
 {
 	m_Locker.lock();
 	if( TIMER_DATA == type )
@@ -62,18 +62,17 @@ void CenterServer::onMsg( unsigned int id, KernalNetWorkType netTyp, KernalMessa
 	else if( NETWORK_DATA == type )
 	{
 		// 中心服务器无网关 直接和客户端通信
-		struct KernalNetWork *pNetWork = m_Epoll.getNetWork( id );
-		if( KernalNetWorkType_CONNECTED == pNetWork->type )
+		if( KernalNetWorkType_CONNECTED == netTyp )
 		{
 			char *buff = (char*)data;
 			DealStart(buff);
-			DealMsg(id, CenterRegisterServerInfo, buff);
-			DealMsg(id, CenterUpdateServerInfo, buff);
+			DealMsg( id, CenterRegisterServerInfo, buff );
+			DealMsg( id, CenterUpdateServerInfo, buff );
 			DealMsg( id, GateWayInternalServerMsg, buff );
-			DealMsg(id, PlatformGameServerMsg, buff);
+			DealMsg( id, PlatformGameServerMsg, buff );
 			DealEnd();
 		}
-		else if( KernalNetWorkType_CONNECTED_HTTP == pNetWork->type )
+		else if( KernalNetWorkType_CONNECTED_HTTP == netTyp )
 		{
 			char buff[50];
 			memset( buff, 0, sizeof(buff) );
