@@ -431,6 +431,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 {
 	//m_locker.lock();
 
+	printf("KernalEpoll::handleMessage 000 %d  %d \n\r",m_eventNum,m_eventIndex);
     result.init();
     if( m_eventNum == m_eventIndex )
     {
@@ -462,6 +463,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 
         }
     }
+	printf("KernalEpoll::handleMessage 111 %d  %d \n\r",m_eventNum,m_eventIndex);
 
     struct epoll_event *pEvent = &m_events[ m_eventIndex++ ];
     struct KernalNetWork *pNetWork = ( struct KernalNetWork * )(pEvent->data.ptr);
