@@ -686,6 +686,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         pNetWork->isRead = false;
         msgType = KernalSocketMessageType_NO;
         result.id = pNetWork->id;
+        result.netType = pNetWork->type;
 
         int ret = -1;
         if( KernalNetWorkType_CONNECTED_HTTP == pNetWork->type )
@@ -747,7 +748,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                     {
                         result.size = size;
                         result.data = ( char* )malloc( size );
-                        result.netType = pNetWork->type;
                         memset( result.data, 0, size );
                         memcpy( result.data, pNetWork->readBuffers + 4, size );
                         msgType = KernalSocketMessageType_SOCKET_DATA;
