@@ -841,7 +841,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         epollMod( pNetWork->fd, 0, pNetWork );
         if( KernalNetWorkType_CONNECTED_HTTP == pNetWork->type )
         {
-            //closeSocket( pNetWork->id );
+            closeSocket( pNetWork->id );
             msgType = KernalSocketMessageType_SOCKET_CLOSE;
         }
         if( KernalNetWorkType_NO != pNetWork->type && ( pNetWork->isWrite || pNetWork->isRead ) )
