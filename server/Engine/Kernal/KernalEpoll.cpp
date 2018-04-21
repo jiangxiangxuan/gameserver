@@ -815,7 +815,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 			{
 				NWriteInt32(dataBuf, &tmp->size);
 			}
-			NWriteBit(dataBuf,data,tmp->size);
+			NWriteBit(dataBuf,tmp->data,tmp->size);
 			ret = sendMsg( pNetWork->fd, buffer, dataBuf - buffer );
 			free( buffer );
 #endif
