@@ -87,6 +87,7 @@ void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMess
 			{
 				sprintf( buff, "{\"state\":\"0\"}" );
 			}
+			printf("CenterServer::onMsg %s \n\r",buff);
 			m_Epoll.send( id, buff, strlen(buff) );
 
 		}
