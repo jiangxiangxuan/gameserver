@@ -811,7 +811,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 			char *buffer = (char*)malloc( tmp->size + 4 );
 			memset( buffer, 0, tmp->size + 4 );
 			char *dataBuf = buffer;
-			int ret = 0;
 			if( KernalNetWorkType_CONNECTED_HTTP != pNetWork->type )
 			{
 				NWriteInt32(dataBuf, &tmp->size);
