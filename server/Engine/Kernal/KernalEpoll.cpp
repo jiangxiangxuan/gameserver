@@ -237,7 +237,7 @@ bool KernalEpoll::send( int id, void *data, int size )
 	int fd = 0;
     NWriteInt32(dataBuf, &id);
     NWriteInt32(dataBuf, &socket_data);
-    NWriteInt32(dataBuf, &ssize);
+    NWriteInt32(dataBuf, &size);
     NWriteInt32(dataBuf, &fd);
     dataBuf = _buf;
     sendMsg( m_ctrlfd[1], dataBuf, ssize, true );
