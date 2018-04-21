@@ -513,7 +513,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
             int type = *( (int*)(pNetWork->readBuffers + 4) );
             int id = *( (int*)(pNetWork->readBuffers) );
 			
-			printf("KernalEpoll::handleMessage 333 %d  %d  %d  %d\n\r",id,type,size,fd);
+			printf("KernalEpoll::handleMessage 333 %d  %d  %d  %d  %d\n\r",id,type,size,fd,pNetWork->readBuffersLen);
             if( pNetWork->readBuffersLen - 16 >= size )
             {
                 struct KernalNetWork *pNet = &m_NetWorks[ HASH_ID( id ) ];
