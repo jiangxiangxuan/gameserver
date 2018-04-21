@@ -443,6 +443,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 			//m_locker.unlock();
 		    return KernalSocketMessageType_NO;
 		}
+		printf("KernalEpoll::handleMessage 111 %d  %d \n\r",m_eventNum,m_eventIndex);
 
         for ( int i = 0; i < m_eventNum; i++ )
         {
@@ -463,7 +464,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 
         }
     }
-	printf("KernalEpoll::handleMessage 111 %d  %d \n\r",m_eventNum,m_eventIndex);
+	printf("KernalEpoll::handleMessage 222 %d  %d \n\r",m_eventNum,m_eventIndex);
 
     struct epoll_event *pEvent = &m_events[ m_eventIndex++ ];
     struct KernalNetWork *pNetWork = ( struct KernalNetWork * )(pEvent->data.ptr);
