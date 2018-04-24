@@ -525,22 +525,20 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                 }
                 else if( type == socket_connect )
                 {
-		    		struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
-                    pNetWork->init();
+                    pNet->init();
 
-                    pNetWork->type = KernalNetWorkType_CONNECTED;
-                    pNetWork->fd   = fd;
-                    pNetWork->id   = id;
+                    pNet->type = KernalNetWorkType_CONNECTED;
+                    pNet->fd   = fd;
+                    pNet->id   = id;
 
                     setnonblocking( fd );
                     epollAdd( id );
                 }
                 else if( type == socket_listen )
                 {
-                    struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
-                    pNetWork->type = KernalNetWorkType_LISTEN;
-                    pNetWork->fd   = fd;
-                    pNetWork->id   = id;
+                    pNet->type = KernalNetWorkType_LISTEN;
+                    pNet->fd   = fd;
+                    pNet->id   = id;
 
                     setnonblocking( fd );
                     epollAdd( id );
