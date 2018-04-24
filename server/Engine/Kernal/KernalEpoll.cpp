@@ -243,7 +243,6 @@ bool KernalEpoll::send( int id, void *data, int size )
     dataBuf = _buf;
     sendMsg( m_ctrlfd[1], dataBuf, ssize, true );
 	free( _buf );
-	printf("KernalEpoll send data=%s size=%d\r\n",data,size);
 #if 0
     struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
     if( KernalNetWorkType_NO == pNetWork->type || pNetWork->id != id )
@@ -432,7 +431,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 {
     //m_locker.lock();
 
-    printf("KernalEpoll::handleMessage 000 %d  %d \n\r",m_eventNum,m_eventIndex);
     result.init();
     if( m_eventNum == m_eventIndex )
     {
@@ -444,7 +442,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 	    	//m_locker.unlock();
 	    	return KernalSocketMessageType_NO;
 		}
-		printf("KernalEpoll::handleMessage 111 %d  %d \n\r",m_eventNum,m_eventIndex);
 
         for ( int i = 0; i < m_eventNum; i++ )
         {
@@ -465,7 +462,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 
         }
     }
-    printf("KernalEpoll::handleMessage 222 %d  %d \n\r",m_eventNum,m_eventIndex);
 
     struct epoll_event *pEvent = &m_events[ m_eventIndex++ ];
     struct KernalNetWork *pNetWork = ( struct KernalNetWork * )(pEvent->data.ptr);
@@ -514,7 +510,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
             int type = *( (int*)(pNetWork->readBuffers + 4) );
             int id = *( (int*)(pNetWork->readBuffers) );
 			
-	   		printf("KernalEpoll::handleMessage 333 %d  %d  %d  %d  %d\n\r",id,type,size,fd,pNetWork->readBuffersLen);
             if( pNetWork->readBuffersLen - 16 >= size )
             {
                 struct KernalNetWork *pNet = &m_NetWorks[ HASH_ID( id ) ];
@@ -552,13 +547,11 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                 }
                 else if( pNet->id == id )  // 发送数据
                 {
-					printf("KernalEpoll::handleMessage 444 %d  %d  %d \n\r",m_eventNum,m_eventIndex,pNet->type);
                     if( KernalNetWorkType_CONNECTED == pNet->type || KernalNetWorkType_CONNECTED_HTTP == pNet->type )
                     {
                         void *buffer = malloc( size );
                         memset( buffer, 0, size );
                         memcpy( buffer, pNetWork->readBuffers + 16, size );
-						printf("kernalepoll::handleMessage 444-000  data=%s,size=%d \r\n\r\n", buffer,size);
                         pNet->buffers.appendBuffer( buffer, size );
                         epollMod( pNet->fd, EPOLLOUT, pNet );
                         pNet->isWrite = true;
@@ -792,13 +785,11 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 
     if( pNetWork->isWrite /*pEvent->events & EPOLLOUT*/ ) //发送数据
     {
-		printf("KernalEpoll::handleMessage 555 %d  %d  %d  \n\r",m_eventNum,m_eventIndex,pNetWork->id);
         pNetWork->isWrite = false;
         result.id = pNetWork->id;
 
         while( pNetWork->buffers.head )
         {
-			printf("KernalEpoll::handleMessage 666 %d  %d  %d  \n\r",m_eventNum,m_eventIndex,pNetWork->type);
             msgType = KernalSocketMessageType_NO;
             struct KernalNetWorkBuffer *tmp = pNetWork->buffers.head;
             int ret = 0;
@@ -821,7 +812,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 			ret = sendMsg( pNetWork->fd, buffer, dataBuf - buffer );
 			free( buffer );
 #endif
-			printf("KernalEpoll::handleMessage 777 data=%s  size=%d  \n\r",tmp->data,tmp->size);
             
             pNetWork->buffers.head = tmp->next;
             free(tmp->data);
