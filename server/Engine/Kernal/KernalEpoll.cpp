@@ -239,10 +239,11 @@ bool KernalEpoll::send( int id, void *data, int size )
     NWriteInt32(dataBuf, &socket_data);
     NWriteInt32(dataBuf, &size);
     NWriteInt32(dataBuf, &fd);
+	NWriteBit(dataBuf, data, size);
     dataBuf = _buf;
     sendMsg( m_ctrlfd[1], dataBuf, ssize, true );
 	free( _buf );
-
+	printf("KernalEpoll send data=%s size=%d\r\n",data,size);
 #if 0
     struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
     if( KernalNetWorkType_NO == pNetWork->type || pNetWork->id != id )
@@ -429,9 +430,9 @@ int KernalEpoll::sendMsg( int fd, const void *data, int size, bool useWrite )
 
 KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 {
-	//m_locker.lock();
+    //m_locker.lock();
 
-	printf("KernalEpoll::handleMessage 000 %d  %d \n\r",m_eventNum,m_eventIndex);
+    printf("KernalEpoll::handleMessage 000 %d  %d \n\r",m_eventNum,m_eventIndex);
     result.init();
     if( m_eventNum == m_eventIndex )
     {
@@ -439,9 +440,9 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         m_eventIndex = 0;
 		if( m_eventNum <= 0)
     	{
-		    m_eventNum = 0;
-			//m_locker.unlock();
-		    return KernalSocketMessageType_NO;
+	    	m_eventNum = 0;
+	    	//m_locker.unlock();
+	    	return KernalSocketMessageType_NO;
 		}
 		printf("KernalEpoll::handleMessage 111 %d  %d \n\r",m_eventNum,m_eventIndex);
 
@@ -464,7 +465,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 
         }
     }
-	printf("KernalEpoll::handleMessage 222 %d  %d \n\r",m_eventNum,m_eventIndex);
+    printf("KernalEpoll::handleMessage 222 %d  %d \n\r",m_eventNum,m_eventIndex);
 
     struct epoll_event *pEvent = &m_events[ m_eventIndex++ ];
     struct KernalNetWork *pNetWork = ( struct KernalNetWork * )(pEvent->data.ptr);
@@ -508,12 +509,12 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 
         if( pNetWork->readBuffersLen >= 16 )
         {
-			int fd = *( (int*)(pNetWork->readBuffers + 12) );
+	    	int fd = *( (int*)(pNetWork->readBuffers + 12) );
             int size = *( (int*)(pNetWork->readBuffers + 8) );
             int type = *( (int*)(pNetWork->readBuffers + 4) );
             int id = *( (int*)(pNetWork->readBuffers) );
 			
-			printf("KernalEpoll::handleMessage 333 %d  %d  %d  %d  %d\n\r",id,type,size,fd,pNetWork->readBuffersLen);
+	   		printf("KernalEpoll::handleMessage 333 %d  %d  %d  %d  %d\n\r",id,type,size,fd,pNetWork->readBuffersLen);
             if( pNetWork->readBuffersLen - 16 >= size )
             {
                 struct KernalNetWork *pNet = &m_NetWorks[ HASH_ID( id ) ];
@@ -529,7 +530,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                 }
                 else if( type == socket_connect )
                 {
-					struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
+		    		struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
                     pNetWork->init();
 
                     pNetWork->type = KernalNetWorkType_CONNECTED;
@@ -557,6 +558,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                         void *buffer = malloc( size );
                         memset( buffer, 0, size );
                         memcpy( buffer, pNetWork->readBuffers + 16, size );
+						printf("kernalepoll::handleMessage 444-000  data=%s,size=%d \r\n\r\n", buffer,size);
                         pNet->buffers.appendBuffer( buffer, size );
                         epollMod( pNet->fd, EPOLLOUT, pNet );
                         pNet->isWrite = true;
@@ -819,7 +821,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 			ret = sendMsg( pNetWork->fd, buffer, dataBuf - buffer );
 			free( buffer );
 #endif
-			printf("KernalEpoll::handleMessage 777 %d  %d  %d  %d  \n\r",m_eventNum,m_eventIndex,pNetWork->fd,ret);
+			printf("KernalEpoll::handleMessage 777 data=%s  size=%d  \n\r",tmp->data,tmp->size);
             
             pNetWork->buffers.head = tmp->next;
             free(tmp->data);
