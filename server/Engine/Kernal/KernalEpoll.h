@@ -210,7 +210,6 @@ public:
     void epollDel( int id );
     void release();
 
-    struct KernalNetWork *getNetWork( int id );
     void close( int id );
 
     // 检测心跳

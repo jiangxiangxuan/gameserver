@@ -902,12 +902,6 @@ int KernalEpoll::getSocketID()
     return -1;
 }
 
-struct KernalNetWork *KernalEpoll::getNetWork( int id )
-{
-    struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
-    return pNetWork;
-}
-
 void KernalEpoll::heartbeat()
 {
 	return;
