@@ -557,80 +557,30 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                         pNet->isWrite = true;
                     }
                 }
-				/*else if( pNet->id != id ) 
+				else if( pNet->id != id ) // 连接已经关闭
 				{
-					closeSocket( id );
                     result.id = id;
                     msgType = KernalSocketMessageType_SOCKET_CLOSE;
-				}*/
+				}
 
                 pNetWork->readBuffersLen -= size + 16;
                 memmove( pNetWork->readBuffers, pNetWork->readBuffers + size + 16, pNetWork->readBuffersLen );
             }
         }
-#if 0
-        int ret = readMsg( pNetWork->fd, pNetWork->readBuffers + pNetWork->readBuffersLen, RECV_BUFFER_SIZE - pNetWork->readBuffersLen, true, true );
-        if( ret > 0 )
-        {
-            pNetWork->readBuffersLen += ret;
-        }
 
-        while( true )
-        {
-            if( pNetWork->readBuffersLen >= 12 )
-            {
-                int size = *( (int*)(pNetWork->readBuffers + 8) );
-                int type = *( (int*)(pNetWork->readBuffers + 4) );
-                int id = *( (int*)(pNetWork->readBuffers) );
-                if( size <= pNetWork->readBuffersLen - 12 )
-                {
-                    struct KernalNetWork *pNet = &m_NetWorks[ HASH_ID( id ) ];
-                    if( type == socket_close )  // 关闭连接
-                    {
-                        closeSocket( id );
-                    }
-                    else  // 发送数据
-                    {
-                        if( KernalNetWorkType_CONNECTED == pNet->type || KernalNetWorkType_CONNECTED_HTTP == pNet->type )
-                        {
-                            void *buffer = malloc( size );
-                            memset( buffer, 0, size );
-                            memcpy( buffer, pNetWork->readBuffers + 12, size );
-                            pNet->buffers.appendBuffer( buffer, size );
-                            epollMod( pNet->fd, EPOLLOUT, pNet );
-                            pNet->isWrite = true;
-                        }
-
-                        pNetWork->readBuffersLen -= size + 12;
-                        memmove( pNetWork->readBuffers, pNetWork->readBuffers + size + 12, pNetWork->readBuffersLen );
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-            else
-            {
-                break;
-            }
-        }
-#endif
-
-#if 1
         if( pNetWork->readBuffersLen < 16 )
         {
             pNetWork->isRead = false;
         }
-        else if( socket_data == msgType )
+        else /*if( socket_data == msgType )*/
         {
             int size = *( (int*)(pNetWork->readBuffers + 8) );
-            if( size > 0 && size > pNetWork->readBuffersLen - 12 )
+            if( size > 0 && size >= pNetWork->readBuffersLen - 16 )
             {
                 pNetWork->isRead = false;
             }
         }
-#endif
+		
         if( pNetWork->isRead )
         {
             --m_eventIndex;
@@ -793,14 +743,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
             msgType = KernalSocketMessageType_NO;
             struct KernalNetWorkBuffer *tmp = pNetWork->buffers.head;
             int ret = 0;
-#if 0			
-            if( KernalNetWorkType_CONNECTED_HTTP != pNetWork->type )
-            {
-                ret = sendMsg( pNetWork->fd, &tmp->size, 4 );
-            }
-            ret = sendMsg( pNetWork->fd, tmp->data, tmp->size );
-#endif			
-#if 1		
+		
 			char *buffer = (char*)malloc( tmp->size + 4 );
 			memset( buffer, 0, tmp->size + 4 );
 			char *dataBuf = buffer;
@@ -811,7 +754,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 			NWriteBit(dataBuf,tmp->data,tmp->size);
 			ret = sendMsg( pNetWork->fd, buffer, dataBuf - buffer );
 			free( buffer );
-#endif
             
             pNetWork->buffers.head = tmp->next;
             free(tmp->data);
