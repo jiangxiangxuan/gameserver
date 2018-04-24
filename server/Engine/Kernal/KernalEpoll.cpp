@@ -78,7 +78,7 @@ int KernalEpoll::listen( const char *addr, const int port )
     int id =  getSocketID();//fd; //getSocketID();
     if( id > 0 )
     {
-#if 1
+#if 0
         struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
         pNetWork->init();
         pNetWork->type = KernalNetWorkType_LISTEN;
@@ -121,40 +121,7 @@ int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool addTo
 	int ret = ::connect( fd, ( struct sockaddr * )&addrin, sizeof(addrin) );
     int id =  getSocketID();//fd; //getSocketID();
 	sfd = fd;
-#if 0
-    if( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) )
-    {
-#if 1
-        struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
-        pNetWork->init();
 
-        pNetWork->type = KernalNetWorkType_CONNECTED;
-        pNetWork->fd   = fd;
-        pNetWork->id   = id;
-
-        epollAdd( id );
-#else
-        int size = 0;
-        char _buf[16] = {0};
-        char* dataBuf = _buf;
-        NWriteInt32(dataBuf, &id);
-        NWriteInt32(dataBuf, &socket_connect);
-        NWriteInt32(dataBuf, &size);
-        NWriteInt32(dataBuf, &fd);
-        dataBuf = _buf;
-        sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
-#endif
-
-    }
-    else
-    {
-        ::close( fd );
-
-        id = -1;
-    }
-	//m_locker.unlock();
-    return id;
-#endif
 	if( !( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) ) )
 	{
         ::close( fd );
@@ -179,30 +146,6 @@ int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool addTo
     return id;
 }
 
-#if 0
-int KernalEpoll::connectSocket( const char *addr, const int port )
-{
-	int fd = socket( AF_INET, SOCK_STREAM, 0 );
-
-	setnonblocking( fd );
-	struct sockaddr_in addrin;
-	memset(&addrin, 0, sizeof(addrin));
-	addrin.sin_family = AF_INET;
-	addrin.sin_port = htons( port );
-	inet_pton(AF_INET, addr, (void *)&addrin.sin_addr);
-	int ret = ::connect( fd, ( struct sockaddr * )&addrin, sizeof(addrin) );
-    int id =  getSocketID();//fd; //getSocketID();
-    if( !( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) ) )
-    {
-        ::close( fd );
-
-        id = -1;
-    }
-
-    return id;
-}
-#endif
-
 int KernalEpoll::listenHttp( const char *addr, const int port )
 {
     int id = listen( addr, port );
@@ -216,7 +159,8 @@ int KernalEpoll::listenHttp( const char *addr, const int port )
 
 int KernalEpoll::connectHttp( const char *addr, const int port )
 {
-    int id = connect( addr, port );
+	int sfd = 0;
+    int id = connect( addr, port, sfd );
     if( id > 0 )
     {
         struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
