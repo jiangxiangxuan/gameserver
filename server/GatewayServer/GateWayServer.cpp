@@ -239,6 +239,7 @@ void GateWayServer::registerCenterServerInfo()
 
 	struct timespec delay;
 	struct timeval now;
+	int sfd = 0;
 
 	do
 	{
@@ -247,22 +248,22 @@ void GateWayServer::registerCenterServerInfo()
 		delay.tv_nsec = now.tv_usec * 1000;
 		pthread_cond_timedwait(&cond, &mutex, &delay);
 
-		m_CenterServerID = connect(serverIP, serverPort, false);
+		m_CenterServerID = connect(serverIP, serverPort, sfd, false);
 		//m_CenterServerID = m_Epoll.connectSocket( serverIP, serverPort );
 		//for( int i = 0; i < 200000000; ++i );
 		//pthread_delay_n( &delay );
 		if( m_CenterServerID > 0 && EINPROGRESS == errno )
 		{
-			struct KernalNetWork *pNet = m_Epoll.getNetWork(m_CenterServerID);
+			//struct KernalNetWork *pNet = m_Epoll.getNetWork(m_CenterServerID);
 		
 			struct timeval tm = {10, 0};
 			fd_set wset, rset;
 			FD_ZERO( &wset );
 			FD_ZERO( &rset );
-			FD_SET( pNet->fd, &wset );
-			FD_SET( pNet->fd, &rset );
-			int res = select( pNet->fd + 1, &rset, &wset, NULL, &tm );
-			if( res > 0 && FD_ISSET(pNet->fd, &wset)  )
+			FD_SET( sfd, &wset );
+			FD_SET( sfd, &rset );
+			int res = select( sfd + 1, &rset, &wset, NULL, &tm );
+			if( res > 0 && FD_ISSET(sfd, &wset)  )
 			{
 				gettimeofday(&now, NULL);
 				delay.tv_sec = now.tv_sec + 5;
@@ -272,7 +273,7 @@ void GateWayServer::registerCenterServerInfo()
 				int error, code;
 				socklen_t len;
 				len = sizeof(error);
-				code = getsockopt(pNet->fd, SOL_SOCKET, SO_ERROR, &error, &len);
+				code = getsockopt(sfd, SOL_SOCKET, SO_ERROR, &error, &len);
 				if (code < 0 || error)
 				{
 					m_Epoll.close( m_CenterServerID );

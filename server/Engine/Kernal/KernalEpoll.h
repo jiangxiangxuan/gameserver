@@ -189,7 +189,7 @@ public:
 public:
     bool create();
     int listen( const char *addr, const int port );
-    int connect( const char *addr, const int port, bool addToEpoll = true );
+    int connect( const char *addr, const int port, int &sfd, bool addToEpoll = true );
     //int connectSocket( const char *addr, const int port );
 
     // HTTP

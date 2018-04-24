@@ -107,7 +107,7 @@ int KernalEpoll::listen( const char *addr, const int port )
     return id;
 }
 
-int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
+int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool addToEpoll )
 {
 	//m_locker.lock();
 	int fd = socket( AF_INET, SOCK_STREAM, 0 );
@@ -120,6 +120,7 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 	inet_pton(AF_INET, addr, (void *)&addrin.sin_addr);
 	int ret = ::connect( fd, ( struct sockaddr * )&addrin, sizeof(addrin) );
     int id =  getSocketID();//fd; //getSocketID();
+	sfd = fd;
 #if 0
     if( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) )
     {
@@ -158,7 +159,8 @@ int KernalEpoll::connect( const char *addr, const int port, bool addToEpoll )
 	{
         ::close( fd );
 
-        id = -1;
+        id  = -1;
+		sfd = 0;
 	}
 	else if ( addToEpoll && ( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) ) )
 	{
