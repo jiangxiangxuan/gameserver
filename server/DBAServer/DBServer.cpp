@@ -196,10 +196,10 @@ void DBServer::registerCenterServerInfo()
 
 	do
 	{
-    gettimeofday(&now, NULL);
-    delay.tv_sec = now.tv_sec + 2;
-    delay.tv_nsec = now.tv_usec * 1000;
-    pthread_cond_timedwait(&cond, &mutex, &delay);
+		gettimeofday(&now, NULL);
+		delay.tv_sec = now.tv_sec + 2;
+		delay.tv_nsec = now.tv_usec * 1000;
+		pthread_cond_timedwait(&cond, &mutex, &delay);
 
 		m_CenterServerID = connect(serverIP, serverPort, sfd, false);
   	    //m_CenterServerID = m_Epoll.connectSocket( serverIP, serverPort );

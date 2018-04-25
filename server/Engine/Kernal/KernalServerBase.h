@@ -54,7 +54,7 @@ public:
 	~KernalServerBase();
 
 	int listen( const char *ip, int port );
-	int connect( const char *ip, int port, bool addToEpoll = true );
+	int connect( const char *ip, int port, int &sfd, bool addToEpoll = true );
 
 	int listenHttp( const char *ip, int port );
 	int connectHttp( const char *ip, int port );

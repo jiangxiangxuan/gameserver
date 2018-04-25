@@ -47,9 +47,9 @@ int KernalServerBase::listen( const char *ip, int port )
 	return m_Epoll.listen( ip, port );
 }
 
-int KernalServerBase::connect( const char *ip, int port, bool addToEpoll )
+int KernalServerBase::connect( const char *ip, int port, int &sfd, bool addToEpoll )
 {
-	return m_Epoll.connect( ip, port );
+	return m_Epoll.connect( ip, port, sfd );
 }
 
 int KernalServerBase::listenHttp( const char *ip, int port )
