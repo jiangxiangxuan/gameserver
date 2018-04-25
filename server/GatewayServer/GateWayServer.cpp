@@ -399,7 +399,8 @@ void GateWayServer::connServer( CenterNotifyServerInfo &value )
 	delay.tv_nsec = now.tv_usec * 1000;
 	pthread_cond_timedwait(&cond, &mutex, &delay);
 
-	int id = connect( value.ip.c_str(), value.port );
+	int sfd = 0;
+	int id = connect( value.ip.c_str(), value.port, sfd );
 	
 	gettimeofday(&now, NULL);
 	delay.tv_sec = now.tv_sec + 5;
