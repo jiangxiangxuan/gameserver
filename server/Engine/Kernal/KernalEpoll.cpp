@@ -58,7 +58,7 @@ bool KernalEpoll::create()
     return true;
 }
 
-int KernalEpoll::listen( const char *addr, const int port )
+int KernalEpoll::listen( const char *addr, const int port, bool isHttp )
 {
 	int fd = socket( AF_INET, SOCK_STREAM, 0 );
 
@@ -81,7 +81,14 @@ int KernalEpoll::listen( const char *addr, const int port )
 #if 0
         struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
         pNetWork->init();
-        pNetWork->type = KernalNetWorkType_LISTEN;
+		if( !isHttp )
+		{
+			pNetWork->type = KernalNetWorkType_LISTEN;
+		}
+		else
+		{
+			pNetWork->type = KernalNetWorkType_CONNECTED_HTTP;
+		}
         pNetWork->fd   = fd;
         pNetWork->id   = id;
 
@@ -92,7 +99,14 @@ int KernalEpoll::listen( const char *addr, const int port )
         char _buf[16] = {0};
         char* dataBuf = _buf;
         NWriteInt32(dataBuf, &id);
-        NWriteInt32(dataBuf, &socket_listen);
+		if( isHttp )
+		{
+			NWriteInt32(dataBuf, &socket_listen_http);
+		}
+		else
+		{
+			NWriteInt32(dataBuf, &socket_listen);
+		}
         NWriteInt32(dataBuf, &size);
         NWriteInt32(dataBuf, &fd);
         dataBuf = _buf;
@@ -107,7 +121,7 @@ int KernalEpoll::listen( const char *addr, const int port )
     return id;
 }
 
-int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool addToEpoll )
+int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool isHttp, bool addToEpoll )
 {
 	//m_locker.lock();
 	int fd = socket( AF_INET, SOCK_STREAM, 0 );
@@ -135,7 +149,14 @@ int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool addTo
 	    char _buf[16] = {0};
 	    char* dataBuf = _buf;
 	    NWriteInt32(dataBuf, &id);
-	    NWriteInt32(dataBuf, &socket_connect);
+		if( isHttp )
+		{
+			NWriteInt32(dataBuf, &socket_connect_http);
+		}
+		else
+		{
+			NWriteInt32(dataBuf, &socket_connect);
+		}
 	    NWriteInt32(dataBuf, &size);
         NWriteInt32(dataBuf, &fd);
 	    dataBuf = _buf;
@@ -148,24 +169,24 @@ int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool addTo
 
 int KernalEpoll::listenHttp( const char *addr, const int port )
 {
-    int id = listen( addr, port );
-    if( id > 0 )
+    int id = listen( addr, port, true );
+    /*if( id > 0 )
     {
         struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
         pNetWork->type = KernalNetWorkType_LISTEN_HTTP;
-    }
+    }*/
     return id;
 }
 
 int KernalEpoll::connectHttp( const char *addr, const int port )
 {
 	int sfd = 0;
-    int id = connect( addr, port, sfd );
-    if( id > 0 )
+    int id = connect( addr, port, sfd, true );
+    /*if( id > 0 )
     {
         struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
         pNetWork->type = KernalNetWorkType_CONNECTED_HTTP;
-    }
+    }*/
     return id;
 }
 
@@ -469,20 +490,28 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                         msgType = KernalSocketMessageType_SOCKET_CLOSE;
                     }
                 }
-                else if( type == socket_connect )
+                else if( type == socket_connect || type == socket_connect_http )
                 {
                     pNet->init();
 
                     pNet->type = KernalNetWorkType_CONNECTED;
+					if( type == socket_connect_http )
+					{
+						pNet->type = KernalNetWorkType_CONNECTED_HTTP;
+					}
                     pNet->fd   = fd;
                     pNet->id   = id;
 
                     setnonblocking( fd );
                     epollAdd( id );
                 }
-                else if( type == socket_listen )
+                else if( type == socket_listen || type == socket_listen_http )
                 {
                     pNet->type = KernalNetWorkType_LISTEN;
+					if( type == socket_listen_http )
+					{
+						pNet->type = KernalNetWorkType_LISTEN_HTTP;
+					}
                     pNet->fd   = fd;
                     pNet->id   = id;
 

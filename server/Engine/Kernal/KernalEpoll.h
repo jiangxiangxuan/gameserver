@@ -26,17 +26,19 @@
 #define HASH_ID(id) (((unsigned)id) % MAX_NET_WORK_NUM)
 //#define HASH_ID(id) (((unsigned)id))
 
-const int socket_data    = 0;    // 发送数据
-const int socket_connect = 1;    // 建立连接
-const int socket_listen  = 2;    // 监听连接
-const int socket_close   = 3;    // 关闭连接
+const int socket_data         = 0;    // 发送数据
+const int socket_connect      = 1;    // 建立连接
+const int socket_connect_http = 2;    // 建立HTTP连接
+const int socket_listen       = 3;    // 监听连接
+const int socket_listen_http  = 4;    // 监听HTTP连接
+const int socket_close        = 5;    // 关闭连接
 
 enum KernalNetWorkType
 {
     KernalNetWorkType_NO,
     KernalNetWorkType_CONNECTED,
-    KernalNetWorkType_LISTEN,
     KernalNetWorkType_CONNECTED_HTTP,
+    KernalNetWorkType_LISTEN,
     KernalNetWorkType_LISTEN_HTTP,
 };
 
@@ -188,8 +190,8 @@ public:
 
 public:
     bool create();
-    int listen( const char *addr, const int port );
-    int connect( const char *addr, const int port, int &sfd, bool addToEpoll = true );
+    int listen( const char *addr, const int port, bool isHttp = false );
+    int connect( const char *addr, const int port, int &sfd, bool isHttp = false, bool addToEpoll = true );
     //int connectSocket( const char *addr, const int port );
 
     // HTTP
