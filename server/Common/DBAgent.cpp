@@ -219,7 +219,8 @@ void DBAgent::addDBAServer(CenterNotifyServerInfo &value)
 		return;
 	}
 
-	int id = m_pEpoll->connect( value.ip.c_str(), value.port );
+	int sfd = 0;
+	int id = m_pEpoll->connect( value.ip.c_str(), value.port, sfd );
 	if( id > 0 )
 	{
 		DBAServerInfo *pServer = new DBAServerInfo();
