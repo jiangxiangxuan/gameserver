@@ -133,7 +133,8 @@ void KernalServerBase::timerWroker()
 				break;
 			}
 			pushMsg( TIMER_DATA, KernalNetWorkType_NO, NULL, 0, id );
-			m_MessageCond.broadcast();
+			//m_MessageCond.broadcast();
+			m_MessageSem.post();
 		}while( true );
 
 		// 暂停
@@ -164,13 +165,15 @@ void KernalServerBase::epollWroker()
 			case KernalSocketMessageType_SOCKET_DATA: // 如果接收到数据则加入到队列中
 			{
 				pushMsg( NETWORK_DATA, result.netType, result.data, result.size, result.id );
-				m_MessageCond.broadcast();
+				//m_MessageCond.broadcast();
+				m_MessageSem.post();
 				break;
 			}
 			case KernalSocketMessageType_SOCKET_CLOSE: // 关闭连接
 			{
 				pushMsg( NETWORK_CLOSE, result.netType, NULL, 0, result.id );
-				m_MessageCond.broadcast();
+				//m_MessageCond.broadcast();
+				m_MessageSem.post();
 				break;
 			}
 			default:
@@ -191,7 +194,8 @@ void KernalServerBase::worker()
 			KernalMessage *pMsg = m_Messages.pop();
 			if( !pMsg )
 			{
-				m_MessageCond.wait();
+				//m_MessageCond.wait();
+				m_MessageSem.wait();
 				continue;
 			}
 			// 处理消息
@@ -216,6 +220,7 @@ void KernalServerBase::worker()
 		//else
 		{
 			//m_MessageCond.wait();
+			//m_MessageSem.wait();
 		}
 	}
 	onWorkerEnd();
