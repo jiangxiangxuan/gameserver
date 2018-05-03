@@ -47,11 +47,15 @@ template<typename T , uint32_t arraysize> bool KernalArrayLockFree<T , arraysize
 
 
         if(countToIndex(CurrentWriteIndex + 1) == countToIndex(CurrentReadIndex))
-            return null;
-
+		{
+            return NULL;
+		}
+		
         if(!CAS(&m_CurrentWriteIndex , CurrentWriteIndex , CurrentWriteIndex + 1))
+		{
             continue;
-
+		}
+		
         m_Queue[countToIndex(CurrentWriteIndex)] = element;
         break;
 
@@ -75,13 +79,17 @@ template<typename T , uint32_t arraysize> T KernalArrayLockFree<T , arraysize>::
         CurrentReadIndex = m_CurrentReadIndex;
 
         if(countToIndex(CurrentReadIndex) == countToIndex(m_MaxReadIndex))
-            return null;
-
+		{
+            return NULL;
+		}
+		
         result = m_Queue[countToIndex(CurrentReadIndex)];
 
         if(!CAS(&m_CurrentReadIndex , CurrentReadIndex , CurrentReadIndex + 1))
+		{
             continue;
-
+		}
+		
         return result;
 
     }while(1);
