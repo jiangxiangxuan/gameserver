@@ -72,7 +72,6 @@ template<typename T , uint32_t arraysize> bool KernalArrayLockFree<T , arraysize
 template<typename T , uint32_t arraysize> T KernalArrayLockFree<T , arraysize>::pop()
 {
     uint32_t CurrentReadIndex;
-    uint32_t result;
 
     do
     {
@@ -83,7 +82,7 @@ template<typename T , uint32_t arraysize> T KernalArrayLockFree<T , arraysize>::
             return NULL;
 		}
 		
-        result = m_Queue[countToIndex(CurrentReadIndex)];
+        T result = m_Queue[countToIndex(CurrentReadIndex)];
 
         if(!CAS(&m_CurrentReadIndex , CurrentReadIndex , CurrentReadIndex + 1))
 		{
