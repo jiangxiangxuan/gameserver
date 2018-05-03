@@ -186,11 +186,12 @@ void KernalServerBase::worker()
 	onWorkerPre();
 	while( !m_quit )
 	{
-		if( !m_Messages.empty() )
+		//if( !m_Messages.empty() )
 		{
-			KernalMessage *pMsg = m_Messages.front();
+			KernalMessage *pMsg = m_Messages.pop();
 			if( !pMsg )
 			{
+				m_MessageCond.wait();
 				continue;
 			}
 			// 处理消息
@@ -212,9 +213,9 @@ void KernalServerBase::worker()
 			delete pMsg;
 			pMsg = NULL;
 		}
-		else
+		//else
 		{
-			m_MessageCond.wait();
+			//m_MessageCond.wait();
 		}
 	}
 	onWorkerEnd();

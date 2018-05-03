@@ -95,15 +95,15 @@ protected:
 	KernalTimer                 m_Timer;
 private:
 	//KernalQueue<KernalMessage>          m_Messages;       //需处理消息
-	KernalArrayLockFree<KernalMessage>  m_Messages;       //需处理消息(无锁)
-	KernalStack<KernalThread>           m_WorkThreads;    //工作线程
-	KernalThread                        m_EpollThread;    //Epoll 线程
-	KernalThread                        m_TimerThread;    //Timer 线程
-	KernalThread                        m_HeartBeatThread;//心跳 线程
-	KernalConfig                        m_Config;         //配置文件
-	KernalCond                          m_MessageCond;
+	KernalArrayLockFree<KernalMessage*>  m_Messages;       //需处理消息(无锁)
+	KernalStack<KernalThread>            m_WorkThreads;    //工作线程
+	KernalThread                         m_EpollThread;    //Epoll 线程
+	KernalThread                         m_TimerThread;    //Timer 线程
+	KernalThread                         m_HeartBeatThread;//心跳 线程
+	KernalConfig                         m_Config;         //配置文件
+	KernalCond                           m_MessageCond;
 
-	bool                                m_quit;//是否退出
+	bool                                 m_quit;//是否退出
 };
 
 #endif
