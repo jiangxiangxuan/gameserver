@@ -48,7 +48,7 @@ template<typename T , uint32_t arraysize> bool KernalArrayLockFree<T , arraysize
 
         if(countToIndex(CurrentWriteIndex + 1) == countToIndex(CurrentReadIndex))
 		{
-            return NULL;
+            return false;
 		}
 		
         if(!CAS(&m_CurrentWriteIndex , CurrentWriteIndex , CurrentWriteIndex + 1))
@@ -92,6 +92,8 @@ template<typename T , uint32_t arraysize> T KernalArrayLockFree<T , arraysize>::
         return result;
 
     }while(1);
+	
+	return NULL;
 }
 
 #endif
