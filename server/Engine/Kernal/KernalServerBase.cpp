@@ -208,9 +208,9 @@ void KernalServerBase::epollWroker()
 }
 
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
-	void worker(KernalCommunicationPipe *pComPipe);
+void KernalServerBase::worker(KernalCommunicationPipe *pComPipe);
 #else
-	void worker();	
+void KernalServerBase::worker();	
 #endif
 {
 	onWorkerPre();
