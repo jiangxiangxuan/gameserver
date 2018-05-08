@@ -90,11 +90,13 @@ void KernalServerBase::init( const char *configPath )
 		pThread->detach();
 		m_WorkThreads.push( pThread );
 		
+#if defined(KERNAL_USE_COMMUNICATION_PIPE)
 		// 创建线程通信管道
 		KernalCommunicationPipe *pComPipe = new KernalCommunicationPipe();
+		pComPipe->tid = pthread_self();
 		int err = socketpair( AF_UNIX, SOCK_STREAM, 0, pComPipe->pipefd );  
 		m_WorkThreadsPipe.insert( std::pair<pthread_t, KernalCommunicationPipe*>(pthread_self(), pComPipe) );
-		
+#endif
 	}
 }
 
@@ -139,8 +141,10 @@ void KernalServerBase::timerWroker()
 				break;
 			}
 			pushMsg( TIMER_DATA, KernalNetWorkType_NO, NULL, 0, id );
+#if !defined(KERNAL_USE_COMMUNICATION_PIPE)
 			//m_MessageCond.broadcast();
 			m_MessageSem.post();
+#endif
 		}while( true );
 
 		// 暂停
@@ -172,14 +176,18 @@ void KernalServerBase::epollWroker()
 			{
 				pushMsg( NETWORK_DATA, result.netType, result.data, result.size, result.id );
 				//m_MessageCond.broadcast();
+#if !defined(KERNAL_USE_COMMUNICATION_PIPE)
 				m_MessageSem.post();
+#endif				
 				break;
 			}
 			case KernalSocketMessageType_SOCKET_CLOSE: // 关闭连接
 			{
 				pushMsg( NETWORK_CLOSE, result.netType, NULL, 0, result.id );
+#if !defined(KERNAL_USE_COMMUNICATION_PIPE)
 				//m_MessageCond.broadcast();
 				m_MessageSem.post();
+#endif				
 				break;
 			}
 			default:
@@ -192,18 +200,37 @@ void KernalServerBase::epollWroker()
 
 void KernalServerBase::worker()
 {
+	KernalCommunicationPipe *pComPipe = NULL;
+	pthread_t tid = pthread_self();
+	auto iter = m_WorkThreadsPipe.find( tid );
+	if( iter != m_WorkThreadsPipe.end() )
+	{
+		pComPipe = iter->second;
+	}
 	onWorkerPre();
 	while( !m_quit )
 	{
 		//if( !m_Messages.empty() )
 		{
-			KernalMessage *pMsg = m_Messages.pop();
+			KernalMessage *pMsg = NULL;
+#if defined(KERNAL_USE_COMMUNICATION_PIPE)
+			pMsg = new KernalMessage();
+			::read(pComPipe->pipefd[1], pMsg->type, sizeof(pMsg->type));
+			::read(pComPipe->pipefd[1], pMsg->netType, sizeof(pMsg->netType));
+			::read(pComPipe->pipefd[1], pMsg->id, sizeof(pMsg->id));
+			::read(pComPipe->pipefd[1], pMsg->size, sizeof(pMsg->size));
+			pMsg->data = ( char* )malloc( pMsg->size );
+			memset( pMsg->data, 0, pMsg->size );
+			::read(pComPipe->pipefd[1], pMsg->data, pMsg->size);
+#else
+			pMsg = m_Messages.pop();
 			if( !pMsg )
 			{
 				//m_MessageCond.wait();
 				m_MessageSem.wait();
 				continue;
 			}
+#endif
 			// 处理消息
 			switch( pMsg->type )
 			{
@@ -279,13 +306,27 @@ void KernalServerBase::flush()
 
 void KernalServerBase::pushMsg( KernalMessageType type, KernalNetWorkType netType, void *data, unsigned int size, unsigned int id )
 {
+#if defined(KERNAL_USE_COMMUNICATION_PIPE)
+	pthread_t tid = pthread_self();
+	auto iter = m_WorkThreadsPipe.find( tid );
+	if( iter != m_WorkThreadsPipe.end() )
+	{
+		KernalCommunicationPipe *pComPipe = iter->second;
+		::write( pComPipe->pipefd[0], &type, sizeof(type) );
+		::write( pComPipe->pipefd[0], &netType, sizeof(netType) );
+		::write( pComPipe->pipefd[0], &id, sizeof(id) );
+		::write( pComPipe->pipefd[0], &size, sizeof(size) );
+		::write( pComPipe->pipefd[0], (char*)data, size );
+	}
+#else
 	KernalMessage *pMsg = new KernalMessage();
 	pMsg->type     = type;
 	pMsg->netType  = netType;
 	pMsg->data     = data;
 	pMsg->size     = size;
 	pMsg->id       = id;
-	m_Messages.push( pMsg );
+	m_Messages.push( pMsg );	
+#endif	
 }
 
 void KernalServerBase::sendMsg( int fd, char *buff, int len )

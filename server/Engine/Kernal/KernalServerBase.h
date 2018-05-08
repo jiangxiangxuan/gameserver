@@ -18,6 +18,8 @@
 #include "KernalHttpRequest.h"
 #include "KernalArrayLockFree.h"
 
+#define KERNAL_USE_COMMUNICATION_PIPE 1 // 是否使用线程通信管道
+
 enum KernalMessageType
 {
 	NETWORK_DATA,  // SOCKET 消息、网络消息（接收数据）
@@ -48,6 +50,7 @@ public:
 	unsigned int       id;
 };
 
+#if defined(KERNAL_USE_COMMUNICATION_PIPE)
 // 线程的通信管道
 class KernalCommunicationPipe {
 public:
@@ -56,8 +59,10 @@ public:
 		memset( pipefd, 0, sizeof(pipefd) );
 	}
 public:
-	int pipefd[2];
+	int       pipefd[2];
+	pthread_t tid;
 };
+#endif
 
 class KernalServerBase
 {
@@ -114,7 +119,9 @@ private:
 	KernalConfig                                   m_Config;         //配置文件
 	KernalCond                                     m_MessageCond;    //条件变量
 	KernalSem                                      m_MessageSem;     //信号量
+#if defined(KERNAL_USE_COMMUNICATION_PIPE)
 	std::map<pthread_t, KernalCommunicationPipe*>  m_WorkThreadsPipe;//工作线程管道
+#endif
 
 	bool                                           m_quit;//是否退出
 };
