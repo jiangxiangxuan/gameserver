@@ -52,6 +52,7 @@ public:
 
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
 // 线程的通信管道
+class KernalServerBase;
 class KernalCommunicationPipe {
 public:
 	KernalCommunicationPipe()
@@ -59,8 +60,9 @@ public:
 		memset( pipefd, 0, sizeof(pipefd) );
 	}
 public:
-	int       pipefd[2];
-	pthread_t tid;
+	int       		  pipefd[2];
+	pthread_t 		  tid;
+	KernalServerBase *pServerBase;
 };
 #endif
 
@@ -82,7 +84,11 @@ public:
 
 	void timerWroker();
 	void epollWroker();
-	void worker();
+#if defined(KERNAL_USE_COMMUNICATION_PIPE)
+	void worker(KernalCommunicationPipe *pComPipe);
+#else
+	void worker();	
+#endif	
     // 检测心跳
     void heartbeatWorker();
 

@@ -4,8 +4,13 @@
 
 void *KernalServerBaseWorker( void *arg )
 {
+#if defined(KERNAL_USE_COMMUNICATION_PIPE)
+	KernalCommunicationPipe *pComPipe = (KernalCommunicationPipe*)arg;
+	pComPipe->pServerBase->worker(pComPipe);
+#else
 	KernalServerBase *pServerBase = (KernalServerBase*)arg;
 	pServerBase->worker();
+#endif
 	return ((void *)0);
 }
 
@@ -85,18 +90,22 @@ void KernalServerBase::init( const char *configPath )
 	}
 	for( int i = 0; i < m_threadNum; ++i )
 	{
-		KernalThread *pThread = new KernalThread();
-		pThread->init(KernalServerBaseWorker, this);
-		pThread->detach();
-		m_WorkThreads.push( pThread );
-		
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
 		// 创建线程通信管道
 		KernalCommunicationPipe *pComPipe = new KernalCommunicationPipe();
 		pComPipe->tid = pthread_self();
+		pComPipe->pServerBase = this;
 		int err = socketpair( AF_UNIX, SOCK_STREAM, 0, pComPipe->pipefd );  
 		m_WorkThreadsPipe.insert( std::pair<pthread_t, KernalCommunicationPipe*>(pthread_self(), pComPipe) );
 #endif
+		KernalThread *pThread = new KernalThread();
+#if defined(KERNAL_USE_COMMUNICATION_PIPE)
+		pThread->init(KernalServerBaseWorker, pComPipe);
+#else	
+		pThread->init(KernalServerBaseWorker, this);	
+#endif
+		pThread->detach();
+		m_WorkThreads.push( pThread );
 	}
 }
 
@@ -198,15 +207,12 @@ void KernalServerBase::epollWroker()
 	}
 }
 
-void KernalServerBase::worker()
+#if defined(KERNAL_USE_COMMUNICATION_PIPE)
+	void worker(KernalCommunicationPipe *pComPipe);
+#else
+	void worker();	
+#endif
 {
-	KernalCommunicationPipe *pComPipe = NULL;
-	pthread_t tid = pthread_self();
-	auto iter = m_WorkThreadsPipe.find( tid );
-	if( iter != m_WorkThreadsPipe.end() )
-	{
-		pComPipe = iter->second;
-	}
 	onWorkerPre();
 	while( !m_quit )
 	{
@@ -261,7 +267,6 @@ void KernalServerBase::worker()
 
 void KernalServerBase::heartbeatWorker()
 {
-
 	pthread_cond_t  cond;
 	pthread_mutex_t mutex;
 	pthread_mutex_init(&mutex, NULL);
