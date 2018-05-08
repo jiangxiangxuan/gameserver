@@ -57,7 +57,7 @@ public:
 	}
 public:
 	int pipefd[2];
-}
+};
 
 class KernalServerBase
 {
