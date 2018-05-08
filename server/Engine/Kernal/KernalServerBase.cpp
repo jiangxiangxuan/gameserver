@@ -69,6 +69,8 @@ int KernalServerBase::connectHttp( const char *ip, int port )
 
 void KernalServerBase::init( const char *configPath )
 {
+	srand( (unsigned)time(NULL) );
+	
 	m_Epoll.create();
 
 	m_EpollThread.init(KernalServerBaseEpollWorker, this);
@@ -312,7 +314,8 @@ void KernalServerBase::flush()
 void KernalServerBase::pushMsg( KernalMessageType type, KernalNetWorkType netType, void *data, unsigned int size, unsigned int id )
 {
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
-	KernalCommunicationPipe *pComPipe = m_WorkThreadsPipe[0];
+	int index = rand()%m_WorkThreadsPipe.size();
+	KernalCommunicationPipe *pComPipe = m_WorkThreadsPipe[index];
 	if( pComPipe )
 	{
 		::write( pComPipe->pipefd[0], &type, sizeof(type) );

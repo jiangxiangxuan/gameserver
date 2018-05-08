@@ -3,6 +3,7 @@
 #define _KERNAL_SERVER_BASE_H_
 
 #include <stdio.h>
+#include <time.h>
 #include <list>
 #include <initializer_list>
 #include "KernalBuffer.h"
