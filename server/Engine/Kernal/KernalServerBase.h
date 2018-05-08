@@ -126,7 +126,7 @@ private:
 	KernalCond                                     m_MessageCond;    //条件变量
 	KernalSem                                      m_MessageSem;     //信号量
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
-	std::map<pthread_t, KernalCommunicationPipe*>  m_WorkThreadsPipe;//工作线程管道
+	std::vector<KernalCommunicationPipe*>          m_WorkThreadsPipe;//工作线程管道
 #endif
 
 	bool                                           m_quit;//是否退出

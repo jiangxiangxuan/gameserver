@@ -96,7 +96,7 @@ void KernalServerBase::init( const char *configPath )
 		pComPipe->tid = pthread_self();
 		pComPipe->pServerBase = this;
 		int err = socketpair( AF_UNIX, SOCK_STREAM, 0, pComPipe->pipefd );  
-		m_WorkThreadsPipe.insert( std::pair<pthread_t, KernalCommunicationPipe*>(pthread_self(), pComPipe) );
+		m_WorkThreadsPipe.push_back( pComPipe );
 #endif
 		KernalThread *pThread = new KernalThread();
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
@@ -312,11 +312,9 @@ void KernalServerBase::flush()
 void KernalServerBase::pushMsg( KernalMessageType type, KernalNetWorkType netType, void *data, unsigned int size, unsigned int id )
 {
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
-	pthread_t tid = pthread_self();
-	auto iter = m_WorkThreadsPipe.find( tid );
-	if( iter != m_WorkThreadsPipe.end() )
+	KernalCommunicationPipe *pComPipe = m_WorkThreadsPipe[0];
+	if( pComPipe )
 	{
-		KernalCommunicationPipe *pComPipe = iter->second;
 		::write( pComPipe->pipefd[0], &type, sizeof(type) );
 		::write( pComPipe->pipefd[0], &netType, sizeof(netType) );
 		::write( pComPipe->pipefd[0], &id, sizeof(id) );
