@@ -129,7 +129,6 @@ void KernalServerBase::run()
 
 void KernalServerBase::timerWroker()
 {
-
 	pthread_cond_t  cond;
 	pthread_mutex_t mutex;
 	pthread_mutex_init(&mutex, NULL);
