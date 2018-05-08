@@ -215,10 +215,10 @@ void KernalServerBase::worker()
 			KernalMessage *pMsg = NULL;
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
 			pMsg = new KernalMessage();
-			::read(pComPipe->pipefd[1], pMsg->type, sizeof(pMsg->type));
-			::read(pComPipe->pipefd[1], pMsg->netType, sizeof(pMsg->netType));
-			::read(pComPipe->pipefd[1], pMsg->id, sizeof(pMsg->id));
-			::read(pComPipe->pipefd[1], pMsg->size, sizeof(pMsg->size));
+			::read(pComPipe->pipefd[1], &pMsg->type, sizeof(pMsg->type));
+			::read(pComPipe->pipefd[1], &pMsg->netType, sizeof(pMsg->netType));
+			::read(pComPipe->pipefd[1], &pMsg->id, sizeof(pMsg->id));
+			::read(pComPipe->pipefd[1], &pMsg->size, sizeof(pMsg->size));
 			pMsg->data = ( char* )malloc( pMsg->size );
 			memset( pMsg->data, 0, pMsg->size );
 			::read(pComPipe->pipefd[1], pMsg->data, pMsg->size);
