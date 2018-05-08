@@ -103,6 +103,7 @@ private:
 	KernalConfig                         m_Config;         //配置文件
 	KernalCond                           m_MessageCond;    //条件变量
 	KernalSem                            m_MessageSem;     //信号量
+	std::map<pthread_t, int[2]>          m_WorkThreadsPipe;//工作线程管道
 
 	bool                                 m_quit;//是否退出
 };
