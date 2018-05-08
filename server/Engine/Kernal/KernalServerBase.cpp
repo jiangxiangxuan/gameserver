@@ -165,13 +165,11 @@ void KernalServerBase::timerWroker()
 		delay.tv_sec = now.tv_sec;
 		delay.tv_nsec = now.tv_usec * ( 1000000 / TIMER_SLOT );
 		pthread_cond_timedwait(&cond, &mutex, &delay);
-
 	}
 
 	pthread_mutex_unlock(&mutex);
 	pthread_mutex_destroy( &mutex );
 	pthread_cond_destroy( &cond );
-
 }
 
 void KernalServerBase::epollWroker()
