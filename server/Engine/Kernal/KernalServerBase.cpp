@@ -91,9 +91,9 @@ void KernalServerBase::init( const char *configPath )
 		m_WorkThreads.push( pThread );
 		
 		// 创建线程通信管道
-		int fd[2];  
-		int err = socketpair( AF_UNIX, SOCK_STREAM, 0, fd );  
-		m_WorkThreadsPipe.insert( std::pair<pthread_t, int[2]>(pthread_self(), fd) );
+		KernalCommunicationPipe *pComPipe = new KernalCommunicationPipe();
+		int err = socketpair( AF_UNIX, SOCK_STREAM, 0, pComPipe->pipefd );  
+		m_WorkThreadsPipe.insert( std::pair<pthread_t, KernalCommunicationPipe*>(pthread_self(), pComPipe) );
 		
 	}
 }

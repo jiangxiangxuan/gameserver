@@ -48,6 +48,17 @@ public:
 	unsigned int       id;
 };
 
+// 线程的通信管道
+class KernalCommunicationPipe {
+public:
+	KernalCommunicationPipe()
+	{
+		memset( pipefd, 0, sizeof(pipefd) );
+	}
+public:
+	int pipefd[2];
+}
+
 class KernalServerBase
 {
 public:
@@ -94,18 +105,18 @@ protected:
 	KernalEpoll                 m_Epoll;         //EPOLL
 	KernalTimer                 m_Timer;
 private:
-	//KernalQueue<KernalMessage>          m_Messages;      //需处理消息
-	KernalArrayLockFree<KernalMessage*>  m_Messages;       //需处理消息(无锁)
-	KernalStack<KernalThread>            m_WorkThreads;    //工作线程
-	KernalThread                         m_EpollThread;    //Epoll 线程
-	KernalThread                         m_TimerThread;    //Timer 线程
-	KernalThread                         m_HeartBeatThread;//心跳 线程
-	KernalConfig                         m_Config;         //配置文件
-	KernalCond                           m_MessageCond;    //条件变量
-	KernalSem                            m_MessageSem;     //信号量
-	std::map<pthread_t, int[2]>          m_WorkThreadsPipe;//工作线程管道
+	//KernalQueue<KernalMessage>                    m_Messages;      //需处理消息
+	KernalArrayLockFree<KernalMessage*>            m_Messages;       //需处理消息(无锁)
+	KernalStack<KernalThread>                      m_WorkThreads;    //工作线程
+	KernalThread                                   m_EpollThread;    //Epoll 线程
+	KernalThread                                   m_TimerThread;    //Timer 线程
+	KernalThread                                   m_HeartBeatThread;//心跳 线程
+	KernalConfig                                   m_Config;         //配置文件
+	KernalCond                                     m_MessageCond;    //条件变量
+	KernalSem                                      m_MessageSem;     //信号量
+	std::map<pthread_t, KernalCommunicationPipe*>  m_WorkThreadsPipe;//工作线程管道
 
-	bool                                 m_quit;//是否退出
+	bool                                           m_quit;//是否退出
 };
 
 #endif
