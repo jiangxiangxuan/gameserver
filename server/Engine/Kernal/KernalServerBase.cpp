@@ -270,7 +270,8 @@ void KernalServerBase::worker()
 			while( true )
 			{
 				unsigned int timeID = m_Timer.popExpired();
-				if( timeID == 0 {
+				if( timeID == 0 )
+				{
 					break;
 				}
 				pushMsg( TIMER_DATA, KernalNetWorkType_NO, NULL, 0, timeID );
