@@ -224,8 +224,8 @@ void KernalServerBase::worker()
 			struct timeval tm = {0, 1000000};
 			fd_set rset;
 			FD_ZERO( &rset );
-			FD_SET( sfd, &rset );
-			int retval = select(pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm);
+			FD_SET( pComPipe->pipefd[1], &rset );
+			int retval = ::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm );
 			if( retval > 0 && FD_ISSET(pComPipe->pipefd[1], &rset)  )
 			{
 				pMsg = new KernalMessage();

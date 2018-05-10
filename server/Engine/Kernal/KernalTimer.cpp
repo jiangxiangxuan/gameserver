@@ -45,7 +45,7 @@ unsigned int KernalTimer::addTimer( unsigned int expire, int time )
 	auto iter = m_Timers.find( tid );
 	if( iter == m_Timers.end() )
 	{
-		m_Timers.insert( std::make_pair( tid, pTimerNode) );
+		m_Timers.insert( std::make_pair( tid, KernalTimerNodeList() ) );
 	}
 	
 	if( iter != m_Timers.end() )
@@ -97,14 +97,14 @@ void KernalTimer::deleteTimer( unsigned int id )
 #endif
 	for( auto iter = m_Timers.begin(); iter != m_Timers.end(); ++iter )
 	{
-		KernalTimerNode *pTimerNode = iter.second.head;
+		KernalTimerNode *pTimerNode = iter->second.head;
 		while( pTimerNode )
 		{
 			if( pTimerNode->id == id )
 			{
-				if( iter.second.head == pTimerNode )
+				if( iter->second.head == pTimerNode )
 				{
-					iter.second.head = pTimerNode->next;
+					iter->second.head = pTimerNode->next;
 				}
 				else
 				{
@@ -154,14 +154,14 @@ void KernalTimer::deleteTimer( struct KernalTimerNode *pTimerNode )
 
 	for( auto iter = m_Timers.begin(); iter != m_Timers.end(); ++iter )
 	{
-		KernalTimerNode *pTimerN = iter.second.head;
+		KernalTimerNode *pTimerN = iter->second.head;
 		while( pTimerN )
 		{
 			if( pTimerN->id == pTimerNode.id )
 			{
-				if( iter.second.head == pTimerNode )
+				if( pTimerN->head == pTimerNode )
 				{
-					iter.second.head = pTimerNode->next;
+					pTimerN->head = pTimerNode->next;
 				}
 				else
 				{
