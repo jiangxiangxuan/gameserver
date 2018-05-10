@@ -76,8 +76,10 @@ void KernalServerBase::init( const char *configPath )
 	m_EpollThread.init(KernalServerBaseEpollWorker, this);
 	m_EpollThread.detach();
 
+#if !defined(KERNAL_USE_COMMUNICATION_PIPE)
 	m_TimerThread.init(KernalServerBaseTimerWorker, this);
 	m_TimerThread.detach();
+#endif
 
 	m_HeartBeatThread.init(KernalServerBaseHeartBeatWorker, this);
 	m_HeartBeatThread.detach();
