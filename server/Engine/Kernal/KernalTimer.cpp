@@ -273,12 +273,12 @@ unsigned int KernalTimer::popExpired()
 	auto iter = m_Timers.find( tid );
 	if( iter != m_Timers.end() )
 	{
-		struct KernalTimerNode *pNode = iter.second.head;
+		struct KernalTimerNode *pNode = iter->second.head;
 		while( pNode )
 		{
 			if( pNode->expireTime - curTime > 0 )
 			{
-				continue
+				continue;
 			}
 			
 			pNode->expireTime = curTime + pNode->expire;
@@ -300,6 +300,6 @@ unsigned int KernalTimer::popExpired()
 		}
 	}
 	
-	m_TimerLocker.unlock()
+	m_TimerLocker.unlock();
 	return id;
 }
