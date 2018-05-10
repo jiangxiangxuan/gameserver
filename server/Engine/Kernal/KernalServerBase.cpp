@@ -291,6 +291,7 @@ void KernalServerBase::worker()
 
 void KernalServerBase::heartbeatWorker()
 {
+#if 0	
 	pthread_cond_t  cond;
 	pthread_mutex_t mutex;
 	pthread_mutex_init(&mutex, NULL);
@@ -318,7 +319,7 @@ void KernalServerBase::heartbeatWorker()
 	pthread_mutex_unlock(&mutex);
 	pthread_mutex_destroy( &mutex );
 	pthread_cond_destroy( &cond );
-
+#endif
 }
 
 void KernalServerBase::quit()
