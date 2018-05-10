@@ -226,7 +226,7 @@ void KernalServerBase::worker()
 			FD_ZERO( &rset );
 			FD_SET( sfd, &rset );
 			int retval = select(pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm);
-			if( res > 0 && FD_ISSET(pComPipe->pipefd[1], &rset)  )
+			if( retval > 0 && FD_ISSET(pComPipe->pipefd[1], &rset)  )
 			{
 				pMsg = new KernalMessage();
 				::read(pComPipe->pipefd[1], &pMsg->type, sizeof(pMsg->type));

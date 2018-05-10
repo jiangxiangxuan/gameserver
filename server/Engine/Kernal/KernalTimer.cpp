@@ -45,7 +45,7 @@ unsigned int KernalTimer::addTimer( unsigned int expire, int time )
 	auto iter = m_Timers.find( tid );
 	if( iter == m_Timers.end() )
 	{
-		m_Timers.insert( std::make_pair( tid, value) );
+		m_Timers.insert( std::make_pair( tid, pTimerNode) );
 	}
 	
 	if( iter != m_Timers.end() )
