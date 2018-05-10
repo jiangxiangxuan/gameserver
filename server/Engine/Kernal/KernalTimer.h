@@ -11,6 +11,7 @@
 #include <vector>
 #include "KernalLock.h"
 #include "KernalMap.h"
+#include "KernalThread.h"
 
 #define TIMER_SLOT 64 //时间轮槽位
 

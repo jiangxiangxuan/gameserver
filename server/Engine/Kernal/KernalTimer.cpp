@@ -41,7 +41,7 @@ unsigned int KernalTimer::addTimer( unsigned int expire, int time )
     }
     m_TimerNodes[ slot ].head =  pTimerNode;
 #endif
-	pthread_id tid = pthread_self();
+	pthread_t tid = pthread_self();
 	auto iter = m_Timers.find( tid );
 	if( iter == m_Timers.end() )
 	{
@@ -269,7 +269,7 @@ unsigned int KernalTimer::popExpired()
     unsigned int curTime = gettime();
 	
 	m_TimerLocker.lock();
-	pthread_id tid = pthread_self();
+	pthread_t tid = pthread_self();
 	auto iter = m_Timers.find( tid );
 	if( iter != m_Timers.end() )
 	{
