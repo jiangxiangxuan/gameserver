@@ -10,6 +10,7 @@
 #include <sys/time.h>
 #include <vector>
 #include "KernalLock.h"
+#include "KernalMap.h"
 
 #define TIMER_SLOT 64 //时间轮槽位
 
@@ -55,18 +56,23 @@ public:
     void update();
     void expired( int slot );
 public:
-    unsigned int pop();    
+    unsigned int pop();
+    unsigned int popExpired();
 private:   
     void push( unsigned int id );
     void deleteTimer( struct KernalTimerNode *pTimerNode ); 
 private:    
     unsigned int        m_StartTime;
-    int                 m_CurrentSlot;  // 当前槽位
 	KernalMutexLocker   m_TimerLocker;
+#if 0	
+    int                 m_CurrentSlot;  // 当前槽位
 	KernalMutexLocker   m_ExpriedTimerLocker;
 
     KernalTimerNodeList m_TimerNodes[ TIMER_SLOT ];
     std::vector< unsigned int > m_expriedTimers;
+#endif
+	
+	std::map< pthread_t, KernalTimerNodeList > m_Timers;
 };
 
 #endif

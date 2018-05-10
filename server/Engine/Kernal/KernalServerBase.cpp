@@ -129,6 +129,7 @@ void KernalServerBase::run()
 
 void KernalServerBase::timerWroker()
 {
+#if !defined(KERNAL_USE_COMMUNICATION_PIPE)
 	pthread_cond_t  cond;
 	pthread_mutex_t mutex;
 	pthread_mutex_init(&mutex, NULL);
@@ -170,6 +171,7 @@ void KernalServerBase::timerWroker()
 	pthread_mutex_unlock(&mutex);
 	pthread_mutex_destroy( &mutex );
 	pthread_cond_destroy( &cond );
+#endif
 }
 
 void KernalServerBase::epollWroker()
@@ -219,41 +221,61 @@ void KernalServerBase::worker()
 		{
 			KernalMessage *pMsg = NULL;
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
-			pMsg = new KernalMessage();
-			::read(pComPipe->pipefd[1], &pMsg->type, sizeof(pMsg->type));
-			::read(pComPipe->pipefd[1], &pMsg->netType, sizeof(pMsg->netType));
-			::read(pComPipe->pipefd[1], &pMsg->id, sizeof(pMsg->id));
-			::read(pComPipe->pipefd[1], &pMsg->size, sizeof(pMsg->size));
-			pMsg->data = ( char* )malloc( pMsg->size );
-			memset( pMsg->data, 0, pMsg->size );
-			::read(pComPipe->pipefd[1], pMsg->data, pMsg->size);
-#else
-			pMsg = m_Messages.pop();
-			if( !pMsg )
+			struct timeval tm = {0, 1000000};
+			fd_set rset;
+			FD_ZERO( &rset );
+			FD_SET( sfd, &rset );
+			int retval = select(pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm);
+			if( res > 0 && FD_ISSET(pComPipe->pipefd[1], &rset)  )
 			{
-				//m_MessageCond.wait();
-				m_MessageSem.wait();
-				continue;
+				pMsg = new KernalMessage();
+				::read(pComPipe->pipefd[1], &pMsg->type, sizeof(pMsg->type));
+				::read(pComPipe->pipefd[1], &pMsg->netType, sizeof(pMsg->netType));
+				::read(pComPipe->pipefd[1], &pMsg->id, sizeof(pMsg->id));
+				::read(pComPipe->pipefd[1], &pMsg->size, sizeof(pMsg->size));
+				pMsg->data = ( char* )malloc( pMsg->size );
+				memset( pMsg->data, 0, pMsg->size );
+				::read(pComPipe->pipefd[1], pMsg->data, pMsg->size);
+#else
+				pMsg = m_Messages.pop();
+				if( !pMsg )
+				{
+					//m_MessageCond.wait();
+					m_MessageSem.wait();
+					continue;
+				}
+#endif
+				// 处理消息
+				switch( pMsg->type )
+				{
+					case NETWORK_DATA:
+					case TIMER_DATA:
+					case NETWORK_CLOSE:
+					{
+						onMsg(  pMsg->id, pMsg->netType, pMsg->type, (const char *)pMsg->data, pMsg->size );
+						break;
+					}
+					default:
+					{
+						break;
+					}
+				}
+
+				delete pMsg;
+				pMsg = NULL;
+#if defined(KERNAL_USE_COMMUNICATION_PIPE)
+			}
+			
+			// 处理定时器
+			while( true )
+			{
+				unsigned int timeID = m_Timer.popExpired();
+				if( timeID == 0 {
+					break;
+				}
+				pushMsg( TIMER_DATA, KernalNetWorkType_NO, NULL, 0, timeID );
 			}
 #endif
-			// 处理消息
-			switch( pMsg->type )
-			{
-				case NETWORK_DATA:
-				case TIMER_DATA:
-				case NETWORK_CLOSE:
-				{
-					onMsg(  pMsg->id, pMsg->netType, pMsg->type, (const char *)pMsg->data, pMsg->size );
-					break;
-				}
-				default:
-				{
-					break;
-				}
-			}
-
-			delete pMsg;
-			pMsg = NULL;
 		}
 		//else
 		{
