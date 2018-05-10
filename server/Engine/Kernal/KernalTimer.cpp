@@ -157,11 +157,11 @@ void KernalTimer::deleteTimer( struct KernalTimerNode *pTimerNode )
 		KernalTimerNode *pTimerN = iter->second.head;
 		while( pTimerN )
 		{
-			if( pTimerN->id == pTimerNode.id )
+			if( pTimerN->id == pTimerNode->id )
 			{
-				if( pTimerN->head == pTimerNode )
+				if( iter->second.head == pTimerNode )
 				{
-					pTimerN->head = pTimerNode->next;
+					iter->second.head = pTimerNode->next;
 				}
 				else
 				{
