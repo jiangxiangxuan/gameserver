@@ -298,14 +298,31 @@ unsigned int KernalTimer::popExpired()
                 --pNode->time;
             }
 			
+			id = pNode->id;
 			//struct KernalTimerNode *pTempNode = pNode->next;
             // 删除
             if( 0 == pNode->time )
             {
-                deleteTimer( pNode );
+                //deleteTimer( pNode );				
+				if( iter->second.head == pNode )
+				{
+					iter->second.head = pNode->next;
+				}
+				else
+				{
+					if( pNode->pre )
+					{
+						pNode->pre->next = pNode->next;
+					}
+					if( pNode->next )
+					{
+						pNode->next->pre = pNode->pre;
+					}
+				}
+				delete pNode;
+				pNode = NULL;
             }
 			//pNode = pTempNode;
-			id = pNode->id;
 			break;
 		}
 		iter->second.unlock();
