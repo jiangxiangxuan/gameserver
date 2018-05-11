@@ -854,6 +854,7 @@ void KernalEpoll::close( int id )
 
 int KernalEpoll::getSocketID()
 {
+	m_locker.lock();
     for( int i = 0; i < MAX_NET_WORK_NUM; ++i )
     {
         int id = ++m_SocketID;
@@ -867,6 +868,7 @@ int KernalEpoll::getSocketID()
         struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
         if( KernalNetWorkType_NO == pNetWork->type )
         {
+			m_locker.unlock();
             return id;
         }
         else
@@ -874,6 +876,7 @@ int KernalEpoll::getSocketID()
             --i;
         }
     }
+	m_locker.unlock();
     return -1;
 }
 
