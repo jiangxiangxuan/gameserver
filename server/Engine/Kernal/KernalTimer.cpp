@@ -287,6 +287,7 @@ unsigned int KernalTimer::popExpired()
 		{
 			if( pNode->expireTime - curTime > 0 )
 			{
+				pNode = pNode->next;
 				continue;
 			}
 			
