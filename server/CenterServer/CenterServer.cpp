@@ -49,12 +49,12 @@ void CenterServer::onuninit()
 
 void CenterServer::handleTimerMsg( unsigned int id )
 {
-	printf("centerserver on handleTimerMsg tid=%d   id=%d\r\n",pthread_self(), id);
+	printf("centerserver on handleTimerMsg tid=%ld   id=%ld\r\n",pthread_self(), id);
 }
 
 void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size )
 {
-	printf("centerserver on msg tid=%d id=%d\r\n",pthread_self(), id);
+	printf("centerserver on msg tid=%ld id=%d\r\n",pthread_self(), id);
 		
 	m_Locker.lock();
 	if( TIMER_DATA == type )
@@ -77,7 +77,7 @@ void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMess
 		else if( KernalNetWorkType_CONNECTED_HTTP == netType )
 		{
 			unsigned int timeid = m_Timer.addTimer( 500, 10 );
-			printf("centerserver on onMsg add timer tid=%d   id=%ld\r\n",pthread_self(), timeid);
+			printf("centerserver on onMsg add timer tid=%ld   id=%ld\r\n",pthread_self(), timeid);
 	
 			char buff[50];
 			memset( buff, 0, sizeof(buff) );
