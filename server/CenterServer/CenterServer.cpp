@@ -51,6 +51,7 @@ void CenterServer::handleTimerMsg( unsigned int id )
 {
 	printf("centerserver on handleTimerMsg tid=%ld   id=%ld\r\n",pthread_self(), id);
 	
+	// 删除定时任务
 	m_Timer.delTimer( id );
 }
 
@@ -76,7 +77,7 @@ void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMess
 		}
 		else if( KernalNetWorkType_CONNECTED_HTTP == netType )
 		{
-			// 测试定时器
+			// 测试定时任务
 			unsigned int timeid = m_Timer.addTimer( 800, -1 );
 			printf("centerserver on onMsg add timer tid=%ld   id=%ld\r\n",pthread_self(), timeid);
 	
