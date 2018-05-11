@@ -40,9 +40,6 @@ void CenterServer::oninit()
 	const char *httpIP   = getConfig()->getAttributeStr("config/center/http", "ip");
 	int         httpPort = getConfig()->getAttributeInt("config/center/http", "port");
 	listenHttp(httpIP, httpPort);
-	
-	unsigned long int timeid = m_Timer.addTimer( 2, -1 );
-	printf("centerserver on oninit tid=%d   id=%ld\r\n",pthread_self(), timeid);
 }
 
 void CenterServer::onuninit()
@@ -58,6 +55,10 @@ void CenterServer::handleTimerMsg( unsigned int id )
 void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size )
 {
 	printf("centerserver on msg tid=%d id=%d\r\n",pthread_self(), id);
+		
+	unsigned int timeid = m_Timer.addTimer( 2, -1 );
+	printf("centerserver on onMsg add timer tid=%d   id=%ld\r\n",pthread_self(), timeid);
+	
 	m_Locker.lock();
 	if( TIMER_DATA == type )
 	{
