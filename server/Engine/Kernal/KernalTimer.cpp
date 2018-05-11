@@ -334,7 +334,7 @@ int KernalTimer::getMinTimerExpire()
 			{
 				expireTime = 0;
 			}
-			printf("KernalTimer::getMinTimerExpire expireTime=%d curTime=%d   %d\r\n", pNode->expireTime, curTime, expireTime);
+			printf("KernalTimer::getMinTimerExpire expireTime=%ld curTime=%ld   %ld\r\n", pNode->expireTime, curTime, expireTime);
 			if( -1 == minExpire )
 			{
 				minExpire = expireTime;
