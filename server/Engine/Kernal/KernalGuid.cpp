@@ -1,7 +1,7 @@
 
 #include "KernalGuid.h"
 #include "KernalUtil.h"
-#include "Crc32.h"
+#include "KernalCrc32.h"
 
 static unsigned long int g_guid = 0;
 
