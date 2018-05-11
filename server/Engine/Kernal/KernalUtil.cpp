@@ -107,6 +107,6 @@ unsigned long int getCurrentTime()
 	struct timeval tv;
 	gettimeofday(&tv,NULL);
 	//return tv.tv_sec; // 秒
-	//return tv.tv_sec*1000 + tv.tv_usec/1000; // 毫秒
-	return tv.tv_sec*1000000 + tv.tv_usec;   // 微妙
+	return tv.tv_sec*1000 + tv.tv_usec/1000; // 毫秒
+	//return tv.tv_sec*1000000 + tv.tv_usec;   // 微妙
 }
