@@ -230,6 +230,7 @@ void KernalServerBase::worker()
 		{
 			KernalMessage *pMsg = NULL;
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
+			printf("KernalServerBase::worker 000 %d\r\n");
 			int minExpire = m_Timer.getMinTimerExpire();
 			printf("KernalServerBase::worker minExpire = %d\r\n", minExpire);
 			fd_set rset;
@@ -285,16 +286,20 @@ void KernalServerBase::worker()
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
 			}
 			
+			printf("KernalServerBase::worker 111 %d\r\n");
 			// 处理定时器
 			while( true )
 			{
+				printf("KernalServerBase::worker 222 %d\r\n");
 				unsigned int timeID = m_Timer.popExpired();
+				printf("KernalServerBase::worker 333 %d\r\n",timeID);
 				if( timeID == 0 )
 				{
 					break;
 				}
 				pushMsg( TIMER_DATA, KernalNetWorkType_NO, NULL, 0, timeID );
 			}
+			printf("KernalServerBase::worker 444 %d\r\n");
 #endif
 		}
 		//else
