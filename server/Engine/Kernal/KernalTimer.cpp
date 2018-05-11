@@ -25,7 +25,7 @@ unsigned int KernalTimer::addTimer( unsigned int expire, int time )
 {
     //m_TimerLocker.lock();
 
-    unsigned int id = getGuid();
+    unsigned long int id = getGuid();
 
     KernalTimerNode *pTimerNode = new KernalTimerNode();
     pTimerNode->id     = id;

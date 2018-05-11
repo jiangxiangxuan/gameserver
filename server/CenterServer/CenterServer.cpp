@@ -41,7 +41,7 @@ void CenterServer::oninit()
 	int         httpPort = getConfig()->getAttributeInt("config/center/http", "port");
 	listenHttp(httpIP, httpPort);
 	
-	unsigned int timeid = m_Timer.addTimer( 2, -1 );
+	unsigned long int timeid = m_Timer.addTimer( 2, -1 );
 	printf("centerserver on oninit tid=%d   id=%d\r\n",pthread_self(), timeid);
 }
 

@@ -17,12 +17,12 @@
 
 struct KernalTimerNode
 {
-    unsigned int     id;
-    unsigned int     expire;
-    unsigned int     expireTime;
-    int              time;
-    KernalTimerNode *pre;
-    KernalTimerNode *next;
+    unsigned long int     id;
+    unsigned int          expire;
+    unsigned int          expireTime;
+    int                   time;
+    KernalTimerNode      *pre;
+    KernalTimerNode      *next;
 
     KernalTimerNode()
         :id( 0 )
@@ -59,8 +59,8 @@ public:
     ~KernalTimer();
 
 	void init();
-    unsigned int addTimer( unsigned int expire, int time/*执行次数：-1 无限*/ );
-    void deleteTimer( unsigned int id );
+    unsigned long int addTimer( unsigned int expire, int time/*执行次数：-1 无限*/ );
+    void deleteTimer( unsigned long int id );
 
     unsigned int gettime();
 
@@ -73,7 +73,7 @@ public:
     unsigned int popExpired();
 	int getMinTimerExpire();  // 获取最近过期时间的定时器的expire
 private:   
-    void push( unsigned int id );
+    void push( unsigned long int id );
     void deleteTimer( struct KernalTimerNode *pTimerNode );	
 private:    
     unsigned int        m_StartTime;
