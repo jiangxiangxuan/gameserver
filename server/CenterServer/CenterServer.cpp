@@ -76,7 +76,7 @@ void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMess
 		}
 		else if( KernalNetWorkType_CONNECTED_HTTP == netType )
 		{
-			unsigned int timeid = m_Timer.addTimer( 500, 10 );
+			unsigned int timeid = m_Timer.addTimer( 200, -1 );
 			printf("centerserver on onMsg add timer tid=%ld   id=%ld\r\n",pthread_self(), timeid);
 	
 			char buff[50];
