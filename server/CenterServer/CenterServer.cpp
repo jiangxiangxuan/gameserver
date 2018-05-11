@@ -56,9 +56,6 @@ void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMess
 {
 	printf("centerserver on msg tid=%d id=%d\r\n",pthread_self(), id);
 		
-	unsigned int timeid = m_Timer.addTimer( 2, -1 );
-	printf("centerserver on onMsg add timer tid=%d   id=%ld\r\n",pthread_self(), timeid);
-	
 	m_Locker.lock();
 	if( TIMER_DATA == type )
 	{
@@ -79,6 +76,9 @@ void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMess
 		}
 		else if( KernalNetWorkType_CONNECTED_HTTP == netType )
 		{
+			unsigned int timeid = m_Timer.addTimer( 2, -1 );
+			printf("centerserver on onMsg add timer tid=%d   id=%ld\r\n",pthread_self(), timeid);
+	
 			char buff[50];
 			memset( buff, 0, sizeof(buff) );
 
