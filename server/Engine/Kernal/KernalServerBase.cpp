@@ -14,12 +14,14 @@ void *KernalServerBaseWorker( void *arg )
 	return ((void *)0);
 }
 
+#if 0
 void *KernalServerBaseTimerWorker( void *arg )
 {
 	KernalServerBase *pServerBase = (KernalServerBase*)arg;
 	pServerBase->timerWroker();
 	return ((void *)0);
 }
+#endif
 
 void *KernalServerBaseEpollWorker( void *arg )
 {
@@ -76,9 +78,11 @@ void KernalServerBase::init( const char *configPath )
 	m_EpollThread.init(KernalServerBaseEpollWorker, this);
 	m_EpollThread.detach();
 
+#if 0
 #if !defined(KERNAL_USE_COMMUNICATION_PIPE)
 	m_TimerThread.init(KernalServerBaseTimerWorker, this);
 	m_TimerThread.detach();
+#endif
 #endif
 
 	m_HeartBeatThread.init(KernalServerBaseHeartBeatWorker, this);
@@ -129,6 +133,7 @@ void KernalServerBase::run()
 	onExit();
 }
 
+#if 0
 void KernalServerBase::timerWroker()
 {
 #if !defined(KERNAL_USE_COMMUNICATION_PIPE)
@@ -209,6 +214,7 @@ void KernalServerBase::epollWroker()
 		}
 	}
 }
+#endif
 
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
 void KernalServerBase::worker(KernalCommunicationPipe *pComPipe)

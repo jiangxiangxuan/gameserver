@@ -81,14 +81,15 @@ public:
 	void init( const char *configPath );
 	void uninit();
 	void run();
-
+#if 0
 	void timerWroker();
+#endif	
 	void epollWroker();
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
 	void worker(KernalCommunicationPipe *pComPipe);
 #else
 	void worker();	
-#endif	
+#endif
     // 检测心跳
     void heartbeatWorker();
 
@@ -120,7 +121,9 @@ private:
 	KernalArrayLockFree<KernalMessage*>            m_Messages;       //需处理消息(无锁)
 	KernalStack<KernalThread>                      m_WorkThreads;    //工作线程
 	KernalThread                                   m_EpollThread;    //Epoll 线程
+#if 0	
 	KernalThread                                   m_TimerThread;    //Timer 线程
+#endif	
 	KernalThread                                   m_HeartBeatThread;//心跳 线程
 	KernalConfig                                   m_Config;         //配置文件
 	KernalCond                                     m_MessageCond;    //条件变量
