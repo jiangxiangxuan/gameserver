@@ -23,7 +23,7 @@ void KernalTimer::init()
 
 unsigned int KernalTimer::addTimer( unsigned int expire, int time )
 {
-    m_TimerLocker.lock();
+    //m_TimerLocker.lock();
 
     unsigned int id = getGuid();
 
@@ -50,22 +50,24 @@ unsigned int KernalTimer::addTimer( unsigned int expire, int time )
 	
 	if( iter != m_Timers.end() )
 	{
+		iter->second.lock();
 		pTimerNode->next = iter->second.head;
 		if( iter->second.head )
 		{
 			iter->second.head->pre = pTimerNode;
 		}
 		iter->second.head = pTimerNode;
+		iter->second.unlock();
 	}
 	
-	m_TimerLocker.unlock();
+	//m_TimerLocker.unlock();
 
     return id;
 }
 
 void KernalTimer::deleteTimer( unsigned int id )
 {
-    m_TimerLocker.lock();
+    //m_TimerLocker.lock();
 #if 0
     int slot = id % TIMER_SLOT;
     KernalTimerNode *pTimerNode = m_TimerNodes[ slot ].head;
@@ -102,6 +104,7 @@ void KernalTimer::deleteTimer( unsigned int id )
 		{
 			if( pTimerNode->id == id )
 			{
+				iter->second.lock();
 				if( iter->second.head == pTimerNode )
 				{
 					iter->second.head = pTimerNode->next;
@@ -119,17 +122,18 @@ void KernalTimer::deleteTimer( unsigned int id )
 				}
 				delete pTimerNode;
 				pTimerNode = NULL;
+				iter->second.unlock();
 				break;
 			}
 			pTimerNode = pTimerNode->next;
 		}
 	}
-	m_TimerLocker.unlock();
+	//m_TimerLocker.unlock();
 }
 
 void KernalTimer::deleteTimer( struct KernalTimerNode *pTimerNode )
 {
-    m_TimerLocker.lock();
+    //m_TimerLocker.lock();
 #if 0
     int slot = pTimerNode->id % TIMER_SLOT;
 
@@ -159,6 +163,7 @@ void KernalTimer::deleteTimer( struct KernalTimerNode *pTimerNode )
 		{
 			if( pTimerN->id == pTimerNode->id )
 			{
+				iter->second.lock();
 				if( iter->second.head == pTimerNode )
 				{
 					iter->second.head = pTimerNode->next;
@@ -176,12 +181,13 @@ void KernalTimer::deleteTimer( struct KernalTimerNode *pTimerNode )
 				}
 				delete pTimerNode;
 				pTimerNode = NULL;
+				iter->second.unlock();
 				break;
 			}
 			pTimerNode = pTimerNode->next;
 		}
 	}
-	m_TimerLocker.unlock();
+	//m_TimerLocker.unlock();
 }
 
 unsigned int KernalTimer::gettime()
@@ -194,6 +200,7 @@ unsigned int KernalTimer::gettime()
 	return t;
 }
 
+#if 0
 void KernalTimer::update()
 {
 #if 0	
@@ -262,17 +269,19 @@ unsigned int KernalTimer::pop()
 #endif
     return id;
 }
+#endif
 
 unsigned int KernalTimer::popExpired()
 {
     unsigned int id = 0;
     unsigned int curTime = gettime();
 	
-	m_TimerLocker.lock();
+	//m_TimerLocker.lock();
 	pthread_t tid = pthread_self();
 	auto iter = m_Timers.find( tid );
 	if( iter != m_Timers.end() )
 	{
+		iter->second.lock();
 		struct KernalTimerNode *pNode = iter->second.head;
 		while( pNode )
 		{
@@ -298,15 +307,16 @@ unsigned int KernalTimer::popExpired()
 			id = pNode->id;
 			break;
 		}
+		iter->second.unlock();
 	}
 	
-	m_TimerLocker.unlock();
+	//m_TimerLocker.unlock();
 	return id;
 }
 
 int KernalTimer::getMinTimerExpire()
 {
-	m_TimerLocker.lock();
+	//m_TimerLocker.lock();
     unsigned int curTime = gettime();
 	int minExpire = -1;
 	
@@ -314,6 +324,7 @@ int KernalTimer::getMinTimerExpire()
 	auto iter = m_Timers.find( tid );
 	if( iter != m_Timers.end() )
 	{
+		iter->second.lock();
 		struct KernalTimerNode *pNode = iter->second.head;
 		while( pNode )
 		{
@@ -328,8 +339,9 @@ int KernalTimer::getMinTimerExpire()
 			}
 			pNode = pNode->next;
 		}
+		iter->second.unlock();
 	}
-	m_TimerLocker.unlock();
+	//m_TimerLocker.unlock();
 	return minExpire;
 }
 

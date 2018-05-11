@@ -38,8 +38,18 @@ struct KernalTimerNode
 
 struct KernalTimerNodeList
 {
+	KernalMutexLocker      locker;
     struct KernalTimerNode *head;
 	struct KernalTimerNode *tail;
+
+	void lock()
+	{
+		locker.lock();
+	}
+	void unlock()
+	{
+		locker.unlock();
+	}
 };
 
 class KernalTimer
