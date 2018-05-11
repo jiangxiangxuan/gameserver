@@ -329,11 +329,12 @@ int KernalTimer::getMinTimerExpire()
 		struct KernalTimerNode *pNode = iter->second.head;
 		while( pNode )
 		{
-			int expireTime = (int)( pNode->expireTime - curTime );
+			int expireTime = (int)( pNode->expireTime ) - (int)( curTime );
 			if( expireTime < 0 )
 			{
 				expireTime = 0;
 			}
+			printf("KernalTimer::getMinTimerExpire expireTime=%d curTime=%d   %d\r\n", pNode->expireTime, curTime, expireTime);
 			if( -1 == minExpire )
 			{
 				minExpire = expireTime;
