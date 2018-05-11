@@ -21,6 +21,7 @@ bool guidInit()
 unsigned long int getGuid()
 {
 	unsigned long int curTime = getCurrentTime();
-	printf("getGuid g_guid=%ld  time=%ld  time1=%d  guid = %ld\r\n", g_guid, curTime, curTime, g_guid ^ curTime);
+	unsigned int t = curTime;
+	printf("getGuid g_guid=%ld  time=%ld  time1=%d  guid = %ld  t=%d\r\n", g_guid, curTime, curTime, g_guid ^ curTime,t);
 	return g_guid ^ curTime;
 }
