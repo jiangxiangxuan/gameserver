@@ -102,7 +102,7 @@ int getLocalMac(char* mac)
 	return 0;
 }
 
-unsigned long int getCurrentTime()
+unsigned int getCurrentTime()
 {
 	struct timeval tv;
 	gettimeofday(&tv,NULL);
