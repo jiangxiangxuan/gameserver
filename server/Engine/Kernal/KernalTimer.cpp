@@ -26,7 +26,6 @@ unsigned int KernalTimer::addTimer( unsigned int expire, int time )
     //m_TimerLocker.lock();
 
     unsigned int id = getGuid();
-	printf("KernalTimer::addTimer id=%d\n\r",id);
     KernalTimerNode *pTimerNode = new KernalTimerNode();
     pTimerNode->id     = id;
     pTimerNode->expire = expire;
@@ -335,15 +334,17 @@ int KernalTimer::getMinTimerExpire()
 			{
 				expireTime = 0;
 			}
-			printf("KernalTimer::getMinTimerExpire expireTime=%ld curTime=%ld   %ld\r\n", pNode->expireTime, curTime, expireTime);
+			
 			if( -1 == minExpire )
 			{
 				minExpire = expireTime;
 			}
+			
 			if( minExpire > expireTime )
 			{
 				minExpire = expireTime;
 			}
+			
 			pNode = pNode->next;
 			if( 0 == minExpire )
 			{

@@ -231,7 +231,6 @@ void KernalServerBase::worker()
 			KernalMessage *pMsg = NULL;
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
 			int minExpire = m_Timer.getMinTimerExpire();
-			//printf("KernalServerBase::worker minExpire = %d\r\n", minExpire);
 			fd_set rset;
 			FD_ZERO( &rset );
 			FD_SET( pComPipe->pipefd[1], &rset );
