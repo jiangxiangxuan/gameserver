@@ -21,11 +21,11 @@ void KernalTimer::init()
     tv.tv_usec / 10000;
 }
 
-unsigned long int KernalTimer::addTimer( unsigned int expire, int time )
+unsigned int KernalTimer::addTimer( unsigned int expire, int time )
 {
     //m_TimerLocker.lock();
 
-    unsigned long int id = getGuid();
+    unsigned int id = getGuid();
 
     KernalTimerNode *pTimerNode = new KernalTimerNode();
     pTimerNode->id     = id;
@@ -65,7 +65,7 @@ unsigned long int KernalTimer::addTimer( unsigned int expire, int time )
     return id;
 }
 
-void KernalTimer::deleteTimer( unsigned long int id )
+void KernalTimer::deleteTimer( unsigned int id )
 {
     //m_TimerLocker.lock();
 #if 0
