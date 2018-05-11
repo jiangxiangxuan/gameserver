@@ -58,10 +58,14 @@ public:
     void expired( int slot );
 public:
     unsigned int pop();
+	
     unsigned int popExpired();
+	int getMinTimerExpire();  // 获取最近过期时间的定时器的expire
 private:   
     void push( unsigned int id );
-    void deleteTimer( struct KernalTimerNode *pTimerNode ); 
+    void deleteTimer( struct KernalTimerNode *pTimerNode );
+	
+	void initThreadTimer();
 private:    
     unsigned int        m_StartTime;
 	KernalMutexLocker   m_TimerLocker;

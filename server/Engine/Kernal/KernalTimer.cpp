@@ -303,3 +303,42 @@ unsigned int KernalTimer::popExpired()
 	m_TimerLocker.unlock();
 	return id;
 }
+
+int KernalTimer::getMinTimerExpire()
+{
+	m_TimerLocker.lock();
+    unsigned int curTime = gettime();
+	int minExpire = -1;
+	
+	pthread_t tid = pthread_self();
+	auto iter = m_Timers.find( tid );
+	if( iter != m_Timers.end() )
+	{
+		struct KernalTimerNode *pNode = iter->second.head;
+		while( pNode )
+		{
+			int expireTime = (int)( pNode->expireTime - curTime );
+			if( -1 == minExpire )
+			{
+				minExpire = expireTime;
+			}
+			if( minExpire > expireTime )
+			{
+				minExpire = expireTime;
+			}
+			pNode = pNode->next;
+		}
+	}
+	m_TimerLocker.unlock();
+	return minExpire;
+}
+
+unsigned int KernalTimer::initThreadTimer()
+{
+	pthread_t tid = pthread_self();
+	auto iter = m_Timers.find( tid );
+	if( iter == m_Timers.end() )
+	{
+		m_Timers.insert( std::make_pair( tid, KernalTimerNodeList() ) );
+	}
+}

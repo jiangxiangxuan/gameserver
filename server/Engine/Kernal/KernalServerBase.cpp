@@ -217,17 +217,27 @@ void KernalServerBase::worker()
 #endif
 {
 	onWorkerPre();
+	m_Timer.initThreadTimer();
 	while( !m_quit )
 	{
 		//if( !m_Messages.empty() )
 		{
 			KernalMessage *pMsg = NULL;
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
-			struct timeval tm = {0, 1000000};
+			int minExpire = m_Timer.getMinTimerExpire();
 			fd_set rset;
 			FD_ZERO( &rset );
 			FD_SET( pComPipe->pipefd[1], &rset );
-			int retval = ::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm );
+			int retval = 0; //::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm );
+			if( -1 == minExpire )
+			{
+				retval = ::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, NULL );
+			}
+			else
+			{
+				struct timeval tm = {0, minExpire * 10000};
+				retval = ::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm );
+			}
 			if( retval > 0 && FD_ISSET(pComPipe->pipefd[1], &rset)  )
 			{
 				pMsg = new KernalMessage();
