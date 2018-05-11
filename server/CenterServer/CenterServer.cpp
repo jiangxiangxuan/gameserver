@@ -50,6 +50,8 @@ void CenterServer::onuninit()
 void CenterServer::handleTimerMsg( unsigned int id )
 {
 	printf("centerserver on handleTimerMsg tid=%ld   id=%ld\r\n",pthread_self(), id);
+	
+	m_Timer.delTimer( id );
 }
 
 void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size )
