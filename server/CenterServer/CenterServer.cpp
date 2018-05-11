@@ -50,12 +50,12 @@ void CenterServer::onuninit()
 
 }
 
-void CenterServer::handleTimerMsg( unsigned long int id )
+void CenterServer::handleTimerMsg( unsigned int id )
 {
 	printf("centerserver on handleTimerMsg tid=%d   id=%d\r\n",pthread_self(), id);
 }
 
-void CenterServer::onMsg( unsigned long int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size )
+void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size )
 {
 	printf("centerserver on msg tid=%d id=%d\r\n",pthread_self(), id);
 	m_Locker.lock();
