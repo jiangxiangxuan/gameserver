@@ -193,7 +193,7 @@ void KernalServerBase::worker(KernalCommunicationPipe *pComPipe)
 			{
 				break;
 			}
-			onMsg(  timeID, 0, TIMER_DATA, NULL, 0 );
+			onMsg(  timeID, KernalNetWorkType_NO, TIMER_DATA, NULL, 0 );
 		}		
 	}
 	onWorkerEnd();
