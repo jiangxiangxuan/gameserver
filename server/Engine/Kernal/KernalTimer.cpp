@@ -120,6 +120,7 @@ unsigned int KernalTimer::popExpired()
             }
 			
 			id = pNode->id;
+			
             // 如果定时器执行次数为0则删除
             if( 0 == pNode->time )
             {		
@@ -141,6 +142,7 @@ unsigned int KernalTimer::popExpired()
 				delete pNode;
 				pNode = NULL;
             }
+			
 			break;
 		}
 		iter->second.unlock();
