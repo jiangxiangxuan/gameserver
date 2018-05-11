@@ -330,6 +330,10 @@ int KernalTimer::getMinTimerExpire()
 		while( pNode )
 		{
 			int expireTime = (int)( pNode->expireTime - curTime );
+			if( expireTime < 0 )
+			{
+				expireTime = 0;
+			}
 			if( -1 == minExpire )
 			{
 				minExpire = expireTime;
@@ -339,6 +343,10 @@ int KernalTimer::getMinTimerExpire()
 				minExpire = expireTime;
 			}
 			pNode = pNode->next;
+			if( 0 == minExpire )
+			{
+				break;
+			}
 		}
 		iter->second.unlock();
 	}
