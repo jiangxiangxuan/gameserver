@@ -32,10 +32,6 @@ unsigned int KernalTimer::addTimer( unsigned int expire, int time )
 
 	pthread_t tid = pthread_self();
 	auto iter = m_Timers.find( tid );
-	if( iter == m_Timers.end() )
-	{
-		m_Timers.insert( std::make_pair( tid, KernalTimerNodeList() ) );
-	}
 	
 	if( iter != m_Timers.end() )
 	{
@@ -195,10 +191,12 @@ int KernalTimer::getMinTimerExpire()
 
 void KernalTimer::initThreadTimer()
 {
+	m_TimerLocker.lock();
 	pthread_t tid = pthread_self();
 	auto iter = m_Timers.find( tid );
 	if( iter == m_Timers.end() )
 	{
 		m_Timers.insert( std::make_pair( tid, KernalTimerNodeList() ) );
 	}
+	m_TimerLocker.unlock();
 }

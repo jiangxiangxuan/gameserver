@@ -137,67 +137,64 @@ void KernalServerBase::worker(KernalCommunicationPipe *pComPipe)
 	onWorkerPre();
 	m_Timer.initThreadTimer();
 	while( !m_quit )
-	{
-		//if( !m_Messages.empty() )
+	{		
+		KernalMessage *pMsg = NULL;
+		
+		int minExpire = m_Timer.getMinTimerExpire(); // 获取最近过期时间的定时器的expire
+		fd_set rset;
+		FD_ZERO( &rset );
+		FD_SET( pComPipe->pipefd[1], &rset );
+		int retval = 0; //::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm );
+		if( -1 == minExpire )
 		{
-			KernalMessage *pMsg = NULL;
-			
-			int minExpire = m_Timer.getMinTimerExpire(); // 获取最近过期时间的定时器的expire
-			fd_set rset;
-			FD_ZERO( &rset );
-			FD_SET( pComPipe->pipefd[1], &rset );
-			int retval = 0; //::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm );
-			if( -1 == minExpire )
-			{
-				retval = ::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, NULL );
-			}
-			else
-			{
-				struct timeval tm = {0, minExpire * 10000};
-				retval = ::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm );
-			}
-			if( retval > 0 && FD_ISSET(pComPipe->pipefd[1], &rset)  )
-			{
-				pMsg = new KernalMessage();
-				::read(pComPipe->pipefd[1], &pMsg->type, sizeof(pMsg->type));
-				::read(pComPipe->pipefd[1], &pMsg->netType, sizeof(pMsg->netType));
-				::read(pComPipe->pipefd[1], &pMsg->id, sizeof(pMsg->id));
-				::read(pComPipe->pipefd[1], &pMsg->size, sizeof(pMsg->size));
-				pMsg->data = ( char* )malloc( pMsg->size );
-				memset( pMsg->data, 0, pMsg->size );
-				::read(pComPipe->pipefd[1], pMsg->data, pMsg->size);
+			retval = ::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, NULL );
+		}
+		else
+		{
+			struct timeval tm = {0, minExpire * 10000};
+			retval = ::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm );
+		}
+		if( retval > 0 && FD_ISSET(pComPipe->pipefd[1], &rset)  )
+		{
+			// 处理网络消息
+			pMsg = new KernalMessage();
+			::read(pComPipe->pipefd[1], &pMsg->type, sizeof(pMsg->type));
+			::read(pComPipe->pipefd[1], &pMsg->netType, sizeof(pMsg->netType));
+			::read(pComPipe->pipefd[1], &pMsg->id, sizeof(pMsg->id));
+			::read(pComPipe->pipefd[1], &pMsg->size, sizeof(pMsg->size));
+			pMsg->data = ( char* )malloc( pMsg->size );
+			memset( pMsg->data, 0, pMsg->size );
+			::read(pComPipe->pipefd[1], pMsg->data, pMsg->size);
 
-				// 处理消息
-				switch( pMsg->type )
+			// 处理消息
+			switch( pMsg->type )
+			{
+				case NETWORK_DATA:
+				case NETWORK_CLOSE:
 				{
-					case NETWORK_DATA:
-					case TIMER_DATA:
-					case NETWORK_CLOSE:
-					{
-						onMsg(  pMsg->id, pMsg->netType, pMsg->type, (const char *)pMsg->data, pMsg->size );
-						break;
-					}
-					default:
-					{
-						break;
-					}
+					onMsg(  pMsg->id, pMsg->netType, pMsg->type, (const char *)pMsg->data, pMsg->size );
+					break;
 				}
-
-				delete pMsg;
-				pMsg = NULL;
-			}
-			
-			// 处理定时器
-			while( true )
-			{
-				unsigned int timeID = m_Timer.popExpired();
-				if( timeID == 0 )
+				default:
 				{
 					break;
 				}
-				pushMsg( TIMER_DATA, KernalNetWorkType_NO, NULL, 0, timeID );
 			}
+
+			delete pMsg;
+			pMsg = NULL;
 		}
+			
+		// 处理定时器消息
+		while( true )
+		{
+			unsigned int timeID = m_Timer.popExpired();
+			if( timeID == 0 )
+			{
+				break;
+			}
+			onMsg(  timeID, 0, TIMER_DATA, NULL, 0 );
+		}		
 	}
 	onWorkerEnd();
 }
