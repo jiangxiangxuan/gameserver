@@ -180,6 +180,7 @@ void KernalServerBase::timerWroker()
 	pthread_cond_destroy( &cond );
 #endif
 }
+#endif
 
 void KernalServerBase::epollWroker()
 {
@@ -214,7 +215,6 @@ void KernalServerBase::epollWroker()
 		}
 	}
 }
-#endif
 
 #if defined(KERNAL_USE_COMMUNICATION_PIPE)
 void KernalServerBase::worker(KernalCommunicationPipe *pComPipe)
