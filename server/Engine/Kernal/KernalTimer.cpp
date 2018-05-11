@@ -51,7 +51,7 @@ unsigned int KernalTimer::addTimer( unsigned int expire, int time )
     return id;
 }
 
-void KernalTimer::deleteTimer( unsigned int id )
+void KernalTimer::delTimer( unsigned int id )
 {
 	for( auto iter = m_Timers.begin(); iter != m_Timers.end(); ++iter )
 	{

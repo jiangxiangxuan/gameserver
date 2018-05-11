@@ -60,7 +60,7 @@ public:
 
 	void init();
     unsigned int addTimer( unsigned int expire, int time/*执行次数：-1 无限*/ );
-    void deleteTimer( unsigned int id );
+    void delTimer( unsigned int id );
 
     unsigned int gettime();
 public:	
