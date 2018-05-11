@@ -18,8 +18,6 @@
 #include "KernalHttpRequest.h"
 #include "KernalArrayLockFree.h"
 
-#define KERNAL_USE_COMMUNICATION_PIPE 1 // 是否使用线程通信管道
-
 enum KernalMessageType
 {
 	NETWORK_DATA,  // SOCKET 消息、网络消息（接收数据）
@@ -50,7 +48,6 @@ public:
 	unsigned int       id;
 };
 
-#if defined(KERNAL_USE_COMMUNICATION_PIPE)
 // 线程的通信管道
 class KernalServerBase;
 class KernalCommunicationPipe {
@@ -64,7 +61,6 @@ public:
 	pthread_t 		  tid;
 	KernalServerBase *pServerBase;
 };
-#endif
 
 class KernalServerBase
 {
@@ -81,15 +77,11 @@ public:
 	void init( const char *configPath );
 	void uninit();
 	void run();
-#if 0
-	void timerWroker();
-#endif	
+
 	void epollWroker();
-#if defined(KERNAL_USE_COMMUNICATION_PIPE)
+	
 	void worker(KernalCommunicationPipe *pComPipe);
-#else
-	void worker();	
-#endif
+
     // 检测心跳
     void heartbeatWorker();
 
@@ -121,17 +113,11 @@ private:
 	KernalArrayLockFree<KernalMessage*>            m_Messages;       //需处理消息(无锁)
 	KernalStack<KernalThread>                      m_WorkThreads;    //工作线程
 	KernalThread                                   m_EpollThread;    //Epoll 线程
-#if 0	
-	KernalThread                                   m_TimerThread;    //Timer 线程
-#endif	
 	KernalThread                                   m_HeartBeatThread;//心跳 线程
 	KernalConfig                                   m_Config;         //配置文件
 	KernalCond                                     m_MessageCond;    //条件变量
 	KernalSem                                      m_MessageSem;     //信号量
-#if defined(KERNAL_USE_COMMUNICATION_PIPE)
 	std::vector<KernalCommunicationPipe*>          m_WorkThreadsPipe;//工作线程管道
-#endif
-
 	bool                                           m_quit;//是否退出
 };
 

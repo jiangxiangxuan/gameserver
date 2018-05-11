@@ -4,24 +4,10 @@
 
 void *KernalServerBaseWorker( void *arg )
 {
-#if defined(KERNAL_USE_COMMUNICATION_PIPE)
 	KernalCommunicationPipe *pComPipe = (KernalCommunicationPipe*)arg;
 	pComPipe->pServerBase->worker(pComPipe);
-#else
-	KernalServerBase *pServerBase = (KernalServerBase*)arg;
-	pServerBase->worker();
-#endif
 	return ((void *)0);
 }
-
-#if 0
-void *KernalServerBaseTimerWorker( void *arg )
-{
-	KernalServerBase *pServerBase = (KernalServerBase*)arg;
-	pServerBase->timerWroker();
-	return ((void *)0);
-}
-#endif
 
 void *KernalServerBaseEpollWorker( void *arg )
 {
@@ -78,13 +64,6 @@ void KernalServerBase::init( const char *configPath )
 	m_EpollThread.init(KernalServerBaseEpollWorker, this);
 	m_EpollThread.detach();
 
-#if 0
-#if !defined(KERNAL_USE_COMMUNICATION_PIPE)
-	m_TimerThread.init(KernalServerBaseTimerWorker, this);
-	m_TimerThread.detach();
-#endif
-#endif
-
 	m_HeartBeatThread.init(KernalServerBaseHeartBeatWorker, this);
 	m_HeartBeatThread.detach();
 
@@ -98,20 +77,14 @@ void KernalServerBase::init( const char *configPath )
 	}
 	for( int i = 0; i < m_threadNum; ++i )
 	{
-#if defined(KERNAL_USE_COMMUNICATION_PIPE)
 		// 创建线程通信管道
 		KernalCommunicationPipe *pComPipe = new KernalCommunicationPipe();
 		pComPipe->tid = pthread_self();
 		pComPipe->pServerBase = this;
 		int err = socketpair( AF_UNIX, SOCK_STREAM, 0, pComPipe->pipefd );  
 		m_WorkThreadsPipe.push_back( pComPipe );
-#endif
 		KernalThread *pThread = new KernalThread();
-#if defined(KERNAL_USE_COMMUNICATION_PIPE)
 		pThread->init(KernalServerBaseWorker, pComPipe);
-#else	
-		pThread->init(KernalServerBaseWorker, this);	
-#endif
 		pThread->detach();
 		m_WorkThreads.push( pThread );
 	}
@@ -133,55 +106,6 @@ void KernalServerBase::run()
 	onExit();
 }
 
-#if 0
-void KernalServerBase::timerWroker()
-{
-#if !defined(KERNAL_USE_COMMUNICATION_PIPE)
-	pthread_cond_t  cond;
-	pthread_mutex_t mutex;
-	pthread_mutex_init(&mutex, NULL);
-	pthread_cond_init(&cond, NULL);
-	pthread_mutex_lock(&mutex);
-
-	struct timespec delay;
-	struct timeval now;
-
-	while( !m_quit )
-	{
-		m_Timer.update();
-
-		unsigned int id = 0;
-		do
-		{
-			id = m_Timer.pop();
-			if( 0 == id )
-			{
-				break;
-			}
-			pushMsg( TIMER_DATA, KernalNetWorkType_NO, NULL, 0, id );
-#if !defined(KERNAL_USE_COMMUNICATION_PIPE)
-			//m_MessageCond.broadcast();
-			m_MessageSem.post();
-#endif
-		}while( true );
-
-		// 暂停
-		//usleep( 100 );
-		//for( int i = 0; i < 1000; ++i );
-
-		gettimeofday(&now, NULL);
-		delay.tv_sec = now.tv_sec;
-		delay.tv_nsec = now.tv_usec * ( 1000000 / TIMER_SLOT );
-		pthread_cond_timedwait(&cond, &mutex, &delay);
-	}
-
-	pthread_mutex_unlock(&mutex);
-	pthread_mutex_destroy( &mutex );
-	pthread_cond_destroy( &cond );
-#endif
-}
-#endif
-
 void KernalServerBase::epollWroker()
 {
 	KernalRequestMsg result;
@@ -192,20 +116,12 @@ void KernalServerBase::epollWroker()
 		{
 			case KernalSocketMessageType_SOCKET_DATA: // 如果接收到数据则加入到队列中
 			{
-				pushMsg( NETWORK_DATA, result.netType, result.data, result.size, result.id );
-				//m_MessageCond.broadcast();
-#if !defined(KERNAL_USE_COMMUNICATION_PIPE)
-				m_MessageSem.post();
-#endif				
+				pushMsg( NETWORK_DATA, result.netType, result.data, result.size, result.id );		
 				break;
 			}
 			case KernalSocketMessageType_SOCKET_CLOSE: // 关闭连接
 			{
-				pushMsg( NETWORK_CLOSE, result.netType, NULL, 0, result.id );
-#if !defined(KERNAL_USE_COMMUNICATION_PIPE)
-				//m_MessageCond.broadcast();
-				m_MessageSem.post();
-#endif				
+				pushMsg( NETWORK_CLOSE, result.netType, NULL, 0, result.id );		
 				break;
 			}
 			default:
@@ -216,11 +132,7 @@ void KernalServerBase::epollWroker()
 	}
 }
 
-#if defined(KERNAL_USE_COMMUNICATION_PIPE)
 void KernalServerBase::worker(KernalCommunicationPipe *pComPipe)
-#else
-void KernalServerBase::worker()
-#endif
 {
 	onWorkerPre();
 	m_Timer.initThreadTimer();
@@ -229,8 +141,8 @@ void KernalServerBase::worker()
 		//if( !m_Messages.empty() )
 		{
 			KernalMessage *pMsg = NULL;
-#if defined(KERNAL_USE_COMMUNICATION_PIPE)
-			int minExpire = m_Timer.getMinTimerExpire();
+			
+			int minExpire = m_Timer.getMinTimerExpire(); // 获取最近过期时间的定时器的expire
 			fd_set rset;
 			FD_ZERO( &rset );
 			FD_SET( pComPipe->pipefd[1], &rset );
@@ -254,15 +166,7 @@ void KernalServerBase::worker()
 				pMsg->data = ( char* )malloc( pMsg->size );
 				memset( pMsg->data, 0, pMsg->size );
 				::read(pComPipe->pipefd[1], pMsg->data, pMsg->size);
-#else
-				pMsg = m_Messages.pop();
-				if( !pMsg )
-				{
-					//m_MessageCond.wait();
-					m_MessageSem.wait();
-					continue;
-				}
-#endif
+
 				// 处理消息
 				switch( pMsg->type )
 				{
@@ -281,7 +185,6 @@ void KernalServerBase::worker()
 
 				delete pMsg;
 				pMsg = NULL;
-#if defined(KERNAL_USE_COMMUNICATION_PIPE)
 			}
 			
 			// 处理定时器
@@ -294,12 +197,6 @@ void KernalServerBase::worker()
 				}
 				pushMsg( TIMER_DATA, KernalNetWorkType_NO, NULL, 0, timeID );
 			}
-#endif
-		}
-		//else
-		{
-			//m_MessageCond.wait();
-			//m_MessageSem.wait();
 		}
 	}
 	onWorkerEnd();
@@ -352,7 +249,6 @@ void KernalServerBase::flush()
 
 void KernalServerBase::pushMsg( KernalMessageType type, KernalNetWorkType netType, void *data, unsigned int size, unsigned int id )
 {
-#if defined(KERNAL_USE_COMMUNICATION_PIPE)
 	int index = rand()%m_WorkThreadsPipe.size();
 	KernalCommunicationPipe *pComPipe = m_WorkThreadsPipe[index];
 	if( pComPipe )
@@ -363,15 +259,6 @@ void KernalServerBase::pushMsg( KernalMessageType type, KernalNetWorkType netTyp
 		::write( pComPipe->pipefd[0], &size, sizeof(size) );
 		::write( pComPipe->pipefd[0], (char*)data, size );
 	}
-#else
-	KernalMessage *pMsg = new KernalMessage();
-	pMsg->type     = type;
-	pMsg->netType  = netType;
-	pMsg->data     = data;
-	pMsg->size     = size;
-	pMsg->id       = id;
-	m_Messages.push( pMsg );	
-#endif	
 }
 
 void KernalServerBase::sendMsg( int fd, char *buff, int len )

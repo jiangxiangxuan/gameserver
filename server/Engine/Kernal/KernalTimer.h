@@ -63,29 +63,13 @@ public:
     void deleteTimer( unsigned int id );
 
     unsigned int gettime();
-
-    void update();
-    void expired( int slot );
-public:
-    unsigned int pop();
-	
+public:	
 	void initThreadTimer();
     unsigned int popExpired();
 	int getMinTimerExpire();  // 获取最近过期时间的定时器的expire
-private:   
-    void push( unsigned int id );
-    void deleteTimer( struct KernalTimerNode *pTimerNode );	
 private:    
     unsigned int        m_StartTime;
 	KernalMutexLocker   m_TimerLocker;
-#if 0	
-    int                 m_CurrentSlot;  // 当前槽位
-	KernalMutexLocker   m_ExpriedTimerLocker;
-
-    KernalTimerNodeList m_TimerNodes[ TIMER_SLOT ];
-    std::vector< unsigned int > m_expriedTimers;
-#endif
-	
 	std::map< pthread_t, KernalTimerNodeList > m_Timers;
 };
 
