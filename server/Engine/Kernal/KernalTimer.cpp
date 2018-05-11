@@ -285,7 +285,8 @@ unsigned int KernalTimer::popExpired()
 		struct KernalTimerNode *pNode = iter->second.head;
 		while( pNode )
 		{
-			if( pNode->expireTime - curTime > 0 )
+			int expireTime = (int)( pNode->expireTime ) - (int)( curTime );
+			if( expireTime > 0 )
 			{
 				pNode = pNode->next;
 				continue;
