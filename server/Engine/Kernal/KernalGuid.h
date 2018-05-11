@@ -3,6 +3,6 @@
 #define _KERNAL_GUID_H_
 
 bool guidInit();
-unsigned long int getGuid();
+unsigned int getGuid();
 
 #endif
