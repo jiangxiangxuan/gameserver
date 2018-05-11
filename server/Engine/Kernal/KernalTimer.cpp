@@ -333,7 +333,7 @@ int KernalTimer::getMinTimerExpire()
 	return minExpire;
 }
 
-unsigned int KernalTimer::initThreadTimer()
+void KernalTimer::initThreadTimer()
 {
 	pthread_t tid = pthread_self();
 	auto iter = m_Timers.find( tid );
