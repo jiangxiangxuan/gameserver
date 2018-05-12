@@ -176,6 +176,7 @@ void KernalServerBase::worker(KernalCommunicationPipe *pComPipe)
 			{
 				case NETWORK_DATA:
 				case NETWORK_CLOSE:
+				case NETWORK_CONNECT:
 				{
 					onMsg(  pMsg->id, pMsg->netType, pMsg->type, (const char *)pMsg->data, pMsg->size );
 					break;
