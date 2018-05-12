@@ -26,7 +26,7 @@ public:
 	virtual void oninit();
 	virtual void onuninit();
 
-	virtual void onWorkerPre();
+	virtual void onWorkerBegin();
 	virtual void onWorkerEnd();
 protected:
 	void connectCenterServer();

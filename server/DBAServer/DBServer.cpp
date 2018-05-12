@@ -38,7 +38,7 @@ void DBServer::oninit()
 	listen(ip, port);
 }
 
-void DBServer::onWorkerPre()
+void DBServer::onWorkerBegin()
 {
 	DataBase *pDataBase = new DataBase();
 	pDataBase->loadLib();
