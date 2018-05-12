@@ -62,7 +62,7 @@ private:
 	mysql_num_fields_i        m_pmysql_num_fields_i;
 	mysql_fetch_row_i         m_pmysql_fetch_row_i;
 	mysql_error_i             m_pmysql_error_i;
-        mysql_free_result_i       m_pmysql_free_result_i;
+    mysql_free_result_i       m_pmysql_free_result_i;
 private:
 	void      *m_pLib;
 	MYSQL     *m_pConn;
