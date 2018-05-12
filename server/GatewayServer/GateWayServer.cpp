@@ -299,50 +299,12 @@ void GateWayServer::connServer( CenterNotifyServerInfo &value )
 			break;
 		}
 	}
+	
 	if( isFind )
 	{
 		return;
 	}
-#if 0	
-	// TODO:待改
-	pthread_cond_t  cond;
-	pthread_mutex_t mutex;
-	pthread_mutex_init(&mutex, NULL);
-	pthread_cond_init(&cond, NULL);
-    pthread_mutex_lock(&mutex);
-
-	struct timespec delay;
-	struct timeval now;
-
-	gettimeofday(&now, NULL);
-	delay.tv_sec = now.tv_sec + 5;
-	delay.tv_nsec = now.tv_usec * 1000;
-	pthread_cond_timedwait(&cond, &mutex, &delay);
-
-	int sfd = 0;
-	int id = connect( value.ip.c_str(), value.port, sfd );
 	
-	gettimeofday(&now, NULL);
-	delay.tv_sec = now.tv_sec + 5;
-	delay.tv_nsec = now.tv_usec * 1000;
-	pthread_cond_timedwait(&cond, &mutex, &delay);
-
-	if( id > 0 )
-	{
-		ServerInfo *pServer = new ServerInfo();
-		pServer->type = value.type;
-		memcpy( pServer->ip, value.ip.c_str(), value.ip.length() );
-		pServer->port = value.port;
-		pServer->id = id;
-
-		m_Servers.insert( std::pair<ServerType, ServerInfo*>( value.type, pServer) );
-	}
-	
-    pthread_mutex_unlock(&mutex);
-    pthread_mutex_destroy( &mutex );
-    pthread_cond_destroy( &cond );
-#endif
-
 	int sfd = 0;
 	int id = connect( value.ip.c_str(), value.port, sfd );
 	
