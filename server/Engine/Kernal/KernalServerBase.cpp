@@ -139,7 +139,7 @@ void KernalServerBase::epollWroker()
 
 void KernalServerBase::worker(KernalCommunicationPipe *pComPipe)
 {
-	onWorkerPre();
+	onWorkerBegin();
 	m_Timer.initThreadTimer();
 	while( !m_quit )
 	{		
@@ -264,7 +264,7 @@ void KernalServerBase::sendMsg( int fd, char *buff, int len )
 	m_Epoll.send( fd, buff, len );
 }
 
-void KernalServerBase::onWorkerPre()
+void KernalServerBase::onWorkerBegin()
 {
 
 }

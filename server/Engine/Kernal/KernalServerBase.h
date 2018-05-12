@@ -103,7 +103,7 @@ public:
 	virtual void oninit() = 0;
 	virtual void onuninit() = 0;
 
-	virtual void onWorkerPre();
+	virtual void onWorkerBegin();
 	virtual void onWorkerEnd();
 protected:
 	int                         m_threadNum;
