@@ -110,8 +110,8 @@ protected:
 	KernalEpoll                 m_Epoll;         //EPOLL
 	KernalTimer                 m_Timer;
 private:
-	//KernalQueue<KernalMessage>                    m_Messages;      //需处理消息
-	KernalArrayLockFree<KernalMessage*>            m_Messages;       //需处理消息(无锁)
+	//KernalQueue<KernalMessage>                     m_Messages;       //需处理消息
+	//KernalArrayLockFree<KernalMessage*>            m_Messages;       //需处理消息(无锁)
 	KernalStack<KernalThread>                      m_WorkThreads;    //工作线程
 	KernalThread                                   m_EpollThread;    //Epoll 线程
 	KernalThread                                   m_HeartBeatThread;//心跳 线程
@@ -119,7 +119,7 @@ private:
 	KernalCond                                     m_MessageCond;    //条件变量
 	KernalSem                                      m_MessageSem;     //信号量
 	std::vector<KernalCommunicationPipe*>          m_WorkThreadsPipe;//工作线程管道
-	bool                                           m_quit;//是否退出
+	bool                                           m_quit;           //是否退出
 };
 
 #endif
