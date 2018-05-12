@@ -20,9 +20,10 @@
 
 enum KernalMessageType
 {
-	NETWORK_DATA,  // SOCKET 消息、网络消息（接收数据）
-	NETWORK_CLOSE,  // SOCKET 连接关闭
-	TIMER_DATA,    // 定时器 消息
+	NETWORK_DATA,     // SOCKET 消息、网络消息（接收数据）
+	NETWORK_CLOSE,    // SOCKET 连接关闭
+	NETWORK_CONNECT,  // SOCKET 连接
+	TIMER_DATA,       // 定时器 消息
 };
 
 // 消息处理

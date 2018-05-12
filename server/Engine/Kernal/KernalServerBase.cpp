@@ -119,9 +119,14 @@ void KernalServerBase::epollWroker()
 				pushMsg( NETWORK_DATA, result.netType, result.data, result.size, result.id );		
 				break;
 			}
+			case KernalSocketMessageType_SOCKET_CONNECT:// 连接 socket
+			{
+				pushMsg( NETWORK_CONNECT, result.netType, NULL, 0, result.id );
+				break;
+			}
 			case KernalSocketMessageType_SOCKET_CLOSE: // 关闭连接
 			{
-				pushMsg( NETWORK_CLOSE, result.netType, NULL, 0, result.id );		
+				pushMsg( NETWORK_CLOSE, result.netType, NULL, 0, result.id );
 				break;
 			}
 			default:

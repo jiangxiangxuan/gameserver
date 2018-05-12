@@ -517,6 +517,12 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 
                     setnonblocking( fd );
                     epollAdd( id );
+					
+                    result.id = id;
+					if( type == socket_listen )
+					{
+						msgType = KernalSocketMessageType_SOCKET_CONNECT;
+					}
                 }
                 else if( pNet->id == id )  // 发送数据
                 {

@@ -3,12 +3,14 @@
 
 GateWayServer *GateWayServer::ms_pGateWayServer = NULL;
 
+#if 0
 void *GateWayServerConnectCenterWorker( void *arg )
 {
 	GateWayServer *pGateWayServer = (GateWayServer*)arg;
 	pGateWayServer->registerCenterServerInfo();
 	return ((void *)0);
 }
+#endif
 
 GateWayServer::GateWayServer()
 	: m_CenterServerID( -1 )
@@ -62,7 +64,6 @@ void GateWayServer::oninit()
 	m_GameMinCmd = getConfig()->getAttributeInt("config/gateway/gamecmd", "min");
 	m_GameMaxCmd = getConfig()->getAttributeInt("config/gateway/gamecmd", "max");
 
-	connectCenterServer();
 }
 
 void GateWayServer::onuninit()
@@ -124,6 +125,20 @@ void GateWayServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMes
 			DealMsg(id, GateWayInternalServerMsg, buff);
 			DealMsg(id, CenterNotifyServerInfo,   buff);
 			DealEnd();
+		}
+	}
+	else if( NETWORK_CONNECT == type )
+	{
+		if( m_CenterServerID == id )
+		{
+			const char *ip   = getConfig()->getAttributeStr("config/gateway/listen", "ip");
+			int         port = getConfig()->getAttributeInt("config/gateway/listen", "port");
+
+			CenterRegisterServerInfo msg;
+			msg.type = SERVER_GATEWAY;
+			msg.ip   = ip;
+			msg.port = port;
+			MsgSend( m_Epoll, m_CenterServerID, CenterRegisterServerInfo, 0, msg );
 		}
 	}
 	else if( NETWORK_CLOSE == type )
@@ -208,7 +223,7 @@ void GateWayServer::onProcess()
 
 void GateWayServer::onRun()
 {
-
+	connectCenterServer();
 }
 
 void GateWayServer::onExit()
@@ -218,11 +233,19 @@ void GateWayServer::onExit()
 
 void GateWayServer::connectCenterServer()
 {
+#if 0	
 	KernalThread centerThread;
 	centerThread.init(GateWayServerConnectCenterWorker, this);
 	centerThread.detach();
+#endif
+	const char *serverIP   = getConfig()->getAttributeStr("config/center/listen", "ip");
+	int         serverPort = getConfig()->getAttributeInt("config/center/listen", "port");
+
+	int sfd = 0;
+	m_CenterServerID = connect(serverIP, serverPort, sfd, false);
 }
 
+#if 0
 void GateWayServer::registerCenterServerInfo()
 {
 	const char *ip   = getConfig()->getAttributeStr("config/gateway/listen", "ip");
@@ -320,6 +343,7 @@ void GateWayServer::registerCenterServerInfo()
     pthread_cond_destroy( &cond );
 
 }
+#endif
 
 void GateWayServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value )
 {

@@ -179,6 +179,7 @@ enum KernalSocketMessageType
 {
     KernalSocketMessageType_NO,
     KernalSocketMessageType_SOCKET_DATA,
+    KernalSocketMessageType_SOCKET_CONNECT,
     KernalSocketMessageType_SOCKET_CLOSE,
 };
 
