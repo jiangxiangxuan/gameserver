@@ -3,12 +3,14 @@
 
 PlatformServer *PlatformServer::ms_pPlatformServer = NULL;
 
+#if 0
 void *PlatformServerConnectCenterWorker( void *arg )
 {
 	PlatformServer *pPlatformServer = (PlatformServer*)arg;
 	pPlatformServer->registerCenterServerInfo();
 	return ((void *)0);
 }
+#endif
 
 PlatformServer::PlatformServer()
 	: m_pIdbcRedis( NULL ),
@@ -62,8 +64,6 @@ void PlatformServer::oninit()
 	const char *dbaip    = getConfig()->getAttributeStr("config/dba/listen", "ip");
 	int         dbaport  = getConfig()->getAttributeInt("config/dba/listen", "port");
 	m_DBAgent.init( &m_Epoll, dbaip, dbaport );
-
-	connectCenterServer();
 }
 
 void PlatformServer::onuninit()
@@ -97,6 +97,21 @@ void PlatformServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMe
         DealMsg( id, CenterNotifyServerInfo,   buff );
 		DealEnd();
 	}
+	else if( NETWORK_CONNECT == type )
+	{
+		// 如果连接的是中心服务器
+		if( m_CenterServerID == id )
+		{
+			const char *ip   = getConfig()->getAttributeStr("config/login/listen", "ip");
+			int         port = getConfig()->getAttributeInt("config/login/listen", "port");
+
+			CenterRegisterServerInfo msg;
+			msg.type = SERVER_GATEWAY;
+			msg.ip   = ip;
+			msg.port = port;
+			MsgSend( m_Epoll, m_CenterServerID, CenterRegisterServerInfo, 0, msg );
+		}
+	}
 	else if( NETWORK_CLOSE == type )
 	{
 		if( m_CenterServerID == id )
@@ -118,7 +133,7 @@ void PlatformServer::onProcess()
 
 void PlatformServer::onRun()
 {
-
+	connectCenterServer();
 }
 
 void PlatformServer::onExit()
@@ -193,11 +208,19 @@ void PlatformServer::delTimer( unsigned int id )
 
 void PlatformServer::connectCenterServer()
 {
+#if 0	
     KernalThread centerThread;
 	centerThread.init(PlatformServerConnectCenterWorker, this);
 	centerThread.detach();
+#endif	
+	const char *serverIP   = getConfig()->getAttributeStr("config/center/listen", "ip");
+	int         serverPort = getConfig()->getAttributeInt("config/center/listen", "port");
+
+	int sfd = 0;
+	m_CenterServerID = connect(serverIP, serverPort, sfd, false);	
 }
 
+#if 0
 void PlatformServer::registerCenterServerInfo()
 {
 	const char *ip   = getConfig()->getAttributeStr("config/login/listen", "ip");
@@ -295,3 +318,4 @@ void PlatformServer::registerCenterServerInfo()
     pthread_cond_destroy( &cond );
 
 }
+#endif

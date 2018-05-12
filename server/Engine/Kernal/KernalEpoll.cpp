@@ -505,7 +505,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                     setnonblocking( fd );
                     epollAdd( id );
 					
-					printf("epoll handle msg id=%ld  fd=%ld\r\n", id, fd);
 					if( type == socket_connect )
 					{
 						msgType = KernalSocketMessageType_SOCKET_CONNECT;

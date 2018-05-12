@@ -78,7 +78,6 @@ void GateWayServer::handleTimerMsg( unsigned int id )
 
 void GateWayServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size )
 {
-	printf("GateWayServer::onMsg cid=%ld  id=%ld\r\n",m_CenterServerID,id);
 	if( TIMER_DATA == type )
 	{
 		handleTimerMsg( id );
@@ -130,7 +129,7 @@ void GateWayServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMes
 	}
 	else if( NETWORK_CONNECT == type )
 	{
-		printf("GateWayServer::onMsg NETWORK_CONNECT cid=%ld  id=%ld\r\n",m_CenterServerID,id);
+		// 如果连接的是中心服务器
 		if( m_CenterServerID == id )
 		{
 			const char *ip   = getConfig()->getAttributeStr("config/gateway/listen", "ip");
@@ -245,7 +244,6 @@ void GateWayServer::connectCenterServer()
 
 	int sfd = 0;
 	m_CenterServerID = connect(serverIP, serverPort, sfd, false);
-	printf("GateWayServer::connectCenterServer cid = %ld  fd=%ld\r\n", m_CenterServerID, sfd);
 }
 
 #if 0

@@ -40,8 +40,9 @@ public:
 	void sendMsgToPlatform( int serverID, char *data, int datalen );
 	unsigned int addTimer( unsigned int expire, int times );
 	void delTimer( unsigned int id );
-
+#if 0
 	void registerCenterServerInfo();
+#endif	
 protected:
 	void connectCenterServer();
 private:

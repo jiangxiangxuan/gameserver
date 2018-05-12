@@ -3,12 +3,14 @@
 
 GameServer *GameServer::ms_pGameServer = NULL;
 
+#if 0
 void *GameServerConnectCenterWorker( void *arg )
 {
 	GameServer *pGameServer = (GameServer*)arg;
 	pGameServer->registerCenterServerInfo();
 	return ((void *)0);
 }
+#endif
 
 GameServer::GameServer()
 	: m_pIdbcRedis( NULL ),
@@ -56,8 +58,6 @@ void GameServer::oninit()
 	const char *redisip    = getConfig()->getAttributeStr("config/common/redis", "ip");
 	int         redisport  = getConfig()->getAttributeInt("config/common/redis", "port");
 	m_pIdbcRedis->connect( redisip, redisport );
-
-	connectCenterServer();
 }
 
 void GameServer::onuninit()
@@ -89,6 +89,21 @@ void GameServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessag
 		DealMsg( id, PlatformGameServerMsg,    buff );
         DealMsg( id, CenterNotifyServerInfo,   buff );
 		DealEnd();
+	}
+	else if( NETWORK_CONNECT == type )
+	{
+		// 如果连接的是中心服务器
+		if( m_CenterServerID == id )
+		{
+			const char *ip   = getConfig()->getAttributeStr("config/game/listen", "ip");
+			int         port = getConfig()->getAttributeInt("config/game/listen", "port");
+
+			CenterRegisterServerInfo msg;
+			msg.type = SERVER_GATEWAY;
+			msg.ip   = ip;
+			msg.port = port;
+			MsgSend( m_Epoll, m_CenterServerID, CenterRegisterServerInfo, 0, msg );
+		}
 	}
 	else if( NETWORK_CLOSE == type )
 	{
@@ -149,7 +164,7 @@ void GameServer::onProcess()
 
 void GameServer::onRun()
 {
-
+	connectCenterServer();
 }
 
 void GameServer::onExit()
@@ -169,11 +184,19 @@ void GameServer::delTimer( unsigned int id )
 
 void GameServer::connectCenterServer()
 {
+#if 0	
 	KernalThread centerThread;
 	centerThread.init(GameServerConnectCenterWorker, this);
 	centerThread.detach();
+#endif
+	const char *serverIP   = getConfig()->getAttributeStr("config/center/listen", "ip");
+	int         serverPort = getConfig()->getAttributeInt("config/center/listen", "port");
+
+	int sfd = 0;
+	m_CenterServerID = connect(serverIP, serverPort, sfd, false);	
 }
 
+#if 0
 void GameServer::registerCenterServerInfo()
 {
 	const char *ip   = getConfig()->getAttributeStr("config/game/listen", "ip");
@@ -267,3 +290,4 @@ void GameServer::registerCenterServerInfo()
     pthread_cond_destroy( &cond );
 
 }
+#endif

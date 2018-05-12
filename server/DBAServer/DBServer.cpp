@@ -3,12 +3,14 @@
 
 DBServer *DBServer::ms_pDBServer = NULL;
 
+#if 0
 void *DBServerConnectCenterWorker( void *arg )
 {
 	DBServer *pDBServer = (DBServer*)arg;
 	pDBServer->registerCenterServerInfo();
 	return ((void *)0);
 }
+#endif
 
 DBServer::DBServer()
 {
@@ -43,8 +45,6 @@ void DBServer::oninit()
 	const char *ip   = getConfig()->getAttributeStr("config/dba/listen", "ip");
 	int         port = getConfig()->getAttributeInt("config/dba/listen", "port");
 	listen(ip, port);
-
-	connectCenterServer();
 }
 
 void DBServer::onWorkerPre()
@@ -97,6 +97,21 @@ void DBServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageT
 		DealMsg( id, DBServerReqMsg, buff );
 		DealEnd();
 	}
+	else if( NETWORK_CONNECT == type )
+	{
+		// 如果连接的是中心服务器
+		if( m_CenterServerID == id )
+		{
+			const char *ip   = getConfig()->getAttributeStr("config/dba/listen", "ip");
+			int         port = getConfig()->getAttributeInt("config/dba/listen", "port");
+
+			CenterRegisterServerInfo msg;
+			msg.type = SERVER_GATEWAY;
+			msg.ip   = ip;
+			msg.port = port;
+			MsgSend( m_Epoll, m_CenterServerID, CenterRegisterServerInfo, 0, msg );
+		}
+	}
 	else if( NETWORK_CLOSE == type )
 	{
 		if( m_CenterServerID == id )
@@ -114,7 +129,7 @@ void DBServer::onProcess()
 
 void DBServer::onRun()
 {
-
+	connectCenterServer();
 }
 
 void DBServer::onExit()
@@ -171,11 +186,19 @@ DataBase *DBServer::getDataBase()
 
 void DBServer::connectCenterServer()
 {
+#if 0	
 	KernalThread centerThread;
 	centerThread.init(DBServerConnectCenterWorker, this);
 	centerThread.detach();
+#endif	
+	const char *serverIP   = getConfig()->getAttributeStr("config/center/listen", "ip");
+	int         serverPort = getConfig()->getAttributeInt("config/center/listen", "port");
+
+	int sfd = 0;
+	m_CenterServerID = connect(serverIP, serverPort, sfd, false);
 }
 
+#if 0
 void DBServer::registerCenterServerInfo()
 {
 	const char *ip   = getConfig()->getAttributeStr("config/dba/listen", "ip");
@@ -269,3 +292,5 @@ void DBServer::registerCenterServerInfo()
     pthread_cond_destroy( &cond );
 
 }
+#endif
+
