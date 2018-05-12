@@ -512,12 +512,13 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 					{
 						pNet->type = KernalNetWorkType_LISTEN_HTTP;
 					}
-                    pNet->fd   = fd;
-                    pNet->id   = id;
+                    pNet->fd = fd;
+                    pNet->id = id;
 
                     setnonblocking( fd );
                     epollAdd( id );
 					
+					printf("epoll handle msg id=%ld  fd=%ld\r\n", id, fd);
 					if( type == socket_listen )
 					{
 						msgType = KernalSocketMessageType_SOCKET_CONNECT;

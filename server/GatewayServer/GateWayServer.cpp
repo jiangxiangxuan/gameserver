@@ -245,6 +245,7 @@ void GateWayServer::connectCenterServer()
 
 	int sfd = 0;
 	m_CenterServerID = connect(serverIP, serverPort, sfd, false);
+	printf("GateWayServer::connectCenterServer cid = %ld  fd=%ld\r\n", m_CenterServerID, sfd);
 }
 
 #if 0
