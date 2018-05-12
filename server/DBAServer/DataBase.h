@@ -23,7 +23,7 @@ typedef MYSQL_FIELD *STDCALL (*mysql_fetch_field_i)(MYSQL_RES *);
 typedef unsigned int STDCALL (*mysql_num_fields_i)(MYSQL_RES *);
 typedef MYSQL_ROW	 STDCALL (*mysql_fetch_row_i)(MYSQL_RES *result);
 typedef const char * STDCALL (*mysql_error_i)(MYSQL *);
-typedef void            STDCALL (*mysql_free_result_i)(MYSQL_RES *result);
+typedef void         STDCALL (*mysql_free_result_i)(MYSQL_RES *result);
 
 class DataBase
 {
