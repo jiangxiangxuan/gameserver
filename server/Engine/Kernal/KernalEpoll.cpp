@@ -476,6 +476,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
             int size = *( (int*)(pNetWork->readBuffers + 8) );
             int type = *( (int*)(pNetWork->readBuffers + 4) );
             int id = *( (int*)(pNetWork->readBuffers) );
+			result.id = id;
 			
             if( pNetWork->readBuffersLen - 16 >= size )
             {
@@ -486,7 +487,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                     if( KernalNetWorkType_NO != pNet->type )
                     {
                         closeSocket( id );
-                        result.id = id;
                         msgType = KernalSocketMessageType_SOCKET_CLOSE;
                     }
                 }
@@ -518,7 +518,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                     setnonblocking( fd );
                     epollAdd( id );
 					
-                    result.id = id;
 					if( type == socket_listen )
 					{
 						msgType = KernalSocketMessageType_SOCKET_CONNECT;
@@ -538,7 +537,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                 }
 				else if( pNet->id != id ) // 连接已经关闭
 				{
-                    result.id = id;
                     msgType = KernalSocketMessageType_SOCKET_CLOSE;
 				}
 
