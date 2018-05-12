@@ -166,7 +166,7 @@ void DBServer::execute( int session, DBServerReqMsg &value )
 	ack.data = (char*)malloc(datalen);
 	memcpy(ack.data, dataBuff, datalen);
 
-	MsgSend( m_Epoll, session, DBServerAckMsg, 0, ack);
+	MsgSend( m_Epoll, session, DBServerAckMsg, 0, ack );
 }
 
 DataBase *DBServer::getDataBase()
