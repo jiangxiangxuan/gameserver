@@ -504,6 +504,12 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 
                     setnonblocking( fd );
                     epollAdd( id );
+					
+					printf("epoll handle msg id=%ld  fd=%ld\r\n", id, fd);
+					if( type == socket_connect )
+					{
+						msgType = KernalSocketMessageType_SOCKET_CONNECT;
+					}
                 }
                 else if( type == socket_listen || type == socket_listen_http )
                 {
@@ -517,12 +523,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 
                     setnonblocking( fd );
                     epollAdd( id );
-					
-					printf("epoll handle msg id=%ld  fd=%ld\r\n", id, fd);
-					if( type == socket_listen )
-					{
-						msgType = KernalSocketMessageType_SOCKET_CONNECT;
-					}
                 }
                 else if( pNet->id == id )  // 发送数据
                 {
