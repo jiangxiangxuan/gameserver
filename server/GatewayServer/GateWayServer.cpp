@@ -135,12 +135,19 @@ void GateWayServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMes
 	}
 	else if( NETWORK_CLOSE == type )
 	{
-		if( m_CenterServerID == id )
+		if( m_CenterServerID == id ) // 如果是中心服务器
 		{
 			m_CenterServerID = -1;
 			connectCenterServer();
 		}
-		offlineByClientID( id );
+		else if( isInternalServer( id ) ) // 如果是内部服务器
+		{
+			closeServer( id );
+		}
+		else
+		{
+			offlineByClientID( id );
+		}
 	}
 }
 
@@ -296,7 +303,7 @@ void GateWayServer::connServer( CenterNotifyServerInfo &value )
 	{
 		return;
 	}
-	
+#if 0	
 	// TODO:待改
 	pthread_cond_t  cond;
 	pthread_mutex_t mutex;
@@ -334,7 +341,21 @@ void GateWayServer::connServer( CenterNotifyServerInfo &value )
     pthread_mutex_unlock(&mutex);
     pthread_mutex_destroy( &mutex );
     pthread_cond_destroy( &cond );
+#endif
 
+	int sfd = 0;
+	int id = connect( value.ip.c_str(), value.port, sfd );
+	
+	if( id > 0 )
+	{
+		ServerInfo *pServer = new ServerInfo();
+		pServer->type = value.type;
+		memcpy( pServer->ip, value.ip.c_str(), value.ip.length() );
+		pServer->port = value.port;
+		pServer->id = id;
+
+		m_Servers.insert( std::pair<ServerType, ServerInfo*>( value.type, pServer) );
+	}	
 }
 
 bool GateWayServer::isInternalServer( unsigned int id )
