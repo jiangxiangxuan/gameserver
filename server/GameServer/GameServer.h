@@ -39,10 +39,7 @@ public:
 	void sendMsgToClient( int session, int clientID, char *data, int datalen );
 	void sendMsgToPlatform( int serverID, char *data, int datalen );
 	unsigned int addTimer( unsigned int expire, int times );
-	void delTimer( unsigned int id );
-#if 0
-	void registerCenterServerInfo();
-#endif	
+	void delTimer( unsigned int id );	
 protected:
 	void connectCenterServer();
 private:

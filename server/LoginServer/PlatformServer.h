@@ -47,10 +47,7 @@ public:
 	
 	void handleDBMsg( int session, int eventid, int error, char *data, int datalen ); // 处理DBA数据
 	void handleGameMsg( int serverID, char *data, int datalen ); // 处理游戏消息
-	void handleTimerMsg( unsigned int id );
-#if 0
-	void registerCenterServerInfo();
-#endif	
+	void handleTimerMsg( unsigned int id );	
 protected:
 	void connectCenterServer();
 private:

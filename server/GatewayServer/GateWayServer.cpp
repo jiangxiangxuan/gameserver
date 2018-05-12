@@ -3,15 +3,6 @@
 
 GateWayServer *GateWayServer::ms_pGateWayServer = NULL;
 
-#if 0
-void *GateWayServerConnectCenterWorker( void *arg )
-{
-	GateWayServer *pGateWayServer = (GateWayServer*)arg;
-	pGateWayServer->registerCenterServerInfo();
-	return ((void *)0);
-}
-#endif
-
 GateWayServer::GateWayServer()
 	: m_CenterServerID( -1 )
 {
@@ -234,117 +225,12 @@ void GateWayServer::onExit()
 
 void GateWayServer::connectCenterServer()
 {
-#if 0	
-	KernalThread centerThread;
-	centerThread.init(GateWayServerConnectCenterWorker, this);
-	centerThread.detach();
-#endif
 	const char *serverIP   = getConfig()->getAttributeStr("config/center/listen", "ip");
 	int         serverPort = getConfig()->getAttributeInt("config/center/listen", "port");
 
 	int sfd = 0;
 	m_CenterServerID = connect(serverIP, serverPort, sfd, false);
 }
-
-#if 0
-void GateWayServer::registerCenterServerInfo()
-{
-	const char *ip   = getConfig()->getAttributeStr("config/gateway/listen", "ip");
-	int         port = getConfig()->getAttributeInt("config/gateway/listen", "port");
-
-	const char *serverIP   = getConfig()->getAttributeStr("config/center/listen", "ip");
-	int         serverPort = getConfig()->getAttributeInt("config/center/listen", "port");
-
-	pthread_cond_t  cond;
-	pthread_mutex_t mutex;
-	pthread_mutex_init(&mutex, NULL);
-	pthread_cond_init(&cond, NULL);
-	pthread_mutex_lock(&mutex);
-
-	struct timespec delay;
-	struct timeval now;
-	int sfd = 0;
-
-	do
-	{
-		gettimeofday(&now, NULL);
-		delay.tv_sec = now.tv_sec + 5;
-		delay.tv_nsec = now.tv_usec * 1000;
-		pthread_cond_timedwait(&cond, &mutex, &delay);
-
-		m_CenterServerID = connect(serverIP, serverPort, sfd, false);
-		//m_CenterServerID = m_Epoll.connectSocket( serverIP, serverPort );
-		//for( int i = 0; i < 200000000; ++i );
-		//pthread_delay_n( &delay );
-		if( m_CenterServerID > 0 && EINPROGRESS == errno )
-		{
-			//struct KernalNetWork *pNet = m_Epoll.getNetWork(m_CenterServerID);
-		
-			struct timeval tm = {10, 0};
-			fd_set wset, rset;
-			FD_ZERO( &wset );
-			FD_ZERO( &rset );
-			FD_SET( sfd, &wset );
-			FD_SET( sfd, &rset );
-			int res = select( sfd + 1, &rset, &wset, NULL, &tm );
-			if( res > 0 && FD_ISSET(sfd, &wset)  )
-			{
-				gettimeofday(&now, NULL);
-				delay.tv_sec = now.tv_sec + 5;
-				delay.tv_nsec = now.tv_usec * 1000;
-				pthread_cond_timedwait(&cond, &mutex, &delay);
-
-				int error, code;
-				socklen_t len;
-				len = sizeof(error);
-				code = getsockopt(sfd, SOL_SOCKET, SO_ERROR, &error, &len);
-				if (code < 0 || error)
-				{
-					m_Epoll.close( m_CenterServerID );
-					//::close( m_CenterServerID );
-				}
-				else
-				{
-					break;
-				}
-			}
-
-		}
-		else if( m_CenterServerID > 0 )
-		{
-			m_Epoll.close( m_CenterServerID );
-			//::close( m_CenterServerID );
-		}
-	}
-	while( true );
-
-	/*int size = 0;
-	char _buf[BUFF_SIZE] = {0};
-	char* dataBuf = _buf;
-	NWriteInt32(dataBuf, &m_CenterServerID);
-	NWriteInt32(dataBuf, &socket_connect);
-	NWriteInt32(dataBuf, &size);
-	dataBuf = _buf;
-	m_Epoll.sendToPipe( dataBuf, size + 12 );*/
-
-	gettimeofday(&now, NULL);
-	delay.tv_sec = now.tv_sec + 5;
-	delay.tv_nsec = now.tv_usec * 1000;
-	pthread_cond_timedwait(&cond, &mutex, &delay);
-
-	CenterRegisterServerInfo msg;
-	msg.type = SERVER_GATEWAY;
-	msg.ip   = ip;
-	msg.port = port;
-
-	MsgSend( m_Epoll, m_CenterServerID, CenterRegisterServerInfo, 0, msg );
-
-	pthread_mutex_unlock(&mutex);
-    pthread_mutex_destroy( &mutex );
-    pthread_cond_destroy( &cond );
-
-}
-#endif
 
 void GateWayServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value )
 {

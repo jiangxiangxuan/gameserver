@@ -28,9 +28,6 @@ public:
 
 	virtual void onWorkerPre();
 	virtual void onWorkerEnd();
-#if 0
-	void registerCenterServerInfo();
-#endif	
 protected:
 	void connectCenterServer();
 
