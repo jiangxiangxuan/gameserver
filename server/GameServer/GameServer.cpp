@@ -164,7 +164,7 @@ unsigned int GameServer::addTimer( unsigned int expire, int times )
 
 void GameServer::delTimer( unsigned int id )
 {
-	m_Timer.deleteTimer( id );
+	m_Timer.delTimer( id );
 }
 
 void GameServer::connectCenterServer()

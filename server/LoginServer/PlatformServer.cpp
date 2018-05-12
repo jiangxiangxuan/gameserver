@@ -188,7 +188,7 @@ unsigned int PlatformServer::addTimer( unsigned int expire, int times )
 
 void PlatformServer::delTimer( unsigned int id )
 {
-	m_Timer.deleteTimer( id );
+	m_Timer.delTimer( id );
 }
 
 void PlatformServer::connectCenterServer()
