@@ -49,6 +49,10 @@ void GameServer::oninit()
 	const char *redisip    = getConfig()->getAttributeStr("config/common/redis", "ip");
 	int         redisport  = getConfig()->getAttributeInt("config/common/redis", "port");
 	m_pIdbcRedis->connect( redisip, redisport );
+	
+	const char *dbaip    = getConfig()->getAttributeStr("config/dba/listen", "ip");
+	int         dbaport  = getConfig()->getAttributeInt("config/dba/listen", "port");
+	m_DBAgent.init( &m_Epoll, dbaip, dbaport );
 }
 
 void GameServer::onuninit()
@@ -79,6 +83,7 @@ void GameServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessag
 		DealMsg( id, GateWayInternalServerMsg, buff );
 		DealMsg( id, PlatformGameServerMsg,    buff );
         DealMsg( id, CenterNotifyServerInfo,   buff );
+		DealMsg( id, DBServerAckMsg,           buff );
 		DealEnd();
 	}
 	else if( NETWORK_CONNECT == type )
@@ -103,6 +108,10 @@ void GameServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessag
 			m_CenterServerID = -1;
 			connectCenterServer();
 		}
+		else if( !m_DBAgent.handleSocketClose( id ) )  // 如果不是DBA连接
+		{
+
+		}
 	}
 }
 
@@ -115,17 +124,23 @@ void GameServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value )
 {
 	if( SERVERSTATE_RUN == value.state )
 	{
-
+		m_DBAgent.addDBAServer(value);
 	}
 	else
 	{
-
+		m_DBAgent.removeDBAServer(value);
 	}
 }
 
 void GameServer::handlePlatformMsg( int serverID, char *data, int datalen )
 {
 	//TODO:处理大厅消息
+}
+
+void GameServer::handleDBMsg( int session, int eventid, int error, char *data, int datalen )
+{
+	//TODO:处理DBA消息
+	m_DBAgent.handleData( error, eventid, data, datalen );
 }
 
 void GameServer::sendMsgToClient( int session, int clientID, char *data, int datalen )
@@ -161,6 +176,11 @@ void GameServer::onRun()
 void GameServer::onExit()
 {
 	m_pIdbcRedis->close();
+}
+
+int GameServer::executeDBSql( const char *sql, KernalObject *pObj, DBEvent_fn func )
+{
+	return m_DBAgent.execute( sql, pObj, func );
 }
 
 unsigned int GameServer::addTimer( unsigned int expire, int times )

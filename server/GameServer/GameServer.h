@@ -29,6 +29,10 @@ public:
 		return m_pIdbcRedis;
 	}
 
+	DBAgent *getDBAgent()
+	{
+		return &m_DBAgent;
+	};
 public:
 	void handleGateWayMsg( int session, int clientID, char *data, int datalen ); // 处理网关数据
 	void handleCenterNotifyServerInfo( CenterNotifyServerInfo &value );
@@ -46,6 +50,7 @@ private:
 	static GameServer *ms_pGameServer;
 private:
 	IdbcRedis         *m_pIdbcRedis;
+	DBAgent            m_DBAgent;
 	int                m_CenterServerID;
 	KernalThread       m_CenterThread;//连接中心服务器 线程
 };
