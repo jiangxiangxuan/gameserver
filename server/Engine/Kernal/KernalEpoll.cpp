@@ -135,6 +135,7 @@ int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool isHtt
 	int ret = ::connect( fd, ( struct sockaddr * )&addrin, sizeof(addrin) );
     int id =  getSocketID();//fd; //getSocketID();
 	sfd = fd;
+	printf("KernalEpoll::connect ret=%d id=%d fd=%d \n\r", ret, id, fd);
 
 	if( !( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) ) )
 	{
