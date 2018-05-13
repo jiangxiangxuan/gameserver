@@ -55,7 +55,8 @@ private:
 private:
 	IdbcRedis         *m_pIdbcRedis;
 	DBAgent            m_DBAgent;
-	KernalThread       m_CenterThread;//连接中心服务器 线程
+	KernalThread       m_CenterThread;     // 连接中心服务器 线程
+	unsigned int       m_ConnCenterTimeID; // 连接中心服务器的定时任务eventid
 	int                m_CenterServerID;
 private:
     PlatformLogin      m_PlatformLogin;

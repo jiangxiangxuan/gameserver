@@ -70,6 +70,11 @@ void PlatformServer::onuninit()
 void PlatformServer::handleTimerMsg( unsigned int id )
 {
 	//TODO:处理定时器消息
+	// 如果是连接中心服务器定时任务
+	if( m_ConnCenterTimeID == id )
+	{
+		connectCenterServer();
+	}	
 }
 
 void PlatformServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size )
@@ -203,5 +208,15 @@ void PlatformServer::connectCenterServer()
 	int         serverPort = getConfig()->getAttributeInt("config/center/listen", "port");
 
 	int sfd = 0;
-	m_CenterServerID = connect(serverIP, serverPort, sfd, false);	
+	m_CenterServerID = connect(serverIP, serverPort, sfd, false);
+	
+	// 如果没有连接上中心服务器 则定时任务连接
+	if( -1 == m_CenterServerID )
+	{
+		m_ConnCenterTimeID = m_Timer.addTimer( 500, 1 );
+	}
+	else
+	{
+		m_ConnCenterTimeID = 0;
+	}
 }

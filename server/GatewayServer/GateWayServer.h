@@ -60,7 +60,7 @@ private:
 	static GateWayServer *ms_pGateWayServer;
 	int                   m_CenterServerID;
 	unsigned int          m_ConnCenterTimeID; // 连接中心服务器的定时任务eventid
-	KernalThread          m_CenterThread;     //连接中心服务器 线程
+	KernalThread          m_CenterThread;     // 连接中心服务器 线程
 
 	std::multimap< ServerType, ServerInfo* > m_Servers;
 	typedef std::multimap< ServerType, ServerInfo* >::iterator server_multimap;
