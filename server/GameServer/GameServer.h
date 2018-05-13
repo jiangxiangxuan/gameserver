@@ -35,9 +35,12 @@ public:
 		return &m_DBAgent;
 	};
 public:
+	int executeDBSql( const char *sql, KernalObject *pObj = NULL, DBEvent_fn func = NULL );	
+public:
 	void handleGateWayMsg( int session, int clientID, char *data, int datalen ); // 处理网关数据
 	void handleCenterNotifyServerInfo( CenterNotifyServerInfo &value );
-
+	
+	void handleDBMsg( int session, int eventid, int error, char *data, int datalen ); // 处理DBA数据
 	void handleTimerMsg( unsigned int id );
 	void handlePlatformMsg( int serverID, char *data, int datalen ); // 处理大厅消息
 	//void sendMsgToClient( int id, char *data, int datalen );
