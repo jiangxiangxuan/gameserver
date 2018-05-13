@@ -84,7 +84,7 @@ void GateWayServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMes
 		return;
 #endif	
 	
-		// 将消息转发给内部服务器
+		// 将客户端的消息转发给内部服务器
 		if(  id != m_CenterServerID && !isInternalServer( id ) && ( KernalNetWorkType_CONNECTED == netType || KernalNetWorkType_CONNECTED_HTTP == netType ) )
 		{
 			int cmd = 0;
@@ -109,7 +109,7 @@ void GateWayServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMes
 				sendMsgToClient( id, 0, msg, strlen(msg) );
 			}
 		}
-		else if( data ) // 将消息转发给客户端
+		else if( data ) // 将内部服务器的消息转发给客户端
 		{
 			char *buff = (char*)data;
 			DealStart(buff);
@@ -140,9 +140,9 @@ void GateWayServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMes
 			m_CenterServerID = -1;
 			connectCenterServer();
 		}
-		else if( isInternalServer( id ) ) // 如果是内部服务器
+		else if( closeInternalServer( id ) ) // 如果是内部服务器
 		{
-			closeServer( id );
+			
 		}
 		else
 		{
@@ -185,6 +185,8 @@ void GateWayServer::sendMsgToPlatform( unsigned int id, KernalMessageType type, 
 	msg.type     = ( NETWORK_DATA == type ) ? MESSAGE_DATA: MESSAGE_CONNECTCLOSE ;
 	msg.initData( (char*)data, size );
 	
+	// TODO:待优化
+	m_ServersLocker.lock();
 	auto servers = m_Servers.equal_range( SERVER_PLATFORM );
 	for( auto it = servers.first; it != servers.second; ++it )
 	{
@@ -194,6 +196,7 @@ void GateWayServer::sendMsgToPlatform( unsigned int id, KernalMessageType type, 
 			break;
 		}
 	}
+	m_ServersLocker.unlock();
 }
 
 void GateWayServer::sendMsgToGame( unsigned int id, KernalMessageType type, const char *data, unsigned int size )
@@ -203,7 +206,9 @@ void GateWayServer::sendMsgToGame( unsigned int id, KernalMessageType type, cons
     msg.clientID = id;
 	msg.type     = ( NETWORK_DATA == type ) ? MESSAGE_DATA: MESSAGE_CONNECTCLOSE ;
 	msg.initData( (char*)data, size );
-
+	
+	// 待优化
+	m_ServersLocker.lock();
 	auto servers = m_Servers.equal_range( SERVER_GAME );
 	for( auto it = servers.first; it != servers.second; ++it )
 	{
@@ -213,6 +218,7 @@ void GateWayServer::sendMsgToGame( unsigned int id, KernalMessageType type, cons
 			break;
 		}
 	}
+	m_ServersLocker.unlock();
 }
 
 void GateWayServer::onProcess()
@@ -243,16 +249,94 @@ void GateWayServer::handleCenterNotifyServerInfo( CenterNotifyServerInfo &value 
 {
 	if( SERVERSTATE_RUN == value.state )
 	{
-		connServer( value );
+		connInternalServer( value );
 	}
 	else
 	{
-		closeServer( value );
+		closeInternalServer( value );
 	}
 }
 
-void GateWayServer::closeServer( int id )
+void GateWayServer::closeInternalServer( CenterNotifyServerInfo &value )
 {
+	m_ServersLocker.lock();
+	auto servers = m_Servers.equal_range( value.type );
+	for( auto it = servers.first; it != servers.second; ++it )
+	{
+		if( it->second && 0 == strcmp(it->second->ip, value.ip.c_str()) && it->second->port == value.port )
+		{
+			delete it->second;
+			it = m_Servers.erase( it );
+			m_Servers.erase( it );
+			break;
+		}
+	}
+	m_ServersLocker.unlock();
+}
+
+void GateWayServer::connInternalServer( CenterNotifyServerInfo &value )
+{
+	m_ServersLocker.lock();
+	bool isFind = false;
+	auto servers = m_Servers.equal_range( value.type );
+	for( auto it = servers.first; it != servers.second; ++it )
+	{
+		if( it->second && it->second->port == value.port && 0 == strcmp(it->second->ip, value.ip.c_str()) )
+		{
+			isFind = true;
+			break;
+		}
+	}
+	
+	if( isFind )
+	{
+		m_ServersLocker.unlock();
+		return;
+	}
+	
+	int sfd = 0;
+	int id = connect( value.ip.c_str(), value.port, sfd );
+	
+	if( id > 0 )
+	{
+		ServerInfo *pServer = new ServerInfo();
+		pServer->type = value.type;
+		memcpy( pServer->ip, value.ip.c_str(), value.ip.length() );
+		pServer->port = value.port;
+		pServer->id = id;
+
+		m_Servers.insert( std::pair<ServerType, ServerInfo*>( value.type, pServer) );
+	}
+	m_ServersLocker.unlock();
+}
+
+bool GateWayServer::isInternalServer( unsigned int id )
+{
+	m_ServersLocker.lock();
+	bool isFind = false;
+	for( auto iter = m_Servers.begin(); iter != m_Servers.end(); ++iter )
+	{
+		auto servers = m_Servers.equal_range( iter->first );
+		for( auto it = servers.first; it != servers.second; ++it )
+		{
+			if( it->second && it->second->id == id )
+			{
+				isFind = true;
+				break;
+			}
+		}
+		if( isFind )
+		{
+			break;
+		}
+	}
+	m_ServersLocker.unlock();
+	return isFind;
+}
+
+bool GateWayServer::closeInternalServer( unsigned int id )
+{
+	m_ServersLocker.lock();
 	bool isFind = false;
 	for( auto iter = m_Servers.begin(); iter != m_Servers.end(); ++iter )
 	{
@@ -272,74 +356,7 @@ void GateWayServer::closeServer( int id )
 			break;
 		}
 	}
-}
-
-void GateWayServer::closeServer( CenterNotifyServerInfo &value )
-{
-	auto servers = m_Servers.equal_range( value.type );
-	for( auto it = servers.first; it != servers.second; ++it )
-	{
-		if( it->second && 0 == strcmp(it->second->ip, value.ip.c_str()) && it->second->port == value.port )
-		{
-			m_Servers.erase( it );
-			break;
-		}
-	}
-}
-
-void GateWayServer::connServer( CenterNotifyServerInfo &value )
-{
-	bool isFind = false;
-	auto servers = m_Servers.equal_range( value.type );
-	for( auto it = servers.first; it != servers.second; ++it )
-	{
-		if( it->second && it->second->port == value.port && 0 == strcmp(it->second->ip, value.ip.c_str()) )
-		{
-			isFind = true;
-			break;
-		}
-	}
-	
-	if( isFind )
-	{
-		return;
-	}
-	
-	int sfd = 0;
-	int id = connect( value.ip.c_str(), value.port, sfd );
-	
-	if( id > 0 )
-	{
-		ServerInfo *pServer = new ServerInfo();
-		pServer->type = value.type;
-		memcpy( pServer->ip, value.ip.c_str(), value.ip.length() );
-		pServer->port = value.port;
-		pServer->id = id;
-
-		m_Servers.insert( std::pair<ServerType, ServerInfo*>( value.type, pServer) );
-	}	
-}
-
-bool GateWayServer::isInternalServer( unsigned int id )
-{
-	bool isFind = false;
-	for( auto iter = m_Servers.begin(); iter != m_Servers.end(); ++iter )
-	{
-		auto servers = m_Servers.equal_range( iter->first );
-		for( auto it = servers.first; it != servers.second; ++it )
-		{
-			if( it->second && it->second->id == id )
-			{
-				isFind = true;
-				break;
-			}
-		}
-		if( isFind )
-		{
-			break;
-		}
-	}
-
+	m_ServersLocker.unlock();
 	return isFind;
 }
 

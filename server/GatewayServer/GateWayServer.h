@@ -46,15 +46,17 @@ public:
 protected:
 	void connectCenterServer();
 
-	void closeServer( int id );
-	void closeServer( CenterNotifyServerInfo &value );
-	void connServer( CenterNotifyServerInfo &value );
+	void connInternalServer( CenterNotifyServerInfo &value ); // 连接内部服务器
+	void closeInternalServer( CenterNotifyServerInfo &value );// 关闭内部服务器连接
+	bool closeInternalServer( unsigned int id );              // 关闭内部服务器连接
 
 	bool isInternalServer( unsigned int id );
 	
 	int getUidByClientID( int id );
 	void offlineByClientID( int id );
 private:
+	KernalMutexLocker     m_ServersLocker;
+	
 	static GateWayServer *ms_pGateWayServer;
 	int                   m_CenterServerID;
 	KernalThread          m_CenterThread;//连接中心服务器 线程

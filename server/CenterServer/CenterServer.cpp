@@ -95,7 +95,6 @@ void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMess
 				sprintf( buff, "{\"state\":\"0\"}" );
 			}
 			m_Epoll.send( id, buff, strlen(buff) );
-
 		}
 	}
 	else if( NETWORK_CLOSE == type )
