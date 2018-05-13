@@ -135,7 +135,6 @@ int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool isHtt
 	int ret = ::connect( fd, ( struct sockaddr * )&addrin, sizeof(addrin) );
     int id =  getSocketID();//fd; //getSocketID();
 	sfd = fd;
-	printf("KernalEpoll::connect ret=%d id=%d fd=%d \n\r", ret, id, fd);
 
 	if( !( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) ) )
 	{
@@ -146,22 +145,46 @@ int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool isHtt
 	}
 	else if ( addToEpoll && ( 0 == ret || ( id > 0 && -1 == ret && /*ECONNREFUSED*/EINPROGRESS == errno ) ) )
 	{
-	    int size = 0;
-	    char _buf[16] = {0};
-	    char* dataBuf = _buf;
-	    NWriteInt32(dataBuf, &id);
-		if( isHttp )
+		struct timeval tm = {2, 0};
+		fd_set wset, rset;
+		FD_ZERO( &wset );
+		FD_ZERO( &rset );
+		FD_SET( fd, &wset );
+		FD_SET( fd, &rset );
+		int res = ::select( fd + 1, &rset, &wset, NULL, &tm );
+		if( res > 0 && FD_ISSET(fd, &wset)  )
 		{
-			NWriteInt32(dataBuf, &socket_connect_http);
+			int error, code;
+			socklen_t len;
+			len = sizeof(error);
+			code = getsockopt(fd, SOL_SOCKET, SO_ERROR, &error, &len);
+			if (code < 0 || error)
+			{
+				::close( fd );
+				id  = -1;
+				sfd = 0;
+			}
 		}
-		else
+		
+		if( id > 0 )
 		{
-			NWriteInt32(dataBuf, &socket_connect);
+			int size = 0;
+			char _buf[16] = {0};
+			char* dataBuf = _buf;
+			NWriteInt32(dataBuf, &id);
+			if( isHttp )
+			{
+				NWriteInt32(dataBuf, &socket_connect_http);
+			}
+			else
+			{
+				NWriteInt32(dataBuf, &socket_connect);
+			}
+			NWriteInt32(dataBuf, &size);
+			NWriteInt32(dataBuf, &fd);
+			dataBuf = _buf;
+			sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
 		}
-	    NWriteInt32(dataBuf, &size);
-        NWriteInt32(dataBuf, &fd);
-	    dataBuf = _buf;
-	    sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );		
 	}
 
 	//m_locker.unlock();
