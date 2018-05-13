@@ -6,6 +6,7 @@
 #include "Kernal/KernalMap.h"
 #include "Idbc/redis/idbc_redis_noncluster.h"
 #include "Msg.h"
+#include "DBAgent.h"
 
 class GameServer : public KernalServerBase
 {

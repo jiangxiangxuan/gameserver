@@ -17,3 +17,8 @@ void onCenterNotifyServerInfo(int session, CenterNotifyServerInfo &value)
 {
 	GameServer::getInstance()->handleCenterNotifyServerInfo( value );
 }
+
+void onDBServerAckMsg( int session, DBServerAckMsg &value )
+{
+	GameServer::getInstance()->handleDBMsg( session, value.eventid, value.error, value.data, value.datalen );
+}
