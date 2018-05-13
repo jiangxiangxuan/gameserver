@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include "mysql/mysql.h"
 
+#define DATABASE_BUFF_SIZE 65535
+
 typedef MYSQL        STDCALL *(*mysql_init_i)(MYSQL *);
 typedef MYSQL        STDCALL *(*mysql_real_connect_i)(MYSQL *, const char *, const char *, const char *, const char *, unsigned int , const char *, unsigned long );
 typedef MYSQL_STMT   STDCALL *(*mysql_stmt_init_i)(MYSQL *);
@@ -44,6 +46,12 @@ public:
 	{
 		return m_ColNum;
 	};
+	char *getDataBuff()
+	{
+		return m_DataBuff;
+	}
+public:
+	char m_DataBuff[DATABASE_BUFF_SIZE];
 private:
 	mysql_init_i              m_pmysql_init_i;
 	mysql_real_connect_i      m_pmysql_real_connect_i;

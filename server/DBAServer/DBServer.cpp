@@ -136,7 +136,8 @@ void DBServer::execute( int session, DBServerReqMsg &value )
 	int colNum = pDataBase->getColNum();
 	int rowNum = 0;
 	MYSQL_ROW row;
-	char dataBuff[65535] = {'\0'};
+	char *dataBuff = pDataBase->getDataBuff();
+	memset( dataBuff, 0, DATABASE_BUFF_SIZE );
 	char *data = dataBuff;
 	data += 4;
 	NWriteInt32(data,  &colNum);
