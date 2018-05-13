@@ -50,10 +50,14 @@ protected:
 	void notifyServerInfo( ServerType type, char *ip, int port, ServerType serverType, ServerStateType state );
 	void sendServerInfo( int id, ServerType type, ServerStateType state );
 	void sendServerInfo( int id, ServerType type, ServerStateType state, char *ip, int port );
+	
+	bool isInternalServer( unsigned int id );
+	bool delInternalServer( unsigned int id );
 private:
 	static CenterServer *ms_pCenterServer;
 private:
 	KernalMutexLocker  m_Locker;
+	KernalMutexLocker  m_ServersLocker;
 
 	std::multimap< ServerType, ServerInfo* > m_Servers;
 	typedef std::multimap< ServerType, ServerInfo* >::iterator server_multimap;

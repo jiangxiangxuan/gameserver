@@ -57,7 +57,7 @@ void CenterServer::handleTimerMsg( unsigned int id )
 
 void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size )
 {		
-	m_Locker.lock();
+	//m_Locker.lock();
 	if( TIMER_DATA == type )
 	{
 		handleTimerMsg( id );
@@ -100,49 +100,12 @@ void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMess
 	}
 	else if( NETWORK_CLOSE == type )
 	{
-		bool isFind = false;
-		char ip[50];
-		memset( ip, 0, sizeof( ip ) );
-		int port;
-		ServerType serverType;
-		for( auto iter = m_Servers.begin(); iter != m_Servers.end(); ++iter )
+		if( delInternalServer( id ) ) // 如果是内部服务器
 		{
-			auto servers = m_Servers.equal_range( iter->first );
-			for( auto it = servers.first; it != servers.second; ++it )
-			{
-				if( it->second && it->second->id == id )
-				{
-					memcpy( ip, it->second->ip, sizeof( it->second->ip ) );
-					port = it->second->port;
-					serverType = it->second->type;
-
-					delete it->second;
-					it = m_Servers.erase( it );
-					isFind = true;
-					break;
-				}
-			}
-			if( isFind )
-			{
-				break;
-			}
-		}
-
-		// 通知网关相关服务器变化信息
-		if( isFind )
-		{
-			if( SERVER_PLATFORM == serverType || SERVER_GAME == serverType )
-			{
-				notifyServerInfo( SERVER_GATEWAY, ip, port, serverType, SERVERSTATE_CLOSE );
-			}
-			else if( SERVER_DBA == serverType )
-			{
-				notifyServerInfo( SERVER_PLATFORM, ip, port, serverType, SERVERSTATE_CLOSE );
-				notifyServerInfo( SERVER_GAME, ip, port, serverType, SERVERSTATE_CLOSE );
-			}
+			
 		}
 	}
-	m_Locker.unlock();
+	//m_Locker.unlock();
 }
 
 void CenterServer::onProcess()
@@ -167,6 +130,8 @@ void CenterServer::handleGateWayMsg( int session, int clientID, char *data, int 
 
 void CenterServer::handleRegisterServerInfo(int session, CenterRegisterServerInfo &value)
 {
+	m_ServersLocker.lock();
+	
 	bool isFind = false;
 	auto servers = m_Servers.equal_range( value.type );
 	for( auto it = servers.first; it != servers.second; ++it )
@@ -179,6 +144,7 @@ void CenterServer::handleRegisterServerInfo(int session, CenterRegisterServerInf
 	}
 	if( isFind )
 	{
+		m_ServersLocker.unlock();
 		return;
 	}
 
@@ -189,6 +155,7 @@ void CenterServer::handleRegisterServerInfo(int session, CenterRegisterServerInf
 	pServer->port = value.port;
 
 	m_Servers.insert( std::pair<ServerType, ServerInfo*>( value.type, pServer) );
+	m_ServersLocker.unlock();
 
 	// 通知相关服务器变化信息
 	//notifyServerInfo( SERVER_GATEWAY, pServer->ip, pServer->port, value.type, SERVERSTATE_RUN );
@@ -206,8 +173,10 @@ void CenterServer::handleRegisterServerInfo(int session, CenterRegisterServerInf
 	// 如果是网关 则发送 大厅 和 游戏服务器信息
 	if( SERVER_GATEWAY == value.type )
 	{
+		m_ServersLocker.lock();
 		sendServerInfo( session, SERVER_PLATFORM, SERVERSTATE_RUN );
 		sendServerInfo( session, SERVER_GAME, SERVERSTATE_RUN );
+		m_ServersLocker.unlock();
 	}
 }
 
@@ -229,7 +198,7 @@ void CenterServer::notifyServerInfo( ServerType type, char *ip, int port, Server
 	{
 		return;
 	}
-
+	m_ServersLocker.lock();
 	auto servers = m_Servers.equal_range( type );
 	for( auto it = servers.first; it != servers.second; ++it )
 	{
@@ -238,6 +207,7 @@ void CenterServer::notifyServerInfo( ServerType type, char *ip, int port, Server
 			sendServerInfo(it->second->id, serverType, state, ip, port );
 		}
 	}
+	m_ServersLocker.unlock();
 }
 
 void CenterServer::sendServerInfo( int id, ServerType type, ServerStateType state )
@@ -286,4 +256,76 @@ void CenterServer::sendMsgToPlatformByGame(PlatformGameServerMsg &value)
 			break;
 		}
 	}
+}
+
+bool CenterServer::isInternalServer( unsigned int id )
+{
+	m_ServersLocker.lock();
+	bool isFind = false;
+	for( auto iter = m_Servers.begin(); iter != m_Servers.end(); ++iter )
+	{
+		auto servers = m_Servers.equal_range( iter->first );
+		for( auto it = servers.first; it != servers.second; ++it )
+		{
+			if( it->second && it->second->id == id )
+			{
+				isFind = true;
+				break;
+			}
+		}
+		if( isFind )
+		{
+			break;
+		}
+	}
+	m_ServersLocker.unlock();
+	return isFind;
+}
+
+bool CenterServer::delInternalServer( unsigned int id )
+{
+	m_ServersLocker.lock();
+	bool isFind = false;
+	ServerType serverType;
+	char ip[50];
+	memset( ip, 0, sizeof( ip ) );
+	int port;
+	for( auto iter = m_Servers.begin(); iter != m_Servers.end(); ++iter )
+	{
+		auto servers = m_Servers.equal_range( iter->first );
+		for( auto it = servers.first; it != servers.second; ++it )
+		{
+			if( it->second && it->second->id == id )
+			{
+				serverType = it->second->type;
+				memcpy( ip, it->second->ip, sizeof( it->second->ip ) );
+				port = it->second->port;
+
+				delete it->second;
+				it = m_Servers.erase( it );
+				isFind = true;
+				break;
+			}
+		}
+		if( isFind )
+		{
+			break;
+		}
+	}
+	m_ServersLocker.unlock();
+	
+	// 通知网关相关服务器变化信息
+	if( isFind )
+	{
+		if( SERVER_PLATFORM == serverType || SERVER_GAME == serverType )
+		{
+			notifyServerInfo( SERVER_GATEWAY, ip, port, serverType, SERVERSTATE_CLOSE );
+		}
+		else if( SERVER_DBA == serverType )
+		{
+			notifyServerInfo( SERVER_PLATFORM, ip, port, serverType, SERVERSTATE_CLOSE );
+			notifyServerInfo( SERVER_GAME, ip, port, serverType, SERVERSTATE_CLOSE );
+		}
+	}
+	return isFind;
 }
