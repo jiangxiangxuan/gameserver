@@ -247,7 +247,7 @@ void GateWayServer::connectCenterServer()
 
 	int sfd = 0;
 	m_CenterServerID = connect(serverIP, serverPort, sfd, false);
-	
+	printf("GateWayServer::connectCenterServer  cid=%ld\n\r",m_CenterServerID);
 	// 如果没有连接上中心服务器 则定时任务连接
 	if( -1 == m_CenterServerID )
 	{
