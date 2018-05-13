@@ -207,7 +207,7 @@ void GateWayServer::sendMsgToGame( unsigned int id, KernalMessageType type, cons
 	msg.type     = ( NETWORK_DATA == type ) ? MESSAGE_DATA: MESSAGE_CONNECTCLOSE ;
 	msg.initData( (char*)data, size );
 	
-	// 待优化
+	// TODO:待优化
 	m_ServersLocker.lock();
 	auto servers = m_Servers.equal_range( SERVER_GAME );
 	for( auto it = servers.first; it != servers.second; ++it )
