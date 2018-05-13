@@ -96,7 +96,7 @@ DBAgent::~DBAgent()
 
 }
 
-bool DBAgent::init( KernalEpoll *pEpoll, const char *ip, int port )
+bool DBAgent::init( KernalEpoll *pEpoll )
 {
 	m_pEpoll = pEpoll;
 	return true;

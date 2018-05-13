@@ -54,7 +54,7 @@ void PlatformServer::oninit()
 
 	const char *dbaip    = getConfig()->getAttributeStr("config/dba/listen", "ip");
 	int         dbaport  = getConfig()->getAttributeInt("config/dba/listen", "port");
-	m_DBAgent.init( &m_Epoll, dbaip, dbaport );
+	m_DBAgent.init( &m_Epoll );
 }
 
 void PlatformServer::onuninit()

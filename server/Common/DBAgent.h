@@ -65,7 +65,7 @@ public:
 	DBAgent();
 	~DBAgent();
 
-	bool init( KernalEpoll *pEpoll, const char *ip, int port );
+	bool init( KernalEpoll *pEpoll );
 	int execute( const char *sql, KernalObject *pObj = NULL, DBEvent_fn func = NULL );
 	void handleData( int error, int eventid, char *data, int datalen );
 	void releaseEvent( int eventid );
