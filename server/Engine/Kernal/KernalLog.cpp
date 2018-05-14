@@ -22,7 +22,7 @@ KernalLog::~KernalLog()
 
 }
 
-void KernalLog::init( const char *pLogFilePath )
+void KernalLog::init( char *pLogFilePath )
 {
 	memccpy( m_pLogFilePath, pLogFilePath, strlen( pLogFilePath ) );
 		
@@ -62,7 +62,7 @@ void KernalLog::logWorker()
 		FD_ZERO( &rset );
 		FD_SET( m_logPipe[0], &rset );
 		retval = ::select( m_logPipe[0] + 1, &rset, NULL, NULL, NULL );
-		if( retval > 0 && FD_ISSET(pPipe->pipe[1], &rset)  )
+		if( retval > 0 && FD_ISSET( m_logPipe[0], &rset )  )
 		{
 			memset( logbuff, 0, sizeof(logbuff) );
 			ret = ::read( m_logPipe[0], logbuff, sizeof(logbuff) );

@@ -20,7 +20,7 @@ public:
     KernalLog();
     ~KernalLog();
 	
-	bool init( const char *pLogFilePath );
+	bool init( char *pLogFilePath );
 	void logWorker();
 public:
 	void info( const char *pLogText, ... );
