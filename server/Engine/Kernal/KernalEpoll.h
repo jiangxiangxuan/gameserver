@@ -187,7 +187,8 @@ enum KernalSocketMessageType
 // 管道
 struct KernalPipe
 {
-	int pipe[2];
+	pthread_t tid;
+	int       pipe[2];
 };
 
 class KernalEpoll

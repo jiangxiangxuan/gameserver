@@ -147,6 +147,8 @@ void KernalServerBase::worker()
 	
 	KernalPipe* pPipe = m_Epoll.createWorkerPipe( pthread_self() );
 	
+	printf("KernalServerBase::worker  tid=%ld ptid=%ld\n\r", pthread_self(), pPipe->tid);
+	
 	while( !m_quit )
 	{		
 		int minExpire = m_Timer.getMinTimerExpire(); // 获取最近过期时间的定时器的expire
@@ -258,6 +260,7 @@ void KernalServerBase::pushMsg( KernalMessageType type, KernalNetWorkType netTyp
 	KernalPipe* pPipe = m_Epoll.randWorkerPipe();
 	if( pPipe )
 	{
+		printf("KernalServerBase::pushMsg  tid=%ld ptid=%ld\n\r", pthread_self(), pPipe->tid);
 		::write( pPipe->pipe[0], &type, sizeof(type) );
 		::write( pPipe->pipe[0], &netType, sizeof(netType) );
 		::write( pPipe->pipe[0], &id, sizeof(id) );

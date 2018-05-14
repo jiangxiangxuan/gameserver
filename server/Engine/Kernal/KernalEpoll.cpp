@@ -210,6 +210,7 @@ int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool isHtt
 KernalPipe *KernalEpoll::createWorkerPipe( pthread_t tid )
 {
 	KernalPipe *pPipe = new KernalPipe();
+	pPipe->tid = tid;
     if( pipe( pPipe->pipe ) )
     {
 		delete pPipe;
