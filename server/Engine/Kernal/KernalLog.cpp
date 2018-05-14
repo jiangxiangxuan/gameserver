@@ -52,7 +52,7 @@ void KernalLog::info( const char* pLogText, ... )
 
 void KernalLog::logWorker()
 {
-	m_logFd = open( m_pLogFilePath, O_RDWR | O_CREAT );
+	m_logFd = ::open( m_pLogFilePath, O_RDWR | O_CREAT );
 	char logbuff[ LOG_BUFF_LINE_SIZE ];
 	int retval = 0;
 	int ret =  0;
