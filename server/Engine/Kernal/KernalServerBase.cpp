@@ -86,6 +86,8 @@ void KernalServerBase::init( const char *configPath )
 		KernalThread *pThread = new KernalThread();
 		pThread->init(KernalServerBaseWorker, pComPipe);
 		pThread->detach();
+		
+		m_Epoll.createWorkerPipe( pThread->getTid() );
 		m_WorkThreads.push( pThread );
 	}
 }

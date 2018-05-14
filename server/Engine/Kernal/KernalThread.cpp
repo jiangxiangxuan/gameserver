@@ -2,7 +2,7 @@
 #include "KernalThread.h"
 
 KernalThread::KernalThread()
-	:m_thread_t( 0 )
+	:m_tid( 0 )
 {
 
 }
@@ -14,10 +14,10 @@ KernalThread::~KernalThread()
 
 bool KernalThread::init( kernalThreadFunc func, void *arg )
 {
-	return 0 == pthread_create( &m_thread_t, NULL, func, arg );
+	return 0 == pthread_create( &m_tid, NULL, func, arg );
 }
 
 void KernalThread::detach()
 {
-	pthread_detach(  m_thread_t );
+	pthread_detach(  m_tid );
 }

@@ -15,8 +15,12 @@ public:
 
 	bool init( kernalThreadFunc func, void *arg );
 	void detach();
+	pthread_t getTid()
+	{
+		return m_tid;
+	}
 private:
-	pthread_t m_thread_t;	
+	pthread_t m_tid;	
 };
 
 #endif

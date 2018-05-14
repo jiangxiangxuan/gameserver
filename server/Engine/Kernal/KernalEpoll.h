@@ -183,6 +183,12 @@ enum KernalSocketMessageType
     KernalSocketMessageType_SOCKET_CLOSE,
 };
 
+// 管道
+struct KernalPipe
+{
+	int pipe[2];
+}
+
 class KernalEpoll
 {
 public:
@@ -194,7 +200,11 @@ public:
     int listen( const char *addr, const int port, bool isHttp = false );
     int connect( const char *addr, const int port, int &sfd, bool isHttp = false, bool addToEpoll = true );
     //int connectSocket( const char *addr, const int port );
-
+	
+	// 创建工作线程管道
+	KernalPipe *createWorkerPipe( pthread_t tid );
+	void releaseWorkerPipes();
+	
     // HTTP
     int listenHttp( const char *addr, const int port );
     int connectHttp( const char *addr, const int port );
@@ -218,6 +228,10 @@ public:
     // 检测心跳
     void heartbeat();
 private:
+	// 检测是否是工作管道
+	bool checkIsWorkerPipe( int fd );
+	// 获取工作管道(根据当前线程)
+	KernalPipe *getWorkerPipe(); 
     void closeSocket( int id );
     int readMsg( int fd, void *data, int size, bool useRead = false, bool readOnce = false );
     // 发送数据到指定的socket
@@ -227,7 +241,7 @@ private:
     int getSocketID();
 private:
     int                  m_epollfd;
-    int                  m_ctrlfd[2]; // 0:接受 1:发送
+    //int                  m_ctrlfd[2]; // 0:接受 1:发送
 
     struct epoll_event   m_events[ MAX_EVENTS ];
     int                  m_eventNum;
@@ -237,6 +251,8 @@ private:
     int                  m_SocketID; //当前socket id
 
     struct KernalNetWork m_NetWorks[ MAX_NET_WORK_NUM ];
+	
+	std::map< pthread_t, KernalPipe* > m_WorkerPipes;
 };
 
 #endif
