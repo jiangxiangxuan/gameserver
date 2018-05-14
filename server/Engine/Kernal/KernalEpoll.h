@@ -204,6 +204,8 @@ public:
 	
 	// 创建工作线程管道
 	KernalPipe *createWorkerPipe( pthread_t tid );
+	// 随机获取一个工作线程管道
+	KernalPipe *randWorkerPipe();
 	void releaseWorkerPipes();
 	
     // HTTP

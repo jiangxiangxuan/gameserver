@@ -49,6 +49,7 @@ public:
 	unsigned int       id;
 };
 
+#if 0
 // 线程的通信管道
 class KernalServerBase;
 class KernalCommunicationPipe {
@@ -62,6 +63,7 @@ public:
 	pthread_t 		  tid;
 	KernalServerBase *pServerBase;
 };
+#endif
 
 class KernalServerBase
 {
@@ -81,7 +83,8 @@ public:
 
 	void epollWroker();
 	
-	void worker(KernalCommunicationPipe *pComPipe);
+	//void worker(KernalCommunicationPipe *pComPipe);
+	void worker();
 
     // 检测心跳
     void heartbeatWorker();
@@ -118,7 +121,7 @@ private:
 	KernalConfig                                   m_Config;         //配置文件
 	KernalCond                                     m_MessageCond;    //条件变量
 	KernalSem                                      m_MessageSem;     //信号量
-	std::vector<KernalCommunicationPipe*>          m_WorkThreadsPipe;//工作线程管道
+	//std::vector<KernalCommunicationPipe*>          m_WorkThreadsPipe;//工作线程管道
 	bool                                           m_quit;           //是否退出
 };
 

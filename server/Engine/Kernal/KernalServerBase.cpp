@@ -4,8 +4,10 @@
 
 void *KernalServerBaseWorker( void *arg )
 {
-	KernalCommunicationPipe *pComPipe = (KernalCommunicationPipe*)arg;
-	pComPipe->pServerBase->worker(pComPipe);
+	//KernalCommunicationPipe *pComPipe = (KernalCommunicationPipe*)arg;
+	//pComPipe->pServerBase->worker(pComPipe);
+	KernalServerBase *pServerBase = (KernalServerBase*)arg;
+	pServerBase->worker();
 	return ((void *)0);
 }
 
@@ -78,16 +80,15 @@ void KernalServerBase::init( const char *configPath )
 	for( int i = 0; i < m_threadNum; ++i )
 	{
 		// 创建线程通信管道
-		KernalCommunicationPipe *pComPipe = new KernalCommunicationPipe();
-		pComPipe->tid = pthread_self();
-		pComPipe->pServerBase = this;
-		int err = socketpair( AF_UNIX, SOCK_STREAM, 0, pComPipe->pipefd );  
-		m_WorkThreadsPipe.push_back( pComPipe );
+		//KernalCommunicationPipe *pComPipe = new KernalCommunicationPipe();
+		//pComPipe->tid = pthread_self();
+		//pComPipe->pServerBase = this;
+		//int err = socketpair( AF_UNIX, SOCK_STREAM, 0, pComPipe->pipefd );  
+		//m_WorkThreadsPipe.push_back( pComPipe );
 		KernalThread *pThread = new KernalThread();
-		pThread->init(KernalServerBaseWorker, pComPipe);
+		//pThread->init(KernalServerBaseWorker, pComPipe);
+		pThread->init(KernalServerBaseWorker, this);
 		pThread->detach();
-		
-		m_Epoll.createWorkerPipe( pThread->getTid() );
 		m_WorkThreads.push( pThread );
 	}
 }
@@ -139,37 +140,40 @@ void KernalServerBase::epollWroker()
 	}
 }
 
-void KernalServerBase::worker(KernalCommunicationPipe *pComPipe)
+void KernalServerBase::worker()
 {
 	onWorkerBegin();
 	m_Timer.initThreadTimer();
+	
+	KernalPipe* pPipe = m_Epoll.createWorkerPipe( pthread_self() );
+	
 	while( !m_quit )
 	{		
 		int minExpire = m_Timer.getMinTimerExpire(); // 获取最近过期时间的定时器的expire
 		fd_set rset;
 		FD_ZERO( &rset );
-		FD_SET( pComPipe->pipefd[1], &rset );
+		FD_SET( pPipe->pipe[1], &rset );
 		int retval = 0; //::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm );
 		if( -1 == minExpire )
 		{
-			retval = ::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, NULL );
+			retval = ::select( pPipe->pipe[1] + 1, &rset, NULL, NULL, NULL );
 		}
 		else
 		{
 			struct timeval tm = {0, minExpire * 10000};
-			retval = ::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm );
+			retval = ::select( pPipe->pipe[1] + 1, &rset, NULL, NULL, &tm );
 		}
-		if( retval > 0 && FD_ISSET(pComPipe->pipefd[1], &rset)  )
+		if( retval > 0 && FD_ISSET(pPipe->pipe[1], &rset)  )
 		{
 			// 处理网络消息
 			KernalMessage pMsg;
-			::read(pComPipe->pipefd[1], &pMsg.type, sizeof(pMsg.type));
-			::read(pComPipe->pipefd[1], &pMsg.netType, sizeof(pMsg.netType));
-			::read(pComPipe->pipefd[1], &pMsg.id, sizeof(pMsg.id));
-			::read(pComPipe->pipefd[1], &pMsg.size, sizeof(pMsg.size));
+			::read(pPipe->pipe[1], &pMsg.type, sizeof(pMsg.type));
+			::read(pPipe->pipe[1], &pMsg.netType, sizeof(pMsg.netType));
+			::read(pPipe->pipe[1], &pMsg.id, sizeof(pMsg.id));
+			::read(pPipe->pipe[1], &pMsg.size, sizeof(pMsg.size));
 			pMsg.data = ( char* )malloc( pMsg.size );
 			memset( pMsg.data, 0, pMsg.size );
-			::read(pComPipe->pipefd[1], pMsg.data, pMsg.size);
+			::read(pPipe->pipe[1], pMsg.data, pMsg.size);
 
 			// 处理消息
 			switch( pMsg.type )
@@ -249,15 +253,16 @@ void KernalServerBase::flush()
 
 void KernalServerBase::pushMsg( KernalMessageType type, KernalNetWorkType netType, void *data, unsigned int size, unsigned int id )
 {
-	int index = rand()%m_WorkThreadsPipe.size();
-	KernalCommunicationPipe *pComPipe = m_WorkThreadsPipe[index];
+	//int index = rand()%m_WorkThreadsPipe.size();
+	//KernalCommunicationPipe *pComPipe = m_WorkThreadsPipe[index];
+	KernalPipe* pPipe = m_Epoll.randWorkerPipe()
 	if( pComPipe )
 	{
-		::write( pComPipe->pipefd[0], &type, sizeof(type) );
-		::write( pComPipe->pipefd[0], &netType, sizeof(netType) );
-		::write( pComPipe->pipefd[0], &id, sizeof(id) );
-		::write( pComPipe->pipefd[0], &size, sizeof(size) );
-		::write( pComPipe->pipefd[0], (char*)data, size );
+		::write( pPipe->pipe[0], &type, sizeof(type) );
+		::write( pPipe->pipe[0], &netType, sizeof(netType) );
+		::write( pPipe->pipe[0], &id, sizeof(id) );
+		::write( pPipe->pipe[0], &size, sizeof(size) );
+		::write( pPipe->pipe[0], (char*)data, size );
 	}
 }
 

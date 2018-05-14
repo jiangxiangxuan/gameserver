@@ -231,6 +231,20 @@ KernalPipe *KernalEpoll::createWorkerPipe( pthread_t tid )
 	return pPipe;
 }
 
+KernalPipe *KernalEpoll::randWorkerPipe()
+{
+	int index = rand()%m_WorkerPipes.size();
+	for( auto iter = m_WorkerPipes.begin(); iter != m_WorkerPipes.end(); ++iter )
+	{
+		--index;
+		if( index <= 0 )
+		{
+			return iter->second;
+		}
+	}
+	return NULL;
+}
+
 bool KernalEpoll::checkIsWorkerPipe( int fd )
 {
 	for( auto iter = m_WorkerPipes.begin(); iter != m_WorkerPipes.end(); ++iter )
