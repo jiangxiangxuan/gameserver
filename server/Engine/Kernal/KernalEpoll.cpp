@@ -41,7 +41,7 @@ bool KernalEpoll::create()
       return false;
     }
 
-    /*if( pipe( m_ctrlfd ) )
+    if( pipe( m_ctrlfd ) )
     {
         release();
         return false;
@@ -54,9 +54,9 @@ bool KernalEpoll::create()
     pNetWork->fd   = m_ctrlfd[0];
     pNetWork->id   = id;
 
-	epollAdd( id );*/
+	epollAdd( id );
 	
-	createWorkerPipe( pthread_self() );
+	//createWorkerPipe( pthread_self() );
     return true;
 }
 
@@ -112,13 +112,13 @@ int KernalEpoll::listen( const char *addr, const int port, bool isHttp )
         NWriteInt32(dataBuf, &size);
         NWriteInt32(dataBuf, &fd);
         dataBuf = _buf;
-        //sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
+        sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
 		
-		KernalPipe *pPipe = getWorkerPipe();
+		/*KernalPipe *pPipe = getWorkerPipe();
 		if( pPipe )
 		{
 			sendMsg( pPipe->pipe[1], dataBuf, size + 16, true );
-		}
+		}*/
 	
 #endif
 
@@ -192,12 +192,12 @@ int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool isHtt
 			NWriteInt32(dataBuf, &size);
 			NWriteInt32(dataBuf, &fd);
 			dataBuf = _buf;
-			//sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
-			KernalPipe *pPipe = getWorkerPipe();
+			sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
+			/*KernalPipe *pPipe = getWorkerPipe();
 			if( pPipe )
 			{
 				sendMsg( pPipe->pipe[1], dataBuf, size + 16, true );
-			}
+			}*/
 	
 		}
 	}
@@ -235,18 +235,11 @@ KernalPipe *KernalEpoll::createWorkerPipe( pthread_t tid )
 
 KernalPipe *KernalEpoll::randWorkerPipe()
 {
-	int index = rand()%( m_WorkerPipes.size() - 1 );
-	int i = 0;
+	int index = rand()%m_WorkerPipes.size();
 	KernalPipe *pPipe = NULL;
 	printf("KernalEpoll::randWorkerPipe  WorkerPipeSize=%d  tid=%ld index=%d\n\r", m_WorkerPipes.size(), pthread_self(),index);
 	for( auto iter = m_WorkerPipes.begin(); iter != m_WorkerPipes.end(); ++iter )
 	{
-		if( 0 == i )
-		{
-			++i;
-			continue;
-		}
-		++i;
 		--index;
 		if( index <= 0 )
 		{
@@ -257,8 +250,12 @@ KernalPipe *KernalEpoll::randWorkerPipe()
 	return pPipe;
 }
 
-bool KernalEpoll::checkIsWorkerPipe( int fd )
+bool KernalEpoll::checkIsPipe( int fd )
 {
+	if( fd == m_ctrlfd[0] )
+	{
+		return true;
+	}
 	for( auto iter = m_WorkerPipes.begin(); iter != m_WorkerPipes.end(); ++iter )
 	{
 		if( iter->second->pipe[0] == fd )
@@ -582,7 +579,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
     }
 
     //if(  pNetWork->fd == m_ctrlfd[0] && pNetWork->isRead )
-    if( checkIsWorkerPipe( pNetWork->fd ) && pNetWork->isRead )
+    if( checkIsPipe( pNetWork->fd ) && pNetWork->isRead )
     {
         KernalSocketMessageType msgType = KernalSocketMessageType_NO;
         if( pNetWork->readBuffersLen < 16 )
@@ -946,15 +943,15 @@ void KernalEpoll::release()
     {
         struct KernalNetWork *pNetWork = &m_NetWorks[ i ];
         //if( pNetWork->fd != m_ctrlfd[0] && pNetWork->type != KernalNetWorkType_NO )
-        if( !checkIsWorkerPipe( pNetWork->fd ) && pNetWork->type != KernalNetWorkType_NO )
+        if( !checkIsPipe( pNetWork->fd ) && pNetWork->type != KernalNetWorkType_NO )
         {
             closeSocket( pNetWork->id );
         }
     }
 
     ::close( m_epollfd );
-	//::close( m_ctrlfd[0] );
-	//::close( m_ctrlfd[1] );
+	::close( m_ctrlfd[0] );
+	::close( m_ctrlfd[1] );
 	releaseWorkerPipes();
 }
 
@@ -1041,7 +1038,7 @@ void KernalEpoll::heartbeat()
     {
         struct KernalNetWork *pNetWork = &m_NetWorks[ i ];
         //if( pNetWork->id != 0 && pNetWork->fd != 0 && pNetWork->fd != m_ctrlfd[0] && pNetWork->type == KernalNetWorkType_CONNECTED )
-        if( pNetWork->id != 0 && pNetWork->fd != 0 && !checkIsWorkerPipe( pNetWork->fd ) && pNetWork->type == KernalNetWorkType_CONNECTED )
+        if( pNetWork->id != 0 && pNetWork->fd != 0 && !checkIsPipe( pNetWork->fd ) && pNetWork->type == KernalNetWorkType_CONNECTED )
         {
             int ret = ::send( pNetWork->fd, buff, 4, 0 );
             if( ret <= 0 )

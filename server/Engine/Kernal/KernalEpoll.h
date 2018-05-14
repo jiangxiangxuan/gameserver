@@ -232,8 +232,8 @@ public:
     // 检测心跳
     void heartbeat();
 private:
-	// 检测是否是工作管道
-	bool checkIsWorkerPipe( int fd );
+	// 检测是否是管道
+	bool checkIsPipe( int fd );
 	// 获取工作管道(根据当前线程)
 	KernalPipe *getWorkerPipe(); 
     void closeSocket( int id );
@@ -245,7 +245,7 @@ private:
     int getSocketID();
 private:
     int                  m_epollfd;
-    //int                  m_ctrlfd[2]; // 0:接受 1:发送
+    int                  m_ctrlfd[2]; // 0:接受 1:发送
 
     struct epoll_event   m_events[ MAX_EVENTS ];
     int                  m_eventNum;
