@@ -243,7 +243,7 @@ KernalPipe *KernalEpoll::randWorkerPipe()
 		if( 0 == i )
 		{
 			++i;
-			continue
+			continue;
 		}
 		++i;
 		--index;
