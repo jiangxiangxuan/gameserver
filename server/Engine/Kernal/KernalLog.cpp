@@ -22,7 +22,7 @@ KernalLog::~KernalLog()
 
 }
 
-void KernalLog::init( char *pLogFilePath )
+bool KernalLog::init( char *pLogFilePath )
 {
 	memccpy( m_pLogFilePath, pLogFilePath, strlen( pLogFilePath ) );
 		
