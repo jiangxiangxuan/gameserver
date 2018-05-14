@@ -255,7 +255,7 @@ void KernalServerBase::pushMsg( KernalMessageType type, KernalNetWorkType netTyp
 {
 	//int index = rand()%m_WorkThreadsPipe.size();
 	//KernalCommunicationPipe *pComPipe = m_WorkThreadsPipe[index];
-	KernalPipe* pPipe = m_Epoll.randWorkerPipe()
+	KernalPipe* pPipe = m_Epoll.randWorkerPipe();
 	if( pPipe )
 	{
 		::write( pPipe->pipe[0], &type, sizeof(type) );
