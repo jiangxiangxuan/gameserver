@@ -30,7 +30,8 @@ DBServer *DBServer::getInstance()
 }
 
 void DBServer::oninit()
-{
+{	
+	m_Log.init( (char*)(getConfig()->getText("config/dba/log")) );
 	m_threadNum = atoi(getConfig()->getText("config/dba/thread"));
 
 	const char *ip   = getConfig()->getAttributeStr("config/dba/listen", "ip");

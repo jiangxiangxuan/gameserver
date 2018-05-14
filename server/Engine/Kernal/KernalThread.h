@@ -15,6 +15,7 @@ public:
 
 	bool init( kernalThreadFunc func, void *arg );
 	void detach();
+	void join();
 	pthread_t getTid()
 	{
 		return m_tid;

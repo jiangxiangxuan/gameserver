@@ -30,7 +30,9 @@ CenterServer *CenterServer::getInstance()
 }
 
 void CenterServer::oninit()
-{
+{	
+	m_Log.init( (char*)(getConfig()->getText("config/center/log")) );
+
 	m_threadNum = atoi(getConfig()->getText("config/center/thread"));
 
 	const char *ip    = getConfig()->getAttributeStr("config/center/listen", "ip");

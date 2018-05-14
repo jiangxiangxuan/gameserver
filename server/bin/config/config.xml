@@ -8,6 +8,7 @@
 		<thread>8</thread>
 		<listen ip="127.0.0.1" port="8000"/>
 		<http ip="127.0.0.1" port="8001"/>
+		<log>center_log.log</log>
 	</center>
 	<gateway>
 		<thread>8</thread>
@@ -16,21 +17,25 @@
 		<centercmd min="1000" max="2000"/>
 		<platformcmd min="2000" max="3000"/>
 		<gamecmd min="100000" max="-1"/>
+		<log>gateway_log.log</log>
 	</gateway>
 	<login>
 		<thread>8</thread>
 		<listen ip="127.0.0.1" port="8020"/>
 		<http ip="127.0.0.1" port="8021"/>
+		<log>login_log.log</log>
 	</login>
 	<game appid="100">
 		<thread>8</thread>
 		<listen ip="127.0.0.1" port="8030"/>
 		<http ip="127.0.0.1" port="8031"/>
+		<log>game_log.log</log>
 	</game>
 	<dba>
 		<thread>8</thread>
 		<listen ip="127.0.0.1" port="6010"/>
 		<db ip="127.0.0.1" port="3306" user="root" pwd="root" dbname="GameDB"/>
 		<logdb ip="127.0.0.1" port="3306" user="root" pwd="root" db="GameDB_log" />
+		<log>dba_log.log</log>
 	</dba>
 </config>

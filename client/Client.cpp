@@ -106,29 +106,31 @@ void Client::clientWorker()
 	struct timeval now;
 
 	int serverID = 0;//connect(serverIP, serverPort);
+	int sfd = 0;
+
 	do{
 		gettimeofday(&now, NULL);
 		delay.tv_sec = now.tv_sec + 2;
 		delay.tv_nsec = now.tv_usec * 1000;
 		pthread_cond_timedwait(&cond, &mutex, &delay);
 
-		serverID = connect(serverIP, serverPort);
+		serverID = connect(serverIP, serverPort, sfd);
 		
 		if( serverID <= 0 )
 		{
 			continue;
 		}
 		
-		struct KernalNetWork *pNet = m_Epoll.getNetWork(serverID);
+		//struct KernalNetWork *pNet = m_Epoll.getNetWork(serverID);
 		
 		struct timeval tm = {2, 0};
 		fd_set wset, rset;
 		FD_ZERO( &wset );
 		FD_ZERO( &rset );
-		FD_SET( pNet->fd, &wset );
-		FD_SET( pNet->fd, &rset );
-		int res = select( pNet->fd + 1, &rset, &wset, NULL, &tm );
-		if( res > 0 && FD_ISSET(pNet->fd, &wset)  )
+		FD_SET( sfd , &wset );
+		FD_SET( sfd, &rset );
+		int res = select( sfd + 1, &rset, &wset, NULL, &tm );
+		if( res > 0 && FD_ISSET(sfd, &wset)  )
 		{
 				gettimeofday(&now, NULL);
 				delay.tv_sec = now.tv_sec + 5;
@@ -138,10 +140,10 @@ void Client::clientWorker()
 				int error, code;
 				socklen_t len;
 				len = sizeof(error);
-				code = getsockopt(pNet->fd, SOL_SOCKET, SO_ERROR, &error, &len);
+				code = getsockopt(sfd, SOL_SOCKET, SO_ERROR, &error, &len);
 				if (code < 0 || error)
 				{
-					::close( pNet->fd );
+					::close( sfd );
 				}
 				else
 				{

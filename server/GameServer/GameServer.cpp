@@ -33,6 +33,8 @@ GameServer *GameServer::getInstance()
 
 void GameServer::oninit()
 {
+	m_Log.init( (char*)(getConfig()->getText("config/game/log")) );
+
 	m_threadNum = atoi(getConfig()->getText("config/game/thread"));
 
 	const char *ip    = getConfig()->getAttributeStr("config/game/listen", "ip");

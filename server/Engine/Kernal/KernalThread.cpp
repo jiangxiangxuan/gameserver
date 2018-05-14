@@ -21,3 +21,9 @@ void KernalThread::detach()
 {
 	pthread_detach(  m_tid );
 }
+
+void KernalThread::join()
+{
+	pthread_join( m_tid, NULL );
+}
+

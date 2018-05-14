@@ -60,7 +60,6 @@ int KernalServerBase::connectHttp( const char *ip, int port )
 void KernalServerBase::init( const char *configPath )
 {
 	srand( (unsigned)time(NULL) );
-	m_Log.init( (char*)("test.log") );
 	
 	m_Epoll.create();
 
@@ -89,8 +88,9 @@ void KernalServerBase::init( const char *configPath )
 		KernalThread *pThread = new KernalThread();
 		//pThread->init(KernalServerBaseWorker, pComPipe);
 		pThread->init(KernalServerBaseWorker, this);
-		pThread->detach();
-		m_WorkThreads.push( pThread );
+		//pThread->detach();
+		//m_WorkThreads.push( pThread );
+		m_WorkThreads.push_back( pThread );
 	}
 }
 
@@ -102,11 +102,15 @@ void KernalServerBase::uninit()
 void KernalServerBase::run()
 {
 	onRun();
-	while( !m_quit )
+	for( auto iter = m_WorkThreads.begin(); iter != m_WorkThreads.end(); ++iter )
+	{
+		(*iter)->join();
+	}
+	/*while( !m_quit )
 	{
 		onProcess();
 		usleep(2000);
-	}
+	}*/
 	onExit();
 }
 

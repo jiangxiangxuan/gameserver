@@ -32,6 +32,8 @@ GateWayServer *GateWayServer::getInstance()
 
 void GateWayServer::oninit()
 {
+	m_Log.init( (char*)(getConfig()->getText("config/gateway/log")) );
+
 	m_threadNum = atoi(getConfig()->getText("config/gateway/thread"));
 
 	const char *ip   = getConfig()->getAttributeStr("config/gateway/listen", "ip");

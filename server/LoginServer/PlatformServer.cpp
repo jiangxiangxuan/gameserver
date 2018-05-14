@@ -33,6 +33,8 @@ PlatformServer *PlatformServer::getInstance()
 
 void PlatformServer::oninit()
 {
+	m_Log.init( (char*)(getConfig()->getText("config/login/log")) );
+
 	m_PlatformLogin.setPlatformAddr( getConfig()->getAttributeStr("config/common/platform", "httpaddr") );
 	
 	m_threadNum = atoi(getConfig()->getText("config/login/thread"));
