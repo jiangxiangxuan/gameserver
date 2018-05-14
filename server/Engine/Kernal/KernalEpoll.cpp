@@ -226,6 +226,7 @@ KernalPipe *KernalEpoll::createWorkerPipe( pthread_t tid )
 		pNetWork->id   = id;
 		epollAdd( id );
 		
+		printf("KernalEpoll::createWorkerPipe  WorkerPipeSize=%d tid=%ld  stid=%ld\n\r", m_WorkerPipes.size(),tid, pthread_self());
 		m_WorkerPipes.insert( std::pair< pthread_t, KernalPipe* >( tid, pPipe ) ); 
 	}
 	return pPipe;
@@ -233,6 +234,7 @@ KernalPipe *KernalEpoll::createWorkerPipe( pthread_t tid )
 
 KernalPipe *KernalEpoll::randWorkerPipe()
 {
+	printf("KernalEpoll::randWorkerPipe  WorkerPipeSize=%d  tid=%ld\n\r", m_WorkerPipes.size(), pthread_self());
 	int index = rand()%m_WorkerPipes.size();
 	for( auto iter = m_WorkerPipes.begin(); iter != m_WorkerPipes.end(); ++iter )
 	{
