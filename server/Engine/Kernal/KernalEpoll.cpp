@@ -234,17 +234,21 @@ KernalPipe *KernalEpoll::createWorkerPipe( pthread_t tid )
 
 KernalPipe *KernalEpoll::randWorkerPipe()
 {
-	printf("KernalEpoll::randWorkerPipe  WorkerPipeSize=%d  tid=%ld\n\r", m_WorkerPipes.size(), pthread_self());
-	int index = rand()%m_WorkerPipes.size();
+	int index = rand()%( m_WorkerPipes.size() - 1 );
+	int i = 0;
+	KernalPipe *pPipe = NULL;
+	printf("KernalEpoll::randWorkerPipe  WorkerPipeSize=%d  tid=%ld index=%d\n\r", m_WorkerPipes.size(), pthread_self(),index);
 	for( auto iter = m_WorkerPipes.begin(); iter != m_WorkerPipes.end(); ++iter )
 	{
+		
 		--index;
 		if( index <= 0 )
 		{
-			return iter->second;
+			pPipe = iter->second;
+			break;
 		}
 	}
-	return NULL;
+	return pPipe;
 }
 
 bool KernalEpoll::checkIsWorkerPipe( int fd )
