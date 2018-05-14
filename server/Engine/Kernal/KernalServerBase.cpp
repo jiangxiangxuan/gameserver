@@ -156,6 +156,7 @@ void KernalServerBase::worker()
 		FD_ZERO( &rset );
 		FD_SET( pPipe->pipe[1], &rset );
 		int retval = 0; //::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm );
+		printf("KernalServerBase::worker 000  tid=%ld ptid=%ld minExpire=%d \n\r", pthread_self(), pPipe->tid,minExpire);
 		if( -1 == minExpire )
 		{
 			retval = ::select( pPipe->pipe[1] + 1, &rset, NULL, NULL, NULL );
@@ -165,6 +166,7 @@ void KernalServerBase::worker()
 			struct timeval tm = {0, minExpire * 10000};
 			retval = ::select( pPipe->pipe[1] + 1, &rset, NULL, NULL, &tm );
 		}
+		printf("KernalServerBase::worker 111  tid=%ld ptid=%ld  minExpire=%d retval=%d\n\r", pthread_self(), pPipe->tid,minExpire,retval);
 		if( retval > 0 && FD_ISSET(pPipe->pipe[1], &rset)  )
 		{
 			// 处理网络消息
