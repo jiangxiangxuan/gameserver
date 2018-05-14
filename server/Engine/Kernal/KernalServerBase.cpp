@@ -60,7 +60,7 @@ int KernalServerBase::connectHttp( const char *ip, int port )
 void KernalServerBase::init( const char *configPath )
 {
 	srand( (unsigned)time(NULL) );
-	m_Log.init( "test.log" );
+	m_Log.init( (char*)("test.log") );
 	
 	m_Epoll.create();
 
