@@ -146,7 +146,7 @@ void KernalServerBase::worker()
 	m_Timer.initThreadTimer();
 	
 	KernalPipe* pPipe = m_Epoll.createWorkerPipe( pthread_self() );
-	m_Log.info("KernalServerBase::worker %s %d\n\r", "aaa", pthread_self());
+	m_Log.info("KernalServerBase::worker %s %ld\n\r", "aaa", pthread_self());
 
 	while( !m_quit )
 	{		
