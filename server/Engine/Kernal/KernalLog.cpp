@@ -24,14 +24,14 @@ KernalLog::~KernalLog()
 
 bool KernalLog::init( char *pLogFilePath )
 {
-	memccpy( m_pLogFilePath, pLogFilePath, strlen( pLogFilePath ) );
+	memcpy( m_pLogFilePath, pLogFilePath, strlen( pLogFilePath ) );
 		
     if( pipe( m_logPipe ) )
     {
         return false;
     }
 	
-	m_LogThread.init(KernalServerBaseWorker, this);
+	m_LogThread.init(KernalLogWorker, this);
 	m_LogThread.detach();
 		
 	return true;
