@@ -240,7 +240,12 @@ KernalPipe *KernalEpoll::randWorkerPipe()
 	printf("KernalEpoll::randWorkerPipe  WorkerPipeSize=%d  tid=%ld index=%d\n\r", m_WorkerPipes.size(), pthread_self(),index);
 	for( auto iter = m_WorkerPipes.begin(); iter != m_WorkerPipes.end(); ++iter )
 	{
-		
+		if( 0 == i )
+		{
+			++i;
+			continue
+		}
+		++i;
 		--index;
 		if( index <= 0 )
 		{
