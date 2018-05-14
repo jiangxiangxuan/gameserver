@@ -187,7 +187,7 @@ enum KernalSocketMessageType
 struct KernalPipe
 {
 	int pipe[2];
-}
+};
 
 class KernalEpoll
 {
