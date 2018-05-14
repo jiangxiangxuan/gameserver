@@ -147,8 +147,7 @@ void KernalServerBase::worker()
 	
 	KernalPipe* pPipe = m_Epoll.createWorkerPipe( pthread_self() );
 	
-	printf("KernalServerBase::worker  tid=%ld ptid=%ld\n\r", pthread_self(), pPipe->tid);
-	
+
 	while( !m_quit )
 	{		
 		int minExpire = m_Timer.getMinTimerExpire(); // 获取最近过期时间的定时器的expire
@@ -156,7 +155,6 @@ void KernalServerBase::worker()
 		FD_ZERO( &rset );
 		FD_SET( pPipe->pipe[1], &rset );
 		int retval = 0; //::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm );
-		printf("KernalServerBase::worker 000  tid=%ld ptid=%ld minExpire=%d \n\r", pthread_self(), pPipe->tid,minExpire);
 		if( -1 == minExpire )
 		{
 			retval = ::select( pPipe->pipe[1] + 1, &rset, NULL, NULL, NULL );
@@ -166,7 +164,6 @@ void KernalServerBase::worker()
 			struct timeval tm = {0, minExpire * 10000};
 			retval = ::select( pPipe->pipe[1] + 1, &rset, NULL, NULL, &tm );
 		}
-		printf("KernalServerBase::worker 111  tid=%ld ptid=%ld  minExpire=%d retval=%d\n\r", pthread_self(), pPipe->tid,minExpire,retval);
 		if( retval > 0 && FD_ISSET(pPipe->pipe[1], &rset)  )
 		{
 			// 处理网络消息
@@ -262,7 +259,6 @@ void KernalServerBase::pushMsg( KernalMessageType type, KernalNetWorkType netTyp
 	KernalPipe* pPipe = m_Epoll.randWorkerPipe();
 	if( pPipe )
 	{
-		printf("KernalServerBase::pushMsg  tid=%ld ptid=%ld\n\r", pthread_self(), pPipe->tid);
 		::write( pPipe->pipe[0], &type, sizeof(type) );
 		::write( pPipe->pipe[0], &netType, sizeof(netType) );
 		::write( pPipe->pipe[0], &id, sizeof(id) );
