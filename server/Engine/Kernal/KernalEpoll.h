@@ -16,6 +16,7 @@
 
 #include "KernalNetWorkMsgDef.h"
 #include "KernalLock.h"
+#include "KernalMap.h"
 
 #define HTTP_BUFFER_SIZE  1024  // http 请求数据大小
 
