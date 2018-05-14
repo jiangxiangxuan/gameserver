@@ -959,7 +959,7 @@ void KernalEpoll::close( int id )
 	KernalPipe *pPipe = getWorkerPipe();
 	if( !pPipe )
 	{
-		return false;
+		return;
 	}
 	
     int size = 0;
