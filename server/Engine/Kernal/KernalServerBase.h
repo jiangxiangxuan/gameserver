@@ -17,6 +17,7 @@
 #include "KernalUtil.h"
 #include "KernalHttpRequest.h"
 #include "KernalArrayLockFree.h"
+#include "KernalLog.h"
 
 enum KernalMessageType
 {
@@ -112,6 +113,7 @@ protected:
 	int                         m_threadNum;
 	KernalEpoll                 m_Epoll;         //EPOLL
 	KernalTimer                 m_Timer;
+	KernalLog                   m_Log;
 private:
 	//KernalQueue<KernalMessage>                     m_Messages;       //需处理消息
 	//KernalArrayLockFree<KernalMessage*>            m_Messages;       //需处理消息(无锁)
