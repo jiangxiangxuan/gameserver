@@ -57,16 +57,6 @@ void GameServer::oninit()
 	m_DBAgent.init( &m_Epoll );
 }
 
-void GameServer::onuninit()
-{
-	if( m_pIdbcRedis )
-	{
-		m_pIdbcRedis->unloadLib();
-		delete m_pIdbcRedis;
-		m_pIdbcRedis = NULL;
-	}
-}
-
 void GameServer::handleTimerMsg( unsigned int id )
 {
 	//TODO:处理定时器消息
@@ -182,7 +172,13 @@ void GameServer::onRun()
 
 void GameServer::onExit()
 {
-	m_pIdbcRedis->close();
+	if( m_pIdbcRedis )
+	{
+		m_pIdbcRedis->close();
+		m_pIdbcRedis->unloadLib();
+		delete m_pIdbcRedis;
+		m_pIdbcRedis = NULL;
+	}
 }
 
 int GameServer::executeDBSql( const char *sql, KernalObject *pObj, DBEvent_fn func )

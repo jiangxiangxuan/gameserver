@@ -36,7 +36,6 @@ public:
 	virtual void onRun();
 	virtual void onExit();
 	virtual void oninit();
-	virtual void onuninit();
 
 public:
 	void handleTimerMsg( unsigned int id );

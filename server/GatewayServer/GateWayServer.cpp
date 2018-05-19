@@ -59,11 +59,6 @@ void GateWayServer::oninit()
 
 }
 
-void GateWayServer::onuninit()
-{
-
-}
-
 void GateWayServer::handleTimerMsg( unsigned int id )
 {
 	// 如果是连接中心服务器定时任务

@@ -105,7 +105,6 @@ public:
 	virtual void onRun() = 0;
 	virtual void onExit() = 0;
 	virtual void oninit() = 0;
-	virtual void onuninit() = 0;
 
 	virtual void onWorkerBegin();
 	virtual void onWorkerEnd();

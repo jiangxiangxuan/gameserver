@@ -66,11 +66,6 @@ void DBServer::onWorkerEnd()
 	m_DataBases.erase( pthread_self() );
 }
 
-void DBServer::onuninit()
-{
-
-}
-
 void DBServer::handleTimerMsg( unsigned int id )
 {
 	// 如果是连接中心服务器定时任务

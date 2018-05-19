@@ -24,7 +24,6 @@ public:
 	virtual void onRun();
 	virtual void onExit();
 	virtual void oninit();
-	virtual void onuninit();
 
 	virtual void onWorkerBegin();
 	virtual void onWorkerEnd();

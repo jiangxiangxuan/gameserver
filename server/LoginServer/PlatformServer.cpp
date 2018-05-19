@@ -59,16 +59,6 @@ void PlatformServer::oninit()
 	m_DBAgent.init( &m_Epoll );
 }
 
-void PlatformServer::onuninit()
-{
-	if( m_pIdbcRedis )
-	{
-		m_pIdbcRedis->unloadLib();
-		delete m_pIdbcRedis;
-		m_pIdbcRedis = NULL;
-	}
-}
-
 void PlatformServer::handleTimerMsg( unsigned int id )
 {
 	//TODO:处理定时器消息
@@ -136,7 +126,13 @@ void PlatformServer::onRun()
 
 void PlatformServer::onExit()
 {
-	m_pIdbcRedis->close();
+	if( m_pIdbcRedis )
+	{
+		m_pIdbcRedis->close();
+		m_pIdbcRedis->unloadLib();
+		delete m_pIdbcRedis;
+		m_pIdbcRedis = NULL;
+	}
 }
 
 void PlatformServer::handleGateWayMsg( int session, int clientID, char *data, int datalen )

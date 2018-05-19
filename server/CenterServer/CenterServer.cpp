@@ -44,11 +44,6 @@ void CenterServer::oninit()
 	listenHttp(httpIP, httpPort);
 }
 
-void CenterServer::onuninit()
-{
-
-}
-
 void CenterServer::handleTimerMsg( unsigned int id )
 {
 	printf("centerserver on handleTimerMsg tid=%ld   id=%ld\r\n",pthread_self(), id);

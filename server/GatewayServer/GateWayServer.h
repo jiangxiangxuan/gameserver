@@ -34,7 +34,6 @@ public:
 	virtual void onRun();
 	virtual void onExit();
 	virtual void oninit();
-	virtual void onuninit();
 
 public:
 	void sendMsgToClient( int id, int uid, char *data, int datalen );
