@@ -903,7 +903,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 			printf("Kernal Epoll HandleMsg Send\n\r");
 			ret = sendMsg( pNetWork->fd, tmp->data, tmp->offset, tmp->size );
 			printf("Kernal Epoll HandleMsg Send  %d  %d\n\r", tmp->offset, tmp->size);
-			
+
 			if( tmp->offset >= tmp->size )
 			{
 				pNetWork->buffers.head = tmp->next;
