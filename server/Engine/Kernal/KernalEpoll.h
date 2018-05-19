@@ -48,11 +48,13 @@ struct KernalNetWorkBuffer
     struct KernalNetWorkBuffer *next;
     void *data;
     int size;
+	int offset;
 
     KernalNetWorkBuffer()
         :next( NULL )
         ,data( NULL )
         ,size( 0 )
+		,offset( 0 )
     {
 
     }
@@ -237,9 +239,9 @@ private:
 	// 获取工作管道(根据当前线程)
 	KernalPipe *getWorkerPipe(); 
     void closeSocket( int id );
-    int readMsg( int fd, void *data, int size, bool useRead = false, bool readOnce = false );
+    int readMsg( int fd, void *data, int &readOffset, bool useRead = false, bool readOnce = false );
     // 发送数据到指定的socket
-    int sendMsg( int fd, const void *data, int size, bool useWrite = false );
+    int sendMsg( int fd, const void *data, int &offset, int size, bool useWrite = false, bool sendAll = false/*是否发送完整消息*/ );
     int readHttpMsg( int fd, void *data, int size );
 private:
     int getSocketID();
