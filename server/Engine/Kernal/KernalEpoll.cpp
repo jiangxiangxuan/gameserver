@@ -694,7 +694,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 						if( KernalNetWorkType_CONNECTED == pNet->type )
 						{
 							memcpy( buffer, &size, 4);
-							memcpy( buffer + 4, pNetWork->readBuffers + 16, size - 4 );							
+							memcpy( (char*)buffer + 4, pNetWork->readBuffers + 16, size - 4 );							
 						}
 						else
 						{
