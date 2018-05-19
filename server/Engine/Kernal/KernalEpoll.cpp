@@ -549,6 +549,7 @@ int KernalEpoll::sendMsg( int fd, const void *data, int &offSet, int size, bool 
     return ret;
 }
 
+// TODO: 待优化
 KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 {
     //m_locker.lock();
