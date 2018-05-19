@@ -162,6 +162,7 @@ public:
         readBuffers = ( char * )malloc(RECV_BUFFER_SIZE);
         memset( readBuffers, 0, RECV_BUFFER_SIZE );
     }
+
     void clear()
     {
         id = 0;
@@ -239,7 +240,7 @@ private:
 	// 获取工作管道(根据当前线程)
 	KernalPipe *getWorkerPipe(); 
     void closeSocket( int id );
-    int readMsg( int fd, void *data, int &readOffset, bool useRead = false, bool readOnce = false );
+    int readMsg( int fd, void *data, int &readOffset, bool useRead = false, bool readAll = false/*是否读取完整消息*/ );
     // 发送数据到指定的socket
     int sendMsg( int fd, const void *data, int &offset, int size, bool useWrite = false, bool sendAll = false/*是否发送完整消息*/ );
     int readHttpMsg( int fd, void *data, int size );

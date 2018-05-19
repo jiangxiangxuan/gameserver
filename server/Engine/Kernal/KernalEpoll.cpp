@@ -399,7 +399,7 @@ void KernalEpoll::sendHttpData( int id, const void *data, int size )
     send( id, buff, HTTP_BUFFER_SIZE );
 }
 
-int KernalEpoll::readMsg( int fd, void *data, int &readOffset, bool useRead, bool readOnce )
+int KernalEpoll::readMsg( int fd, void *data, int &readOffset, bool useRead, bool readAll )
 {
     int ret = 0;
     //int readSize = 0;
@@ -423,8 +423,11 @@ int KernalEpoll::readMsg( int fd, void *data, int &readOffset, bool useRead, boo
 		
         if(  ret == -1 && ( errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN) )
         {
-            //continue;
-            break;
+			if( readAll )
+			{
+				continue;				
+			}
+			break;
         }
 
         if( ret <= 0 )
@@ -434,10 +437,6 @@ int KernalEpoll::readMsg( int fd, void *data, int &readOffset, bool useRead, boo
 
         readOffset += ret;
 
-        if( readOnce )
-        {
-            break;
-        }
     }while( readOffset < size );
 
     /*if( ret > 0 )
@@ -593,13 +592,13 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
     if( checkIsPipe( pNetWork->fd ) && pNetWork->isRead )
     {
         KernalSocketMessageType msgType = KernalSocketMessageType_NO;
-        if( pNetWork->readBuffersLen < 16 )
+        /*if( pNetWork->readBuffersLen < 16 )
         {
             int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, true );
-            /*if( ret > 0 )
-            {
-                pNetWork->readBuffersLen += ret;
-            }*/
+            //if( ret > 0 )
+            //{
+            //    pNetWork->readBuffersLen += ret;
+            //}
         }
         else
         {
@@ -607,12 +606,13 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
             if( size > pNetWork->readBuffersLen - 16 )
             {
                 int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, true );
-                /*if( ret > 0 )
-                {
-                    pNetWork->readBuffersLen += ret;
-                }*/
+                //if( ret > 0 )
+                //{
+                //    pNetWork->readBuffersLen += ret;
+                //}
             }
-        }
+        }*/
+		int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, true );
 
         if( pNetWork->readBuffersLen >= 16 )
         {
@@ -803,29 +803,30 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         }
         else
         {
-            if( pNetWork->readBuffersLen > 0 )
+            /*if( pNetWork->readBuffersLen > 0 )
             {
                 int size = *( (int*)(pNetWork->readBuffers) );
                 if( size > pNetWork->readBuffersLen - 4 )
                 {
-                    ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, false, true );
-                    /*if( ret > 0 )
-                    {
-                        pNetWork->readBuffersLen += ret;
-                    }*/
+                    ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, false, false );
+                    //if( ret > 0 )
+                    //{
+                    //    pNetWork->readBuffersLen += ret;
+                    //}
                 }
 
                 ret = pNetWork->readBuffersLen;
             }
             else
             {
-                ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, false, true );
-                /*if( ret > 0 )
-                {
-                    pNetWork->readBuffersLen += ret;
-                }*/
-            }
-
+                ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, false, false );
+                //if( ret > 0 )
+                //{
+                //    pNetWork->readBuffersLen += ret;
+                //}
+            }*/
+			ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, false, false );
+			
             if( ret > 0 )
             {
                 int size = *( (int*)(pNetWork->readBuffers) );
