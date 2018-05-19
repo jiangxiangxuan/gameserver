@@ -557,7 +557,9 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
     result.init();
     if( m_eventNum == m_eventIndex )
     {
+		printf("KernalEpoll::handleMessage 000-000  %d %d \n\r",m_eventNum,m_eventIndex);
         m_eventNum = epoll_wait( m_epollfd, m_events, MAX_EVENTS, -1 );
+		printf("KernalEpoll::handleMessage 000-111  %d %d \n\r",m_eventNum,m_eventIndex);
         m_eventIndex = 0;
 		if( m_eventNum <= 0)
     	{
