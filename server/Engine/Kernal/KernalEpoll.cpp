@@ -443,7 +443,7 @@ int KernalEpoll::readMsg( int fd, void *data, int &readOffset, bool useRead, boo
 		}
     }while( readOffset < size );
 
-	if( readSize > 0 )
+	if( ret > 0 && readSize > 0 )
 	{
 		ret = readSize;
 	}
@@ -606,7 +606,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
     if( checkIsPipe( pNetWork->fd ) && pNetWork->isRead )
     {
         KernalSocketMessageType msgType = KernalSocketMessageType_NO;
-        /*if( pNetWork->readBuffersLen < 16 )
+        if( pNetWork->readBuffersLen < 16 )
         {
             int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, false );
             //if( ret > 0 )
@@ -625,8 +625,8 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                 //    pNetWork->readBuffersLen += ret;
                 //}
             }
-        }*/
-		int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, false );
+        }
+		//int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, false );
 
         if( pNetWork->readBuffersLen >= 16 )
         {
