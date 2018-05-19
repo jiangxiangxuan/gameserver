@@ -587,6 +587,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 		//m_locker.unlock();
         return KernalSocketMessageType_NO;
     }
+	printf("KernalEpoll::handleMessage 222 %d %d\n\r",m_eventNum,m_eventIndex);
 
     if( pEvent->events & EPOLLHUP )
     {
@@ -595,6 +596,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 		//m_locker.unlock();
         return KernalSocketMessageType_NO;
     }
+	printf("KernalEpoll::handleMessage 333 %d %d\n\r",m_eventNum,m_eventIndex);
 
     //if(  pNetWork->fd == m_ctrlfd[0] && pNetWork->isRead )
     if( checkIsPipe( pNetWork->fd ) && pNetWork->isRead )
@@ -734,6 +736,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 		//m_locker.unlock();
         return msgType;
     }
+	printf("KernalEpoll::handleMessage 444 %d %d\n\r",m_eventNum,m_eventIndex);
 
     if( KernalNetWorkType_LISTEN == pNetWork->type ||  KernalNetWorkType_LISTEN_HTTP == pNetWork->type ) // 有新连接
     {
@@ -777,6 +780,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
     }
     KernalSocketMessageType msgType = KernalSocketMessageType_NO;
 
+	printf("KernalEpoll::handleMessage 555 %d %d\n\r",m_eventNum,m_eventIndex);
     if( pNetWork->isRead /*pEvent->events & EPOLLIN*/ ) // 接收数据
     {
         pNetWork->isRead = false;
@@ -880,6 +884,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         return msgType;
     }
 
+	printf("KernalEpoll::handleMessage 666 %d %d\n\r",m_eventNum,m_eventIndex);
     if( pNetWork->isWrite /*pEvent->events & EPOLLOUT*/ ) //发送数据
     {
         pNetWork->isWrite = false;
@@ -951,6 +956,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         return msgType;
     }
 
+	printf("KernalEpoll::handleMessage 777 %d %d\n\r",m_eventNum,m_eventIndex);
 	//m_locker.unlock();
     return msgType;
 }
