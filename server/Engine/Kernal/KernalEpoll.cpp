@@ -97,7 +97,8 @@ int KernalEpoll::listen( const char *addr, const int port, bool isHttp )
 	    setnonblocking( fd );
         epollAdd( id );
 #else
-        int size = 0;
+        int size      = 0;
+		int offset    = 0;
         char _buf[16] = {0};
         char* dataBuf = _buf;
         NWriteInt32(dataBuf, &id);
@@ -112,7 +113,7 @@ int KernalEpoll::listen( const char *addr, const int port, bool isHttp )
         NWriteInt32(dataBuf, &size);
         NWriteInt32(dataBuf, &fd);
         dataBuf = _buf;
-        sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
+        sendMsg( m_ctrlfd[1], dataBuf, offset, size + 16, true, true );
 		
 		/*KernalPipe *pPipe = getWorkerPipe();
 		if( pPipe )
@@ -177,7 +178,8 @@ int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool isHtt
 		
 		if( id > 0 )
 		{
-			int size = 0;
+			int size 	  = 0;
+			int offset    = 0;
 			char _buf[16] = {0};
 			char* dataBuf = _buf;
 			NWriteInt32(dataBuf, &id);
@@ -192,7 +194,7 @@ int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool isHtt
 			NWriteInt32(dataBuf, &size);
 			NWriteInt32(dataBuf, &fd);
 			dataBuf = _buf;
-			sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
+			sendMsg( m_ctrlfd[1], dataBuf, offset, size + 16, true, true );
 			/*KernalPipe *pPipe = getWorkerPipe();
 			if( pPipe )
 			{
@@ -323,7 +325,8 @@ bool KernalEpoll::send( int id, void *data, int size )
     char *_buf = ( char * )malloc( ssize );
 	memset( _buf, 0, ssize );
     char* dataBuf = _buf;
-	int fd = 0;
+	int fd 	   = 0;
+	int offset = 0;
     NWriteInt32(dataBuf, &id);
     NWriteInt32(dataBuf, &socket_data);
     NWriteInt32(dataBuf, &size);
@@ -331,7 +334,7 @@ bool KernalEpoll::send( int id, void *data, int size )
 	NWriteBit(dataBuf, data, size);
     dataBuf = _buf;
     //sendMsg( m_ctrlfd[1], dataBuf, ssize, true );
-	sendMsg( pPipe->pipe[1], dataBuf, ssize, true );
+	sendMsg( pPipe->pipe[1], dataBuf, offset, ssize, true, true );
 	
 	free( _buf );
 #if 0
@@ -382,7 +385,8 @@ bool KernalEpoll::sendToPipe( void *data, int size )
 	}
 	
 	//sendMsg( m_ctrlfd[1], data, size, true );
-	sendMsg( pPipe->pipe[1], data, size, true );
+	int offset = 0;
+	sendMsg( pPipe->pipe[1], data, offset, size, true, true );
 	return true;
 }
 
@@ -395,29 +399,35 @@ void KernalEpoll::sendHttpData( int id, const void *data, int size )
     send( id, buff, HTTP_BUFFER_SIZE );
 }
 
-int KernalEpoll::readMsg( int fd, void *data, int size, bool useRead, bool readOnce )
+int KernalEpoll::readMsg( int fd, void *data, int &readOffset, bool useRead, bool readAll )
 {
-    int ret = 0;
+    int ret 	 = 0;
     int readSize = 0;
+	int size = RECV_BUFFER_SIZE - readOffset;
     do
     {
         if( useRead )
         {
-            ret = ::read( fd, (char*)data + readSize, size - readSize );
+            ret = ::read( fd, (char*)data + readOffset, size - readOffset );
         }
         else
         {
-            ret = ::recv( fd, (char*)data + readSize, size - readSize, 0 );
+            ret = ::recv( fd, (char*)data + readOffset, size - readOffset, 0 );
         }
 		
 		if( ret == -1 && errno == EWOULDBLOCK )
 		{
-			return readSize;
+			//return readOffset;
+            break;
 		}
 		
         if(  ret == -1 && ( errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN) )
         {
-            continue;
+			if( readAll )
+			{
+				continue;				
+			}
+			break;
         }
 
         if( ret <= 0 )
@@ -425,18 +435,23 @@ int KernalEpoll::readMsg( int fd, void *data, int size, bool useRead, bool readO
             break;
         }
 
-        readSize += ret;
+        readOffset += ret;
+		readSize += ret;
+		if( !readAll )
+		{
+			break;				
+		}
+    }while( readOffset < size );
 
-        if( readOnce )
-        {
-            break;
-        }
-    }while( readSize < size );
-
-    if( ret > 0 )
+	if( readSize > 0 )
+	{
+		ret = readSize;
+	}
+	
+    /*if( ret > 0 )
     {
-        ret = readSize;
-    }
+        ret = readOffset;
+    }*/
     return ret;
 }
 
@@ -488,51 +503,63 @@ int KernalEpoll::readHttpMsg( int fd, void *data, int size )
     return readSize;
 }
 
-int KernalEpoll::sendMsg( int fd, const void *data, int size, bool useWrite )
+int KernalEpoll::sendMsg( int fd, const void *data, int &offSet, int size, bool useWrite, bool sendAll )
 {
     int ret = 0;
-    int sendSize = 0;
+    //int sendSize = 0;
     do
     {
         if( useWrite )
         {
-            ret = ::write( fd, (char*)data + sendSize, size - sendSize );
+            ret = ::write( fd, (char*)data + offSet, size - offSet );
         }
         else
         {
-            ret = ::send( fd, (char*)data + sendSize, size - sendSize, 0 );
+            ret = ::send( fd, (char*)data + offSet, size - offSet, 0 );
         }
 
         if(  ret == -1 && ( errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN ) )
         {
-            continue;
+			if( sendAll )
+			{
+				continue;				
+			}
+			break;
         }
 
         if( ret <= 0 )
         {
             break;
         }
+		
         if( ret > 0 )
         {
-            sendSize += ret;
+            offSet += ret;
         }
-
-    }while( sendSize < size );
-    if( ret > 0 )
+		
+		if( !sendAll )
+		{
+			break;
+		}
+    }while( offSet < size );
+    /*if( ret > 0 )
     {
         ret = size;
-    }
+    }*/
     return ret;
 }
 
 KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 {
+	printf("KernalEpoll::handleMessage 000  %d %d \n\r",m_eventNum,m_eventIndex);
     //m_locker.lock();
 
     result.init();
     if( m_eventNum == m_eventIndex )
     {
+		printf("KernalEpoll::handleMessage 000-000  %d %d \n\r",m_eventNum,m_eventIndex);
         m_eventNum = epoll_wait( m_epollfd, m_events, MAX_EVENTS, -1 );
+		printf("KernalEpoll::handleMessage 000-111  %d %d \n\r",m_eventNum,m_eventIndex);
         m_eventIndex = 0;
 		if( m_eventNum <= 0)
     	{
@@ -560,6 +587,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 
         }
     }
+	printf("KernalEpoll::handleMessage 111 %d %d\n\r",m_eventNum,m_eventIndex);
 
     struct epoll_event *pEvent = &m_events[ m_eventIndex++ ];
     struct KernalNetWork *pNetWork = ( struct KernalNetWork * )(pEvent->data.ptr);
@@ -568,6 +596,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 		//m_locker.unlock();
         return KernalSocketMessageType_NO;
     }
+	printf("KernalEpoll::handleMessage 222 %d %d\n\r",m_eventNum,m_eventIndex);
 
     if( pEvent->events & EPOLLHUP )
     {
@@ -576,6 +605,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 		//m_locker.unlock();
         return KernalSocketMessageType_NO;
     }
+	printf("KernalEpoll::handleMessage 333 %d %d\n\r",m_eventNum,m_eventIndex);
 
     //if(  pNetWork->fd == m_ctrlfd[0] && pNetWork->isRead )
     if( checkIsPipe( pNetWork->fd ) && pNetWork->isRead )
@@ -583,25 +613,32 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         KernalSocketMessageType msgType = KernalSocketMessageType_NO;
         if( pNetWork->readBuffersLen < 16 )
         {
-            int ret = readMsg( pNetWork->fd, pNetWork->readBuffers + pNetWork->readBuffersLen, RECV_BUFFER_SIZE - pNetWork->readBuffersLen, true, true );
-            if( ret > 0 )
-            {
-                pNetWork->readBuffersLen += ret;
-            }
+			printf("KernalEpoll::handleMessage 333---000 %d %d\n\r",m_eventNum,m_eventIndex);
+	
+            int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, false );
+            //if( ret > 0 )
+            //{
+            //    pNetWork->readBuffersLen += ret;
+            //}
+			printf("KernalEpoll::handleMessage 333---111 %d %d\n\r",m_eventNum,m_eventIndex);
+	
         }
         else
         {
             int size = *( (int*)(pNetWork->readBuffers + 8) );
             if( size > pNetWork->readBuffersLen - 16 )
             {
-                int ret = readMsg( pNetWork->fd, pNetWork->readBuffers + pNetWork->readBuffersLen, RECV_BUFFER_SIZE - pNetWork->readBuffersLen, true, true );
-                if( ret > 0 )
-                {
-                    pNetWork->readBuffersLen += ret;
-                }
+                int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, false );
+                //if( ret > 0 )
+                //{
+                //    pNetWork->readBuffersLen += ret;
+                //}
             }
         }
+		//int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, false );
 
+		printf("KernalEpoll::handleMessage 333---222 %d %d\n\r",m_eventNum,m_eventIndex);
+	
         if( pNetWork->readBuffersLen >= 16 )
         {
 	    	int fd = *( (int*)(pNetWork->readBuffers + 12) );
@@ -659,12 +696,29 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                 {
                     if( KernalNetWorkType_CONNECTED == pNet->type || KernalNetWorkType_CONNECTED_HTTP == pNet->type )
                     {
+						if( KernalNetWorkType_CONNECTED == pNet->type )
+						{
+							size += 4;
+						}
                         void *buffer = malloc( size );
                         memset( buffer, 0, size );
-                        memcpy( buffer, pNetWork->readBuffers + 16, size );
+						if( KernalNetWorkType_CONNECTED == pNet->type )
+						{
+							memcpy( buffer, &size, 4);
+							memcpy( buffer + 4, pNetWork->readBuffers + 16, size - 4 );							
+						}
+						else
+						{
+							memcpy( buffer, pNetWork->readBuffers + 16, size );
+						}
                         pNet->buffers.appendBuffer( buffer, size );
                         epollMod( pNet->fd, EPOLLOUT, pNet );
                         pNet->isWrite = true;
+						
+						if( KernalNetWorkType_CONNECTED == pNet->type )
+						{
+							size -= 4;
+						}
                     }
                 }
 				else if( pNet->id != id ) // 连接已经关闭
@@ -697,6 +751,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 		//m_locker.unlock();
         return msgType;
     }
+	printf("KernalEpoll::handleMessage 444 %d %d\n\r",m_eventNum,m_eventIndex);
 
     if( KernalNetWorkType_LISTEN == pNetWork->type ||  KernalNetWorkType_LISTEN_HTTP == pNetWork->type ) // 有新连接
     {
@@ -740,6 +795,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
     }
     KernalSocketMessageType msgType = KernalSocketMessageType_NO;
 
+	printf("KernalEpoll::handleMessage 555 %d %d\n\r",m_eventNum,m_eventIndex);
     if( pNetWork->isRead /*pEvent->events & EPOLLIN*/ ) // 接收数据
     {
         pNetWork->isRead = false;
@@ -779,23 +835,24 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                 int size = *( (int*)(pNetWork->readBuffers) );
                 if( size > pNetWork->readBuffersLen - 4 )
                 {
-                    ret = readMsg( pNetWork->fd, pNetWork->readBuffers + pNetWork->readBuffersLen, RECV_BUFFER_SIZE - pNetWork->readBuffersLen, false, true );
-                    if( ret > 0 )
-                    {
-                        pNetWork->readBuffersLen += ret;
-                    }
+                    ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, false, false );
+                    //if( ret > 0 )
+                    //{
+                    //    pNetWork->readBuffersLen += ret;
+                    //}
                 }
 
                 ret = pNetWork->readBuffersLen;
             }
             else
             {
-                ret = readMsg( pNetWork->fd, pNetWork->readBuffers + pNetWork->readBuffersLen, RECV_BUFFER_SIZE - pNetWork->readBuffersLen, false, true );
-                if( ret > 0 )
-                {
-                    pNetWork->readBuffersLen += ret;
-                }
+                ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, false, false );
+                //if( ret > 0 )
+                //{
+                //    pNetWork->readBuffersLen += ret;
+                //}
             }
+			//ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, false, false );
 
             if( ret > 0 )
             {
@@ -842,6 +899,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         return msgType;
     }
 
+	printf("KernalEpoll::handleMessage 666 %d %d\n\r",m_eventNum,m_eventIndex);
     if( pNetWork->isWrite /*pEvent->events & EPOLLOUT*/ ) //发送数据
     {
         pNetWork->isWrite = false;
@@ -853,7 +911,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
             struct KernalNetWorkBuffer *tmp = pNetWork->buffers.head;
             int ret = 0;
 		
-			char *buffer = (char*)malloc( tmp->size + 4 );
+			/*char *buffer = (char*)malloc( tmp->size + 4 );
 			memset( buffer, 0, tmp->size + 4 );
 			char *dataBuf = buffer;
 			if( KernalNetWorkType_CONNECTED_HTTP != pNetWork->type )
@@ -862,11 +920,18 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 			}
 			NWriteBit(dataBuf,tmp->data,tmp->size);
 			ret = sendMsg( pNetWork->fd, buffer, dataBuf - buffer );
-			free( buffer );
-            
-            pNetWork->buffers.head = tmp->next;
-            free(tmp->data);
-            free(tmp);
+			free( buffer );*/
+			
+			printf("Kernal Epoll HandleMsg Send\n\r");
+			ret = sendMsg( pNetWork->fd, tmp->data, tmp->offset, tmp->size );
+			printf("Kernal Epoll HandleMsg Send  %d  %d\n\r", tmp->offset, tmp->size);
+
+			if( tmp->offset >= tmp->size )
+			{
+				pNetWork->buffers.head = tmp->next;
+				free(tmp->data);
+				free(tmp);
+			}
 
             if( 0 == ret /*&& 0 != errno*/ )
             {
@@ -880,8 +945,19 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                 msgType = KernalSocketMessageType_SOCKET_CLOSE;
                 break;
             }
+			
+			break;
         }
-        epollMod( pNetWork->fd, 0, pNetWork );
+		
+		// 如果未发送完
+		if( pNetWork->buffers.head )
+		{
+			epollMod( pNetWork->fd, EPOLLOUT, pNetWork );
+		}
+		else
+		{
+			epollMod( pNetWork->fd, 0, pNetWork );			
+		}
         if( KernalNetWorkType_CONNECTED_HTTP == pNetWork->type )
         {
             closeSocket( pNetWork->id );
@@ -895,6 +971,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         return msgType;
     }
 
+	printf("KernalEpoll::handleMessage 777 %d %d\n\r",m_eventNum,m_eventIndex);
 	//m_locker.unlock();
     return msgType;
 }
@@ -985,6 +1062,7 @@ void KernalEpoll::close( int id )
 	}
 	
     int size = 0;
+	int offset = 0;
     char _buf[16] = {0};
     char* dataBuf = _buf;
 	int fd = 0;
@@ -993,8 +1071,9 @@ void KernalEpoll::close( int id )
     NWriteInt32(dataBuf, &size);
     NWriteInt32(dataBuf, &fd);
     dataBuf = _buf;
-    //sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
-    sendMsg( pPipe->pipe[1], dataBuf, size + 16, true );
+    ////sendMsg( m_ctrlfd[1], dataBuf, size + 16, true );
+    //sendMsg( pPipe->pipe[1], dataBuf, size + 16, true );
+	sendMsg( pPipe->pipe[1], dataBuf, offset, size + 16, true, true );
 }
 
 int KernalEpoll::getSocketID()
