@@ -602,7 +602,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         KernalSocketMessageType msgType = KernalSocketMessageType_NO;
         if( pNetWork->readBuffersLen < 16 )
         {
-            int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, true );
+            int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, false );
             //if( ret > 0 )
             //{
             //    pNetWork->readBuffersLen += ret;
@@ -613,14 +613,14 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
             int size = *( (int*)(pNetWork->readBuffers + 8) );
             if( size > pNetWork->readBuffersLen - 16 )
             {
-                int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, true );
+                int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, false );
                 //if( ret > 0 )
                 //{
                 //    pNetWork->readBuffersLen += ret;
                 //}
             }
         }
-		//int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, true );
+		//int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, false );
 
         if( pNetWork->readBuffersLen >= 16 )
         {
