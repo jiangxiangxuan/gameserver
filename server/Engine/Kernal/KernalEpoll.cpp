@@ -604,11 +604,15 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         KernalSocketMessageType msgType = KernalSocketMessageType_NO;
         if( pNetWork->readBuffersLen < 16 )
         {
+			printf("KernalEpoll::handleMessage 333---000 %d %d\n\r",m_eventNum,m_eventIndex);
+	
             int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, false );
             //if( ret > 0 )
             //{
             //    pNetWork->readBuffersLen += ret;
             //}
+			printf("KernalEpoll::handleMessage 333---111 %d %d\n\r",m_eventNum,m_eventIndex);
+	
         }
         else
         {
@@ -624,6 +628,8 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         }
 		//int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, false );
 
+		printf("KernalEpoll::handleMessage 333---222 %d %d\n\r",m_eventNum,m_eventIndex);
+	
         if( pNetWork->readBuffersLen >= 16 )
         {
 	    	int fd = *( (int*)(pNetWork->readBuffers + 12) );
