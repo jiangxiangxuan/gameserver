@@ -401,8 +401,8 @@ void KernalEpoll::sendHttpData( int id, const void *data, int size )
 
 int KernalEpoll::readMsg( int fd, void *data, int &readOffset, bool useRead, bool readAll )
 {
-    int ret = 0;
-    //int readSize = 0;
+    int ret 	 = 0;
+    int readSize = 0;
 	int size = RECV_BUFFER_SIZE - readOffset;
     do
     {
@@ -436,9 +436,15 @@ int KernalEpoll::readMsg( int fd, void *data, int &readOffset, bool useRead, boo
         }
 
         readOffset += ret;
+		readSize += ret;
 
     }while( readOffset < size );
-
+	
+	if( readSize > 0 )
+	{
+		ret = readSize;
+	}
+	
     /*if( ret > 0 )
     {
         ret = readOffset;
@@ -826,7 +832,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                 //}
             }
 			//ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, false, false );
-			
+
             if( ret > 0 )
             {
                 int size = *( (int*)(pNetWork->readBuffers) );
@@ -894,7 +900,9 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 			ret = sendMsg( pNetWork->fd, buffer, dataBuf - buffer );
 			free( buffer );*/
 			
+			printf("Kernal Epoll HandleMsg Send\n\r");
 			ret = sendMsg( pNetWork->fd, tmp->data, tmp->offset, tmp->size );
+			printf("Kernal Epoll HandleMsg Send  %d  %d\n\r", tmp->offset, tmp->size);
 			
 			if( tmp->offset >= tmp->size )
 			{
