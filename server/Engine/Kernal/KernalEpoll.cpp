@@ -437,9 +437,12 @@ int KernalEpoll::readMsg( int fd, void *data, int &readOffset, bool useRead, boo
 
         readOffset += ret;
 		readSize += ret;
-
+		if( !readAll )
+		{
+			break;				
+		}
     }while( readOffset < size );
-	
+
 	if( readSize > 0 )
 	{
 		ret = readSize;
@@ -533,7 +536,11 @@ int KernalEpoll::sendMsg( int fd, const void *data, int &offSet, int size, bool 
         {
             offSet += ret;
         }
-
+		
+		if( !sendAll )
+		{
+			break;
+		}
     }while( offSet < size );
     /*if( ret > 0 )
     {
