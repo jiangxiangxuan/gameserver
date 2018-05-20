@@ -105,6 +105,9 @@ void Client::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageTyp
 
 void Client::clientConnectGateWay()
 {	
+	const char *serverIP   = getConfig()->getAttributeStr("config/gateway/listen", "ip");
+	int         serverPort = getConfig()->getAttributeInt("config/gateway/listen", "port");
+
 	int serverID = 0;
 	int sfd = 0;
 	serverID = connect(serverIP, serverPort, sfd);
