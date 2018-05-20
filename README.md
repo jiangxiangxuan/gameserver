@@ -1,2 +1,2 @@
-# gameserver
-gameserver
+# 游戏服务器
+基于epoll模型的游戏服务器  
