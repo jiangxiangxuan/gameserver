@@ -855,10 +855,16 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                 //    pNetWork->readBuffersLen += ret;
                 //}
             }*/
+			static bool test = false;
+			if( !test )
+			{
+				test = true;
+				printf("KernalEpoll::handleMessage 444-000  %d  %d  %d  %d\n\r", m_eventNum, m_eventIndex,pNetWork->readBuffersLen, ret);
+			}
 			ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, false, false );
 			if(ret> 0)
 			{
-				printf("KernalEpoll::handleMessage 444-000  %d  %d  %d  %d\n\r", m_eventNum, m_eventIndex,pNetWork->readBuffersLen, ret);
+				printf("KernalEpoll::handleMessage 444-111  %d  %d  %d  %d\n\r", m_eventNum, m_eventIndex,pNetWork->readBuffersLen, ret);
 			}
             if( ret > 0 )
             {
@@ -877,14 +883,14 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                     pNetWork->readBuffersLen -= size + 4;
                     memmove( pNetWork->readBuffers, pNetWork->readBuffers + size + 4, pNetWork->readBuffersLen );
                 }
-				printf("KernalEpoll::handleMessage 444-111  %d  %d  %d  %d  %d\n\r", m_eventNum, m_eventIndex,pNetWork->readBuffersLen, ret, size);
+				printf("KernalEpoll::handleMessage 444-222  %d  %d  %d  %d  %d\n\r", m_eventNum, m_eventIndex,pNetWork->readBuffersLen, ret, size);
             }
         }
         if( pNetWork->readBuffersLen > 0 )
         {
             pNetWork->isRead = true;
         }
-		//printf("KernalEpoll::handleMessage 444-222  %d  %d  %d  %d\n\r", m_eventNum, m_eventIndex,pNetWork->readBuffersLen, ret);
+		//printf("KernalEpoll::handleMessage 444-333  %d  %d  %d  %d\n\r", m_eventNum, m_eventIndex,pNetWork->readBuffersLen, ret);
 
         if( 0 == ret /*&& 0 != errno*/ )
         {
