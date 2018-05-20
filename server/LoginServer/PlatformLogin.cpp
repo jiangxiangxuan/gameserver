@@ -21,11 +21,11 @@ void PlatformLogin::setPlatformAddr( const char *addr )
 void PlatformLogin::VerifyToken( KernalEpoll *pEpoll, IdbcRedis *pIdbcRedis, int session, int clientid, char *data, int msglen )
 {
 #if 1
-	int uid = 111;
+	int uid1 = 111;
     platformprotocol::SVerifyToken sverifyTokent;
 	protocol::PlayerInfo* playerInfo = sverifyTokent.mutable_playerinfo();
-	playerInfo->set_uid( uid );
-	ProtobufMsgSendToClientByGateWay( (*pEpoll), session, clientid, uid, platformprotocol::PLATFORM_VERIFY_TOKEN, 0, sverifyTokent );
+	playerInfo->set_uid( uid1 );
+	ProtobufMsgSendToClientByGateWay( (*pEpoll), session, clientid, uid1, platformprotocol::PLATFORM_VERIFY_TOKEN, 0, sverifyTokent );
 	return;
 #endif
     platformprotocol::CVerifyToken verifyToken;
