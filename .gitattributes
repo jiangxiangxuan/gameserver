@@ -1,3 +1,2 @@
 *.h linguist-language=c++
 *.cpp linguist-language=c++
-*.php linguist-language=c++
