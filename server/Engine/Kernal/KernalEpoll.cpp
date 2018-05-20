@@ -800,6 +800,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 
     if( pNetWork->isRead /*pEvent->events & EPOLLIN*/ ) // 接收数据
     {
+		printf("KernalEpoll::handleMessage 333  %d  %d\n\r", m_eventNum, m_eventIndex);
         pNetWork->isRead = false;
         msgType = KernalSocketMessageType_NO;
         result.id = pNetWork->id;
