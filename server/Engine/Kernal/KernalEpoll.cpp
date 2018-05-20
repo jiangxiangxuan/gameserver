@@ -904,6 +904,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 
     if( pNetWork->isWrite /*pEvent->events & EPOLLOUT*/ ) //发送数据
     {
+		printf("KernalEpoll::handleMessage 444  %d  %d\n\r", m_eventNum, m_eventIndex);
         pNetWork->isWrite = false;
         result.id = pNetWork->id;
 
