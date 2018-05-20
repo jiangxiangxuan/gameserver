@@ -20,7 +20,7 @@ void PlatformLogin::setPlatformAddr( const char *addr )
 
 void PlatformLogin::VerifyToken( KernalEpoll *pEpoll, IdbcRedis *pIdbcRedis, int session, int clientid, char *data, int msglen )
 {
-#if 1
+#if 1  // 测试
 	int uid1 = 111;
     platformprotocol::SVerifyToken sverifyTokent;
 	protocol::PlayerInfo* playerInfo = sverifyTokent.mutable_playerinfo();
