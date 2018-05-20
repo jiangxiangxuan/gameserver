@@ -41,7 +41,7 @@ Client *Client::getInstance()
 
 void Client::oninit()
 {
-	m_Log.init( "client_test.log" );
+	m_Log.init( (char*)"client_test.log" );
 
 	m_threadNum = 8;
 
