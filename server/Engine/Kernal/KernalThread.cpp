@@ -26,4 +26,3 @@ void KernalThread::join()
 {
 	pthread_join( m_tid, NULL );
 }
-

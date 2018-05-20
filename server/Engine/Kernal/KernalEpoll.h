@@ -260,6 +260,7 @@ private:
     struct KernalNetWork m_NetWorks[ MAX_NET_WORK_NUM ];
 	
 	std::map< pthread_t, KernalPipe* > m_WorkerPipes;
+	KernalMutexLocker    			   m_WorkerPipesLocker;
 };
 
 #endif
