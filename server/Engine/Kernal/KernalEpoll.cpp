@@ -565,7 +565,7 @@ int KernalEpoll::sendMsg( int fd, const void *data, int &offSet, int size, bool 
 KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 {
     //m_locker.lock();
-
+	printf("KernalEpoll::handleMessage 000  %d  %d\n\r", m_eventNum, m_eventIndex);
     result.init();
     if( m_eventNum == m_eventIndex )
     {
@@ -597,6 +597,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 
         }
     }
+	printf("KernalEpoll::handleMessage 111  %d  %d\n\r", m_eventNum, m_eventIndex);
 
     struct epoll_event *pEvent = &m_events[ m_eventIndex++ ];
     struct KernalNetWork *pNetWork = ( struct KernalNetWork * )(pEvent->data.ptr);
@@ -614,6 +615,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         return KernalSocketMessageType_NO;
     }
 
+	printf("KernalEpoll::handleMessage 222  %d  %d\n\r", m_eventNum, m_eventIndex);
     //if(  pNetWork->fd == m_ctrlfd[0] && pNetWork->isRead )
     if( checkIsPipe( pNetWork->fd ) && pNetWork->isRead )
     {
@@ -752,6 +754,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 		//m_locker.unlock();
         return msgType;
     }
+	printf("KernalEpoll::handleMessage 333  %d  %d\n\r", m_eventNum, m_eventIndex);
 
     if( KernalNetWorkType_LISTEN == pNetWork->type ||  KernalNetWorkType_LISTEN_HTTP == pNetWork->type ) // 有新连接
     {
