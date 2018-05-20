@@ -105,16 +105,19 @@ void Client::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageTyp
 
 void Client::clientConnectGateWay()
 {	
+	printf("Client::clientConnectGateWay 000 \n\r");
 	const char *serverIP   = getConfig()->getAttributeStr("config/gateway/listen", "ip");
 	int         serverPort = getConfig()->getAttributeInt("config/gateway/listen", "port");
 
 	int serverID = 0;
 	int sfd = 0;
 	serverID = connect(serverIP, serverPort, sfd);
+	printf("Client::clientConnectGateWay 111 \n\r");
 	if( -1 == serverID )
 	{
 		printf("client clientConnectGateWay err:%d \r\n", errno);
 	}
+	printf("Client::clientConnectGateWay 222 sid:%d\n\r", serverID);
 }
 
 #if 0
@@ -241,7 +244,8 @@ void Client::onProcess()
 
 void Client::onRun()
 {
-	for( int i = 0; i < 100; ++i )
+	printf("Client::onRun \n\r");
+	for( int i = 0; i < 1; ++i )
 	{
 		clientConnectGateWay();
 	}	
