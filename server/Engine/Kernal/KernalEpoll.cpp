@@ -877,7 +877,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                     pNetWork->readBuffersLen -= size + 4;
                     memmove( pNetWork->readBuffers, pNetWork->readBuffers + size + 4, pNetWork->readBuffersLen );
                 }
-				printf("KernalEpoll::handleMessage 444-111  %d  %d  %d  %d\n\r", m_eventNum, m_eventIndex,pNetWork->readBuffersLen, ret);
+				printf("KernalEpoll::handleMessage 444-111  %d  %d  %d  %d  %d\n\r", m_eventNum, m_eventIndex,pNetWork->readBuffersLen, ret, size);
             }
         }
         if( pNetWork->readBuffersLen > 0 )
