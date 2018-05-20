@@ -707,7 +707,8 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                         memset( buffer, 0, size );
 						if( KernalNetWorkType_CONNECTED == pNet->type )
 						{
-							memcpy( buffer, &size, 4);
+							int datalen = size = 4;
+							memcpy( buffer, &datalen, 4);
 							memcpy( (char*)buffer + 4, pNetWork->readBuffers + 16, size - 4 );							
 						}
 						else
