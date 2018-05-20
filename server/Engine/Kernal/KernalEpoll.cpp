@@ -883,7 +883,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         {
             pNetWork->isRead = true;
         }
-		printf("KernalEpoll::handleMessage 444-000  %d  %d  %d\n\r", m_eventNum, m_eventIndex,pNetWork->readBuffersLen);
+		printf("KernalEpoll::handleMessage 444-000  %d  %d  %d  %d\n\r", m_eventNum, m_eventIndex,pNetWork->readBuffersLen, ret);
 
         if( 0 == ret /*&& 0 != errno*/ )
         {
