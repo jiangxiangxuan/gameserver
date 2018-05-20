@@ -833,7 +833,7 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         }
         else
         {
-            if( pNetWork->readBuffersLen > 0 )
+            /*if( pNetWork->readBuffersLen > 0 )
             {
                 int size = *( (int*)(pNetWork->readBuffers) );
                 if( size > pNetWork->readBuffersLen - 4 )
@@ -854,8 +854,8 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
                 //{
                 //    pNetWork->readBuffersLen += ret;
                 //}
-            }
-			//ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, false, false );
+            }*/
+			ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, false, false );
 
             if( ret > 0 )
             {
