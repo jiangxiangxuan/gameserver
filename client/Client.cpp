@@ -3,12 +3,14 @@
 
 Client *Client::ms_pClient = NULL;
 
+#if 0
 void *ClientWriteWorker( void *arg )
 {
 	Client *pClient = (Client*)arg;
 	pClient->clientWorker();
 	return ((void *)0);
 }
+#endif
 
 Client::Client()
 {
@@ -39,8 +41,9 @@ Client *Client::getInstance()
 
 void Client::oninit()
 {
-	m_threadNum = 10;
+	m_threadNum = 8;
 
+#if 0
 	for( int i = 0; i < m_threadNum; ++i )
 	{
 		KernalThread *pThread = new KernalThread();
@@ -48,13 +51,9 @@ void Client::oninit()
 		pThread->detach();
 		m_ClientWorkThreads.push( pThread );
 	}
+#endif
 
 	unsigned int tid = m_Timer.addTimer(100, 1);
-	
-}
-
-void Client::onuninit()
-{
 	
 }
 
@@ -69,7 +68,7 @@ void Client::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageTyp
 	{
 		handleTimerMsg( id );
 	}
-	else
+	else if( NETWORK_DATA == type )
 	{
 		
 		int cmd = 0;
@@ -89,8 +88,33 @@ void Client::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageTyp
 			printf("client onMsg cmd=%d err=%d len=%d uid=%d\r\n",cmd,err,len,verifyToken.playerinfo().uid());
 		}
 	}
+	else if( NETWORK_CONNECT == type )
+	{		
+		for( int i = 0; i < 10; ++i )
+		{
+			char token[128] = {0};
+			memset(token, 0, sizeof(token));
+			sprintf(token,"Token Test %d", i);
+			platformprotocol::CVerifyToken verifyToken;
+			verifyToken.set_token(token); 
+			//printf("CVerifyToken len %d\r\n",verifyToken.ByteSize());
+			ProtobufMsgSend(m_Epoll, id, platformprotocol::PLATFORM_VERIFY_TOKEN, 0, verifyToken);
+		}
+	}
 }
 
+void Client::clientConnectGateWay()
+{	
+	int serverID = 0;
+	int sfd = 0;
+	serverID = connect(serverIP, serverPort, sfd);
+	if( -1 == serverID )
+	{
+		printf("client clientConnectGateWay err:%d \r\n", errno);
+	}
+}
+
+#if 0
 void Client::clientWorker()
 {
 	const char *serverIP   = getConfig()->getAttributeStr("config/gateway/listen", "ip");
@@ -205,6 +229,7 @@ void Client::clientWorker()
 	}
 	//m_Epoll.closeSocket(serverID);
 }
+#endif
 
 void Client::onProcess()
 {
@@ -213,7 +238,10 @@ void Client::onProcess()
 
 void Client::onRun()
 {
-	
+	for( int i = 0; i < 100; ++i )
+	{
+		clientConnectGateWay();
+	}	
 }
 
 void Client::onExit()

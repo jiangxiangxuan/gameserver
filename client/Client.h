@@ -21,8 +21,8 @@ public:
 	virtual void onRun();
 	virtual void onExit();
 	virtual void oninit();
-	virtual void onuninit();
-
+	
+	void clientConnectGateWay();
 	void clientWorker();
 	void handleTimerMsg( unsigned int id );
 private:
