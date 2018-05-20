@@ -41,6 +41,8 @@ Client *Client::getInstance()
 
 void Client::oninit()
 {
+	m_Log.init( "client_test.log" );
+
 	m_threadNum = 8;
 
 #if 0
@@ -64,6 +66,7 @@ void Client::handleTimerMsg( unsigned int id )
 
 void Client::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size )
 {
+	printf("Client::onMsg 000 \n\r",type,TIMER_DATA,NETWORK_DATA,NETWORK_CONNECT);
 	if( TIMER_DATA == type )
 	{
 		handleTimerMsg( id );
