@@ -230,16 +230,16 @@ KernalPipe *KernalEpoll::createWorkerPipe( pthread_t tid )
 		pNetWork->id   = id;
 		epollAdd( id );
 		
-		m_WorkerPipesLocker.lock();
+		//m_WorkerPipesLocker.lock();
 		m_WorkerPipes.insert( std::pair< pthread_t, KernalPipe* >( tid, pPipe ) ); 
-		m_WorkerPipesLocker.unlock();
+		//m_WorkerPipesLocker.unlock();
 	}
 	return pPipe;
 }
 
 KernalPipe *KernalEpoll::randWorkerPipe()
 {
-	m_WorkerPipesLocker.lock();
+	//m_WorkerPipesLocker.lock();
 	int index = rand()%m_WorkerPipes.size();
 	KernalPipe *pPipe = NULL;
 	for( auto iter = m_WorkerPipes.begin(); iter != m_WorkerPipes.end(); ++iter )
@@ -251,7 +251,7 @@ KernalPipe *KernalEpoll::randWorkerPipe()
 			break;
 		}
 	}
-	m_WorkerPipesLocker.unlock();
+	//m_WorkerPipesLocker.unlock();
 	return pPipe;
 }
 
@@ -261,41 +261,41 @@ bool KernalEpoll::checkIsPipe( int fd )
 	{
 		return true;
 	}
-	m_WorkerPipesLocker.lock();
+	//m_WorkerPipesLocker.lock();
 	for( auto iter = m_WorkerPipes.begin(); iter != m_WorkerPipes.end(); ++iter )
 	{
 		if( iter->second->pipe[0] == fd )
 		{
-			m_WorkerPipesLocker.unlock();
+			//m_WorkerPipesLocker.unlock();
 			return true;
 		}
 	}
-	m_WorkerPipesLocker.unlock();
+	//m_WorkerPipesLocker.unlock();
 	return false;
 }
 
 KernalPipe *KernalEpoll::getWorkerPipe()
 {
-	m_WorkerPipesLocker.lock();
+	//m_WorkerPipesLocker.lock();
 	auto iter = m_WorkerPipes.find( pthread_self() );
 	if( iter != m_WorkerPipes.end() )
 	{
 		m_WorkerPipesLocker.unlock();
 		return iter->second;
 	}
-	m_WorkerPipesLocker.unlock();
+	//m_WorkerPipesLocker.unlock();
 	return NULL;
 }
 
 void KernalEpoll::releaseWorkerPipes()
 {
-	m_WorkerPipesLocker.lock();
+	//m_WorkerPipesLocker.lock();
 	for( auto iter = m_WorkerPipes.begin(); iter != m_WorkerPipes.end(); ++iter )
 	{
 		::close( iter->second->pipe[0] );
 		::close( iter->second->pipe[1] );
 	}
-	m_WorkerPipesLocker.unlock();
+	//m_WorkerPipesLocker.unlock();
 }
 
 int KernalEpoll::listenHttp( const char *addr, const int port )
