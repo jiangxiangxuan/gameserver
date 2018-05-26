@@ -210,6 +210,7 @@ public:
 	KernalPipe *createWorkerPipe( pthread_t tid );
 	// 随机获取一个工作线程管道
 	KernalPipe *randWorkerPipe();
+	KernalPipe *getWorkerPipeByIndex( int index ); 
 	void releaseWorkerPipes();
 	
     // HTTP
@@ -239,7 +240,6 @@ private:
 	bool checkIsPipe( int fd );
 	// 获取工作管道(根据当前线程)
 	KernalPipe *getWorkerPipe(); 
-	KernalPipe *getWorkerPipeByIndex( int index ); 
     void closeSocket( int id );
     int readMsg( int fd, void *data, int &readOffset, bool useRead = false, bool readAll = false/*是否读取完整消息*/ );
     // 发送数据到指定的socket
