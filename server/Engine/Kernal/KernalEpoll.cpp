@@ -659,7 +659,8 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
             int type = *( (int*)(pNetWork->readBuffers + 4) );
             int id = *( (int*)(pNetWork->readBuffers) );
 			result.id = id;
-			
+			printf("KernalEpoll::handleMessage-000  %d  %d  %d  %d  %d \n\r",fd,size,type,id,pNetWork->readBuffersLen);
+
             if( pNetWork->readBuffersLen - 16 >= size )
             {
                 struct KernalNetWork *pNet = &m_NetWorks[ HASH_ID( id ) ];
@@ -913,6 +914,8 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         pNetWork->isWrite = false;
         result.id = pNetWork->id;
 
+		printf("KernalEpoll::handleMessage-111  %d  %d \n\r",pNetWork->id,pNetWork->fd);
+
         while( pNetWork->buffers.head )
         {
             msgType = KernalSocketMessageType_NO;
@@ -931,6 +934,8 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 			free( buffer );*/
 			
 			ret = sendMsg( pNetWork->fd, tmp->data, tmp->offset, tmp->size );
+
+			printf("KernalEpoll::handleMessage-222  %d  %d %d \n\r",pNetWork->id,pNetWork->fd,ret);
 
 			if( tmp->offset >= tmp->size )
 			{
