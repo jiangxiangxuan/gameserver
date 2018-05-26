@@ -166,7 +166,8 @@ void KernalServerBase::worker( int arg )
 {
 	onWorkerBegin();
 	m_Timer.initThreadTimer();
-	pthread_setspecific(m_Epoll.getWorkerKey(), (void *)arg);
+	pthread_setspecific(m_Epoll.getWorkerKey(), &arg);
+	printf("KernalEpoll::getWorkerPipe %d \n\r", arg);
 
 	//KernalPipe* pPipe = m_Epoll.createWorkerPipe( pthread_self() );
 	KernalPipe* pPipe = m_Epoll.getWorkerPipeByIndex( arg );

@@ -283,6 +283,7 @@ KernalPipe *KernalEpoll::getWorkerPipe()
 	//auto iter = m_WorkerPipes.find( pthread_self() );
 	
 	int *workerarg = (int*)pthread_getspecific( m_workerKey );
+	printf("KernalEpoll::getWorkerPipe %d \n\r", *workerarg);
 	auto iter = m_WorkerPipes.find( *workerarg );
 	
 	if( iter != m_WorkerPipes.end() )
