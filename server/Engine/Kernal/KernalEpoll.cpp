@@ -652,6 +652,8 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         }
 		//int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, false );
 
+		printf("KernalEpoll::handleMessage----  %d  %d %d %d \n\r",pNetWork->id,pNetWork->fd,pNetWork->readBuffersLen,ret);
+
         if( pNetWork->readBuffersLen >= 16 )
         {
 	    	int fd = *( (int*)(pNetWork->readBuffers + 12) );
