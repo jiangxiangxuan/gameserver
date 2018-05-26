@@ -80,12 +80,12 @@ void KernalServerBase::init( const char *configPath )
 	{
 		m_threadNum = 1;
 	}
-	for( int i = 0; i < m_threadNum; ++i )
+	for( int i = 1; i <= m_threadNum; ++i )
 	{
 		m_Epoll.createWorkerPipe( i );
 	}
 	// 创建工作线程
-	for( int i = 0; i < m_threadNum; ++i )
+	for( int i = 1; i <= m_threadNum; ++i )
 	{
 		// 创建线程通信管道
 		//KernalCommunicationPipe *pComPipe = new KernalCommunicationPipe();
@@ -166,7 +166,8 @@ void KernalServerBase::worker( int arg )
 {
 	onWorkerBegin();
 	m_Timer.initThreadTimer();
-	
+	pthread_setspecific(m_Epoll.getWorkerKey(), (void *)arg);
+
 	//KernalPipe* pPipe = m_Epoll.createWorkerPipe( pthread_self() );
 	KernalPipe* pPipe = m_Epoll.getWorkerPipeByIndex( arg );
 	//m_Log.info("KernalServerBase::worker %s %ld\n\r", "aaa", pthread_self());

@@ -57,6 +57,9 @@ bool KernalEpoll::create()
 	epollAdd( id );
 	
 	//createWorkerPipe( pthread_self() );
+	
+	int status=pthread_key_create(&m_workerKey,NULL);
+	
     return true;
 }
 
@@ -277,7 +280,11 @@ bool KernalEpoll::checkIsPipe( int fd )
 KernalPipe *KernalEpoll::getWorkerPipe()
 {
 	//m_WorkerPipesLocker.lock();
-	auto iter = m_WorkerPipes.find( pthread_self() );
+	//auto iter = m_WorkerPipes.find( pthread_self() );
+	
+	int *workerarg = (int*)pthread_getspecific( m_workerKey );
+	auto iter = m_WorkerPipes.find( *workerarg );
+	
 	if( iter != m_WorkerPipes.end() )
 	{
 		m_WorkerPipesLocker.unlock();
@@ -336,6 +343,8 @@ int KernalEpoll::connectHttp( const char *addr, const int port )
 
 bool KernalEpoll::send( int id, void *data, int size )
 {
+	printf("KernalEpoll::send----000  %d  %d  \n\r",id,size);
+
     if( id < 0 || id > MAX_NET_WORK_NUM )
     {
         return false;
@@ -590,6 +599,8 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 	    	return KernalSocketMessageType_NO;
 		}
 
+		printf("KernalEpoll::handleMessage----000  %d  %d  \n\r",m_eventNum,m_eventIndex);
+
         for ( int i = 0; i < m_eventNum; i++ )
         {
             struct epoll_event *pEvent = &m_events[ i ];
@@ -608,6 +619,8 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
             pNetWork->isRead  = (flag & EPOLLIN) == EPOLLIN;
 
         }
+		printf("KernalEpoll::handleMessage----111  %d  %d  \n\r",m_eventNum,m_eventIndex);
+
     }
 
     struct epoll_event *pEvent = &m_events[ m_eventIndex++ ];

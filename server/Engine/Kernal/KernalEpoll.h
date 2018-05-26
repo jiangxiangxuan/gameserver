@@ -235,6 +235,11 @@ public:
 
     // 检测心跳
     void heartbeat();
+
+	pthread_key_t getWorkerKey()
+	{
+		return m_workerKey;
+	}
 private:
 	// 检测是否是管道
 	bool checkIsPipe( int fd );
@@ -248,6 +253,7 @@ private:
 private:
     int getSocketID();
 private:
+	pthread_key_t   	 m_workerKey;
     int                  m_epollfd;
     int                  m_ctrlfd[2]; // 0:接受 1:发送
 
