@@ -283,7 +283,6 @@ KernalPipe *KernalEpoll::getWorkerPipe()
 	//auto iter = m_WorkerPipes.find( pthread_self() );
 	
 	int *workerarg = (int*)pthread_getspecific( m_workerKey );
-	printf("KernalEpoll::getWorkerPipe %d \n\r", *workerarg);
 	auto iter = m_WorkerPipes.find( *workerarg );
 	
 	if( iter != m_WorkerPipes.end() )
@@ -344,8 +343,6 @@ int KernalEpoll::connectHttp( const char *addr, const int port )
 
 bool KernalEpoll::send( int id, void *data, int size )
 {
-	printf("KernalEpoll::send----000  %d  %d  \n\r",id,size);
-
     if( id < 0 || id > MAX_NET_WORK_NUM )
     {
         return false;
@@ -600,8 +597,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 	    	return KernalSocketMessageType_NO;
 		}
 
-		printf("KernalEpoll::handleMessage----000  %d  %d  \n\r",m_eventNum,m_eventIndex);
-
         for ( int i = 0; i < m_eventNum; i++ )
         {
             struct epoll_event *pEvent = &m_events[ i ];
@@ -620,7 +615,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
             pNetWork->isRead  = (flag & EPOLLIN) == EPOLLIN;
 
         }
-		printf("KernalEpoll::handleMessage----111  %d  %d  \n\r",m_eventNum,m_eventIndex);
 
     }
 
@@ -666,8 +660,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         }
 		//int ret = readMsg( pNetWork->fd, pNetWork->readBuffers, pNetWork->readBuffersLen, true, false );
 
-		printf("KernalEpoll::handleMessage----  %d  %d %d \n\r",pNetWork->id,pNetWork->fd,pNetWork->readBuffersLen);
-
         if( pNetWork->readBuffersLen >= 16 )
         {
 	    	int fd = *( (int*)(pNetWork->readBuffers + 12) );
@@ -675,7 +667,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
             int type = *( (int*)(pNetWork->readBuffers + 4) );
             int id = *( (int*)(pNetWork->readBuffers) );
 			result.id = id;
-			printf("KernalEpoll::handleMessage-000  %d  %d  %d  %d  %d \n\r",fd,size,type,id,pNetWork->readBuffersLen);
 
             if( pNetWork->readBuffersLen - 16 >= size )
             {
@@ -930,8 +921,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
         pNetWork->isWrite = false;
         result.id = pNetWork->id;
 
-		printf("KernalEpoll::handleMessage-111  %d  %d \n\r",pNetWork->id,pNetWork->fd);
-
         while( pNetWork->buffers.head )
         {
             msgType = KernalSocketMessageType_NO;
@@ -950,8 +939,6 @@ KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
 			free( buffer );*/
 			
 			ret = sendMsg( pNetWork->fd, tmp->data, tmp->offset, tmp->size );
-
-			printf("KernalEpoll::handleMessage-222  %d  %d %d \n\r",pNetWork->id,pNetWork->fd,ret);
 
 			if( tmp->offset >= tmp->size )
 			{
