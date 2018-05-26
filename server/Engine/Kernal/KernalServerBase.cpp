@@ -6,8 +6,11 @@ void *KernalServerBaseWorker( void *arg )
 {
 	//KernalCommunicationPipe *pComPipe = (KernalCommunicationPipe*)arg;
 	//pComPipe->pServerBase->worker(pComPipe);
-	KernalServerBase *pServerBase = (KernalServerBase*)arg;
-	pServerBase->worker();
+	/*KernalServerBase *pServerBase = (KernalServerBase*)arg;
+	pServerBase->worker();*/
+	
+	KernalWorkerThreadArg *pWorkerThreadArg = ( KernalWorkerThreadArg* )arg;
+	pWorkerThreadArg->pServerBase->worker( pWorkerThreadArg->arg );
 	return ((void *)0);
 }
 
@@ -79,17 +82,31 @@ void KernalServerBase::init( const char *configPath )
 	}
 	for( int i = 0; i < m_threadNum; ++i )
 	{
+		m_Epoll.createWorkerPipe( i );
+	}
+	// 创建工作线程
+	for( int i = 0; i < m_threadNum; ++i )
+	{
 		// 创建线程通信管道
 		//KernalCommunicationPipe *pComPipe = new KernalCommunicationPipe();
 		//pComPipe->tid = pthread_self();
 		//pComPipe->pServerBase = this;
 		//int err = socketpair( AF_UNIX, SOCK_STREAM, 0, pComPipe->pipefd );  
 		//m_WorkThreadsPipe.push_back( pComPipe );
-		KernalThread *pThread = new KernalThread();
 		//pThread->init(KernalServerBaseWorker, pComPipe);
-		pThread->init(KernalServerBaseWorker, this);
 		//pThread->detach();
 		//m_WorkThreads.push( pThread );
+		
+		/*KernalThread *pThread = new KernalThread();
+		pThread->init(KernalServerBaseWorker, this);
+		m_WorkThreads.push_back( pThread );*/
+		
+		KernalWorkerThreadArg *pWorkerThreadArg = new KernalWorkerThreadArg();
+		pWorkerThreadArg->pServerBase = this;
+		pWorkerThreadArg->arg = i;
+		m_WorkThreadArgs.push_back( pWorkerThreadArg );
+		KernalThread *pThread = new KernalThread();
+		pThread->init(KernalServerBaseWorker, pWorkerThreadArg);
 		m_WorkThreads.push_back( pThread );
 	}
 }
@@ -145,13 +162,14 @@ void KernalServerBase::epollWroker()
 	}
 }
 
-void KernalServerBase::worker()
+void KernalServerBase::worker( int arg )
 {
 	onWorkerBegin();
 	m_Timer.initThreadTimer();
 	
-	KernalPipe* pPipe = m_Epoll.createWorkerPipe( pthread_self() );
-	m_Log.info("KernalServerBase::worker %s %ld\n\r", "aaa", pthread_self());
+	//KernalPipe* pPipe = m_Epoll.createWorkerPipe( pthread_self() );
+	KernalPipe* pPipe = m_Epoll.getWorkerPipeByIndex( arg );
+	//m_Log.info("KernalServerBase::worker %s %ld\n\r", "aaa", pthread_self());
 
 	while( !m_quit )
 	{		

@@ -287,6 +287,19 @@ KernalPipe *KernalEpoll::getWorkerPipe()
 	return NULL;
 }
 
+KernalPipe *KernalEpoll::getWorkerPipeByIndex( int index )
+{
+	//m_WorkerPipesLocker.lock();
+	auto iter = m_WorkerPipes.find( index );
+	if( iter != m_WorkerPipes.end() )
+	{
+		m_WorkerPipesLocker.unlock();
+		return iter->second;
+	}
+	//m_WorkerPipesLocker.unlock();
+	return NULL;
+}
+
 void KernalEpoll::releaseWorkerPipes()
 {
 	//m_WorkerPipesLocker.lock();
