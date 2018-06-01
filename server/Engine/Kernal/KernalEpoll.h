@@ -212,6 +212,7 @@ public:
 	KernalPipe *randWorkerPipe();
 	KernalPipe *getWorkerPipeByIndex( int index ); 
 	void releaseWorkerPipes();
+	int getWorkerThreadKey();
 	
     // HTTP
     int listenHttp( const char *addr, const int port );

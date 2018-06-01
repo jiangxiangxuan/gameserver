@@ -106,15 +106,12 @@ public:
 	};
 
 	void sendMsg( int fd, char *buff, int len );
+	int getWorkerThreadKey();
 
 	virtual void onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size ) = 0;
-	virtual void onProcess() = 0;
+	virtual void onInit() = 0;
 	virtual void onRun() = 0;
 	virtual void onExit() = 0;
-	virtual void oninit() = 0;
-
-	virtual void onWorkerBegin();
-	virtual void onWorkerEnd();
 protected:
 	int                         m_threadNum;
 	KernalEpoll                 m_Epoll;         //EPOLL

@@ -20,10 +20,9 @@ public:
 	static PlatformServer *getInstance();
 
 	virtual void onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size );
-	virtual void onProcess();
+	virtual void onInit();
 	virtual void onRun();
 	virtual void onExit();
-	virtual void oninit();
 
 	IdbcRedis *getRedis()
 	{

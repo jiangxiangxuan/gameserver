@@ -20,19 +20,18 @@ public:
 	void execute( int session, DBServerReqMsg &value );
 
 	virtual void onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size );
-	virtual void onProcess();
+	virtual void onInit();
 	virtual void onRun();
 	virtual void onExit();
-	virtual void oninit();
 
-	virtual void onWorkerBegin();
-	virtual void onWorkerEnd();
 protected:
 	void connectCenterServer();
 
 	void handleTimerMsg( unsigned int id );
 
 	DataBase *getDataBase();
+private:
+	void createDataBase( int arg );
 private:
 	static DBServer *ms_pDBServer;
 private:

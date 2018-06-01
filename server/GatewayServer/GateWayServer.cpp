@@ -30,7 +30,7 @@ GateWayServer *GateWayServer::getInstance()
 	return ms_pGateWayServer;
 }
 
-void GateWayServer::oninit()
+void GateWayServer::onInit()
 {
 	m_Log.init( (char*)(getConfig()->getText("config/gateway/log")) );
 
@@ -220,11 +220,6 @@ void GateWayServer::sendMsgToGame( unsigned int id, KernalMessageType type, cons
 		}
 	}
 	m_ServersLocker.unlock();
-}
-
-void GateWayServer::onProcess()
-{
-
 }
 
 void GateWayServer::onRun()

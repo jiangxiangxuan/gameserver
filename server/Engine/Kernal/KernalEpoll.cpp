@@ -294,6 +294,12 @@ KernalPipe *KernalEpoll::getWorkerPipe()
 	return NULL;
 }
 
+int KernalEpoll::getWorkerThreadKey()
+{
+	int *workerarg = (int*)pthread_getspecific( m_workerKey );
+	return *workerarg;
+}
+
 KernalPipe *KernalEpoll::getWorkerPipeByIndex( int index )
 {
 	//m_WorkerPipesLocker.lock();

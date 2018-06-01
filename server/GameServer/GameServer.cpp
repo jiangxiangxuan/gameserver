@@ -31,7 +31,7 @@ GameServer *GameServer::getInstance()
 	return ms_pGameServer;
 }
 
-void GameServer::oninit()
+void GameServer::onInit()
 {
 	m_Log.init( (char*)(getConfig()->getText("config/game/log")) );
 
@@ -158,11 +158,6 @@ void GameServer::sendMsgToPlatform( int serverID, char *data, int datalen )
 	msg.initData( data, datalen );
 
 	MsgSend( m_Epoll, m_CenterServerID, PlatformGameServerMsg, 0, msg );
-}
-
-void GameServer::onProcess()
-{
-
 }
 
 void GameServer::onRun()

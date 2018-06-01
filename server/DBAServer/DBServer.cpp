@@ -29,7 +29,7 @@ DBServer *DBServer::getInstance()
 	return ms_pDBServer;
 }
 
-void DBServer::oninit()
+void DBServer::onInit()
 {	
 	m_Log.init( (char*)(getConfig()->getText("config/dba/log")) );
 	m_threadNum = atoi(getConfig()->getText("config/dba/thread"));
@@ -37,10 +37,16 @@ void DBServer::oninit()
 	const char *ip   = getConfig()->getAttributeStr("config/dba/listen", "ip");
 	int         port = getConfig()->getAttributeInt("config/dba/listen", "port");
 	listen(ip, port);
+	
+	// 初始化数据库连接
+	for( int i = 1; i <= m_threadNum; ++i )
+	{
+		createDataBase( i );
+	}
 }
 
-void DBServer::onWorkerBegin()
-{
+void DBServer::createDataBase( int arg )
+{	
 	DataBase *pDataBase = new DataBase();
 	pDataBase->loadLib();
 
@@ -52,18 +58,7 @@ void DBServer::onWorkerBegin()
 	const char *dbname = getConfig()->getAttributeStr("config/dba/db", "dbname");
 	pDataBase->connect(dbip, dbport, dbuser, dbpwd, dbname);
 
-	m_DataBases.insert( pthread_self(), pDataBase );
-}
-
-void DBServer::onWorkerEnd()
-{
-	DataBase *pDataBase = m_DataBases.find( pthread_self() );
-	if( pDataBase )
-	{
-		pDataBase->close();
-		pDataBase->unloadLib();
-	}
-	m_DataBases.erase( pthread_self() );
+	m_DataBases.insert( arg, pDataBase );
 }
 
 void DBServer::handleTimerMsg( unsigned int id )
@@ -111,11 +106,6 @@ void DBServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageT
 			connectCenterServer();
 		}
 	}
-}
-
-void DBServer::onProcess()
-{
-
 }
 
 void DBServer::onRun()
@@ -172,7 +162,8 @@ void DBServer::execute( int session, DBServerReqMsg &value )
 
 DataBase *DBServer::getDataBase()
 {
-	DataBase *pDataBase = m_DataBases.find( pthread_self() );
+	//DataBase *pDataBase = m_DataBases.find( pthread_self() );
+	DataBase *pDataBase = m_DataBases.find( getWorkerThreadKey() );
 	return pDataBase;
 }
 

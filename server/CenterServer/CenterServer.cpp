@@ -29,7 +29,7 @@ CenterServer *CenterServer::getInstance()
 	return ms_pCenterServer;
 }
 
-void CenterServer::oninit()
+void CenterServer::onInit()
 {	
 	m_Log.init( (char*)(getConfig()->getText("config/center/log")) );
 
@@ -100,11 +100,6 @@ void CenterServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMess
 			
 		}
 	}
-}
-
-void CenterServer::onProcess()
-{
-
 }
 
 void CenterServer::onRun()

@@ -74,7 +74,7 @@ void KernalServerBase::init( const char *configPath )
 
 	m_Config.init( configPath );
 	guidInit();
-	oninit();
+	onInit();
 
 	if( m_threadNum <= 0 )
 	{
@@ -123,11 +123,6 @@ void KernalServerBase::run()
 	{
 		(*iter)->join();
 	}
-	/*while( !m_quit )
-	{
-		onProcess();
-		usleep(2000);
-	}*/
 	onExit();
 }
 
@@ -164,7 +159,6 @@ void KernalServerBase::epollWroker()
 
 void KernalServerBase::worker( int arg )
 {
-	onWorkerBegin();
 	m_Timer.initThreadTimer();
 	pthread_setspecific(m_Epoll.getWorkerKey(), &arg);
 
@@ -228,7 +222,6 @@ void KernalServerBase::worker( int arg )
 			onMsg(  timeID, KernalNetWorkType_NO, TIMER_DATA, NULL, 0 );
 		}		
 	}
-	onWorkerEnd();
 }
 
 void KernalServerBase::heartbeatWorker()
@@ -296,12 +289,7 @@ void KernalServerBase::sendMsg( int fd, char *buff, int len )
 	m_Epoll.send( fd, buff, len );
 }
 
-void KernalServerBase::onWorkerBegin()
+int KernalServerBase::getWorkerThreadKey()
 {
-
-}
-
-void KernalServerBase::onWorkerEnd()
-{
-
+	return m_Epoll.getWorkerThreadKey();
 }

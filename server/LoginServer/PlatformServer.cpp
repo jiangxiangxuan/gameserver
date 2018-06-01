@@ -31,7 +31,7 @@ PlatformServer *PlatformServer::getInstance()
 	return ms_pPlatformServer;
 }
 
-void PlatformServer::oninit()
+void PlatformServer::onInit()
 {
 	m_Log.init( (char*)(getConfig()->getText("config/login/log")) );
 
@@ -112,11 +112,6 @@ void PlatformServer::onMsg( unsigned int id, KernalNetWorkType netType, KernalMe
 
 		}
 	}
-}
-
-void PlatformServer::onProcess()
-{
-
 }
 
 void PlatformServer::onRun()
