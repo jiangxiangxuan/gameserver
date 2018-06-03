@@ -28,7 +28,7 @@ enum KernalMessageType
 };
 
 // 消息处理
-class KernalMessage //: public KernalListNode< KernalMessage >
+class KernalMessage 
 {
 public:
 	KernalMessage()
@@ -49,22 +49,6 @@ public:
 	unsigned int       size;
 	unsigned int       id;
 };
-
-#if 0
-// 线程的通信管道
-class KernalServerBase;
-class KernalCommunicationPipe {
-public:
-	KernalCommunicationPipe()
-	{
-		memset( pipefd, 0, sizeof(pipefd) );
-	}
-public:
-	int       		  pipefd[2];
-	pthread_t 		  tid;
-	KernalServerBase *pServerBase;
-};
-#endif
 
 // 线程参数
 class KernalServerBase;
@@ -91,7 +75,6 @@ public:
 
 	void epollWroker();
 	
-	//void worker(KernalCommunicationPipe *pComPipe);
 	void worker( int arg );
 
     // 检测心跳
@@ -114,21 +97,17 @@ public:
 	virtual void onExit() = 0;
 protected:
 	int                         m_threadNum;
-	KernalEpoll                 m_Epoll;         //EPOLL
+	KernalEpoll                 m_Epoll; //EPOLL
 	KernalTimer                 m_Timer;
 	KernalLog                   m_Log;
 private:
-	//KernalQueue<KernalMessage>                     m_Messages;       //需处理消息
-	//KernalArrayLockFree<KernalMessage*>            m_Messages;       //需处理消息(无锁)
-	//KernalStack<KernalThread>                      m_WorkThreads;    //工作线程
 	std::vector<KernalThread*>                     m_WorkThreads;    //工作线程
 	KernalThread                                   m_EpollThread;    //Epoll 线程
 	KernalThread                                   m_HeartBeatThread;//心跳 线程
 	KernalConfig                                   m_Config;         //配置文件
 	KernalCond                                     m_MessageCond;    //条件变量
 	KernalSem                                      m_MessageSem;     //信号量
-	//std::vector<KernalCommunicationPipe*>          m_WorkThreadsPipe;//工作线程管道
-	std::vector<KernalWorkerThreadArg*>            m_WorkThreadArgs;    //工作线程参数
+	std::vector<KernalWorkerThreadArg*>            m_WorkThreadArgs; //工作线程参数
 	bool                                           m_quit;           //是否退出
 };
 

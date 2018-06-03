@@ -46,9 +46,9 @@ typedef double         float64;
 								char _buf[BUFF_SIZE] = {0};   \
 								char* data = _buf;            \
 								int len = 0;                  \
-								NWriteInt32(data,&MSG_##cmd);  \
+								NWriteInt32(data,&MSG_##cmd); \
 								int err = error;              \
-								NWriteInt32(data,&err);        \
+								NWriteInt32(data,&err);       \
 								Write##cmd(msg,data);         \
 								len = data - _buf;            \
 								data = _buf;           		  \
@@ -79,18 +79,18 @@ typedef double         float64;
 								int len = obj.ByteSize();           \
 								char *pdata = new char[len];        \
 								obj.SerializeToArray(pdata, len);   \
-								char *_buff = new char[len+12];      \
+								char *_buff = new char[len+12];     \
 								char *databuff = _buff;             \
 								NWriteInt32(databuff,&pcmd);        \
 								NWriteInt32(databuff,&perr);        \
 								NWriteInt32(databuff,&len);         \
 								NWriteBit(databuff,pdata,len);      \
-								net.send(id,_buff,len+12);           \
+								net.send(id,_buff,len+12);          \
 								delete []pdata; delete []_buff;     \
 							}
 
 //通过网关发送消息给客户端
-#define ProtobufMsgSendToClientByGateWay( net, session, clientid, uid, cmd, err, protomsg ) {              \
+#define ProtobufMsgSendToClientByGateWay( net, session, clientid, uid, cmd, err, protomsg ) {         \
 											int pcmd = cmd;                                           \
 											int perr = err;                                           \
 											int len1 = protomsg.ByteSize();                           \

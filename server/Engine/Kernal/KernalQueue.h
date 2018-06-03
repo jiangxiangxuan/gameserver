@@ -17,10 +17,6 @@ public:
 	void push( T *pNode );
 	bool empty();
 	int size();
-	/*
-	void pop( );
-	T *top();
-	*/
 	T *front( );
 	T *back( );
 	T *pop();
@@ -51,18 +47,6 @@ void KernalQueue< T >::push( T *pNode )
 	m_locker.unlock();
 }
 
-/*
-template< typename T >
-void KernalStack< T >::pop( )
-{
-	m_locker.lock();
-
-	m_stack.pop();
-
-	m_locker.unlock();
-}
-*/
-
 template< typename T >
 T *KernalQueue< T >::pop()
 {
@@ -73,12 +57,8 @@ T *KernalQueue< T >::pop()
 	
 	T *t = NULL;
 	m_locker.lock();
-	//typename std::vector<T*>::iterator iter = m_queue.begin();
-	//if( iter != m_queue.end() )
 	if( m_queue.size() )
 	{
-		//t = (*iter);
-		//m_queue.erase( iter );
 		t = m_queue.front();
 		m_queue.pop();
 	}

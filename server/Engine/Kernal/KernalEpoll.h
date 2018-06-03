@@ -21,11 +21,10 @@
 #define HTTP_BUFFER_SIZE  1024  // http 请求数据大小
 
 #define MAX_EVENTS        64
-#define MAX_NET_WORK_NUM  65535 //最多接收连接数
-#define RECV_BUFFER_SIZE  1024  // 接收数据缓冲区大小
+#define MAX_NET_WORK_NUM  65535 	 //最多接收连接数
+#define RECV_BUFFER_SIZE  1024 * 10  // 接收数据缓冲区大小
 
 #define HASH_ID(id) (((unsigned)id) % MAX_NET_WORK_NUM)
-//#define HASH_ID(id) (((unsigned)id))
 
 const int socket_data         = 0;    // 发送数据
 const int socket_connect      = 1;    // 建立连接
@@ -204,7 +203,6 @@ public:
     bool create();
     int listen( const char *addr, const int port, bool isHttp = false );
     int connect( const char *addr, const int port, int &sfd, bool isHttp = false, bool addToEpoll = true );
-    //int connectSocket( const char *addr, const int port );
 	
 	// 创建工作线程管道
 	KernalPipe *createWorkerPipe( pthread_t tid );

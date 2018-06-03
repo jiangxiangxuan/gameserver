@@ -4,11 +4,6 @@
 
 void *KernalServerBaseWorker( void *arg )
 {
-	//KernalCommunicationPipe *pComPipe = (KernalCommunicationPipe*)arg;
-	//pComPipe->pServerBase->worker(pComPipe);
-	/*KernalServerBase *pServerBase = (KernalServerBase*)arg;
-	pServerBase->worker();*/
-	
 	KernalWorkerThreadArg *pWorkerThreadArg = ( KernalWorkerThreadArg* )arg;
 	pWorkerThreadArg->pServerBase->worker( pWorkerThreadArg->arg );
 	return ((void *)0);
@@ -80,27 +75,16 @@ void KernalServerBase::init( const char *configPath )
 	{
 		m_threadNum = 1;
 	}
+	
+	// 创建工作线程管道
 	for( int i = 1; i <= m_threadNum; ++i )
 	{
 		m_Epoll.createWorkerPipe( i );
 	}
+	
 	// 创建工作线程
 	for( int i = 1; i <= m_threadNum; ++i )
 	{
-		// 创建线程通信管道
-		//KernalCommunicationPipe *pComPipe = new KernalCommunicationPipe();
-		//pComPipe->tid = pthread_self();
-		//pComPipe->pServerBase = this;
-		//int err = socketpair( AF_UNIX, SOCK_STREAM, 0, pComPipe->pipefd );  
-		//m_WorkThreadsPipe.push_back( pComPipe );
-		//pThread->init(KernalServerBaseWorker, pComPipe);
-		//pThread->detach();
-		//m_WorkThreads.push( pThread );
-		
-		/*KernalThread *pThread = new KernalThread();
-		pThread->init(KernalServerBaseWorker, this);
-		m_WorkThreads.push_back( pThread );*/
-		
 		KernalWorkerThreadArg *pWorkerThreadArg = new KernalWorkerThreadArg();
 		pWorkerThreadArg->pServerBase = this;
 		pWorkerThreadArg->arg = i;
@@ -162,9 +146,7 @@ void KernalServerBase::worker( int arg )
 	m_Timer.initThreadTimer();
 	pthread_setspecific(m_Epoll.getWorkerKey(), &arg);
 
-	//KernalPipe* pPipe = m_Epoll.createWorkerPipe( pthread_self() );
 	KernalPipe* pPipe = m_Epoll.getWorkerPipeByIndex( arg );
-	//m_Log.info("KernalServerBase::worker %s %ld\n\r", "aaa", pthread_self());
 
 	while( !m_quit )
 	{		
@@ -172,7 +154,7 @@ void KernalServerBase::worker( int arg )
 		fd_set rset;
 		FD_ZERO( &rset );
 		FD_SET( pPipe->pipe[1], &rset );
-		int retval = 0; //::select( pComPipe->pipefd[1] + 1, &rset, NULL, NULL, &tm );
+		int retval = 0;
 		if( -1 == minExpire )
 		{
 			retval = ::select( pPipe->pipe[1] + 1, &rset, NULL, NULL, NULL );
@@ -226,7 +208,7 @@ void KernalServerBase::worker( int arg )
 
 void KernalServerBase::heartbeatWorker()
 {
-#if 0	
+	
 	pthread_cond_t  cond;
 	pthread_mutex_t mutex;
 	pthread_mutex_init(&mutex, NULL);
@@ -239,11 +221,7 @@ void KernalServerBase::heartbeatWorker()
 	while( !m_quit )
 	{
 		m_Epoll.heartbeat();
-
-		// 暂停
-		//usleep( 10000000 );
-		//for( int i = 0; i < 500000000; ++i );
-
+		
 		gettimeofday(&now, NULL);
 		delay.tv_sec = now.tv_sec + 5;
 		delay.tv_nsec = now.tv_usec;
@@ -271,8 +249,6 @@ void KernalServerBase::flush()
 
 void KernalServerBase::pushMsg( KernalMessageType type, KernalNetWorkType netType, void *data, unsigned int size, unsigned int id )
 {
-	//int index = rand()%m_WorkThreadsPipe.size();
-	//KernalCommunicationPipe *pComPipe = m_WorkThreadsPipe[index];
 	KernalPipe* pPipe = m_Epoll.randWorkerPipe();
 	if( pPipe )
 	{

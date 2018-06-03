@@ -15,10 +15,6 @@ public:
 
 	void push( T *pNode );
 	bool empty();
-	/*
-	void pop( );
-	T *top();
-	*/
 	T *pop( );
 private:
 	std::stack<T*>       m_stack;
@@ -46,18 +42,6 @@ void KernalStack< T >::push( T *pNode )
 
 	m_locker.unlock();
 }
-
-/*
-template< typename T >
-void KernalStack< T >::pop( )
-{
-	m_locker.lock();
-
-	m_stack.pop();
-
-	m_locker.unlock();
-}
-*/
 
 template< typename T >
 bool KernalStack< T >::empty()
