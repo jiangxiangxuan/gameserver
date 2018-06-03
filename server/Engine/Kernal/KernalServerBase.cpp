@@ -209,30 +209,6 @@ void KernalServerBase::worker( int arg )
 void KernalServerBase::heartbeatWorker()
 {
 	
-	pthread_cond_t  cond;
-	pthread_mutex_t mutex;
-	pthread_mutex_init(&mutex, NULL);
-	pthread_cond_init(&cond, NULL);
-	pthread_mutex_lock(&mutex);
-
-	struct timespec delay;
-	struct timeval now;
-
-	while( !m_quit )
-	{
-		m_Epoll.heartbeat();
-		
-		gettimeofday(&now, NULL);
-		delay.tv_sec = now.tv_sec + 5;
-		delay.tv_nsec = now.tv_usec;
-		pthread_cond_timedwait(&cond, &mutex, &delay);
-
-	}
-
-	pthread_mutex_unlock(&mutex);
-	pthread_mutex_destroy( &mutex );
-	pthread_cond_destroy( &cond );
-#endif
 }
 
 void KernalServerBase::quit()
