@@ -18,7 +18,7 @@ public:
 	T *pop( );
 private:
 	std::stack<T*>       m_stack;
-	KernalMutexLocker    m_locker;
+	KernalSpinLocker    m_locker;
 };
 
 template< typename T >
