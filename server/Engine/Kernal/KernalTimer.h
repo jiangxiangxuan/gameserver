@@ -38,18 +38,8 @@ struct KernalTimerNode
 
 struct KernalTimerNodeList
 {
-	KernalMutexLocker      locker;
     struct KernalTimerNode *head;
 	struct KernalTimerNode *tail;
-
-	void lock()
-	{
-		locker.lock();
-	}
-	void unlock()
-	{
-		locker.unlock();
-	}
 };
 
 class KernalTimer
@@ -64,13 +54,12 @@ public:
 
     unsigned int gettime();
 public:	
-	void initThreadTimer();
     unsigned int popExpired();
 	int getMinTimerExpire();  // 获取最近过期时间的定时器的expire
 private:    
     unsigned int        m_StartTime;
 	KernalMutexLocker   m_TimerLocker;
-	std::map< pthread_t, KernalTimerNodeList > m_Timers;
+	KernalTimerNodeList m_Timers; 
 };
 
 #endif

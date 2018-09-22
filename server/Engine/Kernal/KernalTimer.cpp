@@ -29,57 +29,49 @@ unsigned int KernalTimer::addTimer( unsigned int expire, int time )
     pTimerNode->expire = expire;
     pTimerNode->time   = time;
     pTimerNode->expireTime = gettime() + pTimerNode->expire;
-
-	pthread_t tid = pthread_self();
-	auto iter = m_Timers.find( tid );
 	
-	if( iter != m_Timers.end() )
+	m_TimerLocker.lock();
+	pTimerNode->next = m_Timers.head;
+	if( m_Timers.head )
 	{
-		iter->second.lock();
-		pTimerNode->next = iter->second.head;
-		if( iter->second.head )
-		{
-			iter->second.head->pre = pTimerNode;
-		}
-		iter->second.head = pTimerNode;
-		iter->second.unlock();
+		m_Timers.head->pre = pTimerNode;
 	}
+	m_Timers.head = pTimerNode;
+	m_TimerLocker.unlock();
+
     return id;
 }
 
 void KernalTimer::delTimer( unsigned int id )
 {
-	for( auto iter = m_Timers.begin(); iter != m_Timers.end(); ++iter )
+	m_TimerLocker.lock();
+	KernalTimerNode *pTimerNode = m_Timers.head;
+	while( pTimerNode )
 	{
-		iter->second.lock();
-		KernalTimerNode *pTimerNode = iter->second.head;
-		while( pTimerNode )
+		if( pTimerNode->id == id )
 		{
-			if( pTimerNode->id == id )
+			if( m_Timers.head == pTimerNode )
 			{
-				if( iter->second.head == pTimerNode )
-				{
-					iter->second.head = pTimerNode->next;
-				}
-				else
-				{
-					if( pTimerNode->pre )
-					{
-						pTimerNode->pre->next = pTimerNode->next;
-					}
-					if( pTimerNode->next )
-					{
-						pTimerNode->next->pre = pTimerNode->pre;
-					}
-				}
-				delete pTimerNode;
-				pTimerNode = NULL;
-				break;
+				m_Timers.head = pTimerNode->next;
 			}
-			pTimerNode = pTimerNode->next;
+			else
+			{
+				if( pTimerNode->pre )
+				{
+					pTimerNode->pre->next = pTimerNode->next;
+				}
+				if( pTimerNode->next )
+				{
+					pTimerNode->next->pre = pTimerNode->pre;
+				}
+			}
+			delete pTimerNode;
+			pTimerNode = NULL;
+			break;
 		}
-		iter->second.unlock();
+		pTimerNode = pTimerNode->next;
 	}
+	m_TimerLocker.unlock();
 }
 
 unsigned int KernalTimer::gettime()
@@ -97,56 +89,49 @@ unsigned int KernalTimer::popExpired()
     unsigned int id = 0;
     unsigned int curTime = gettime();
 	
-	pthread_t tid = pthread_self();
-	auto iter = m_Timers.find( tid );
-	if( iter != m_Timers.end() )
+	m_TimerLocker.lock();
+	struct KernalTimerNode *pNode = m_Timers.head;
+	while( pNode )
 	{
-		iter->second.lock();
-		struct KernalTimerNode *pNode = iter->second.head;
-		while( pNode )
+		int expireTime = (int)( pNode->expireTime ) - (int)( curTime );
+		if( expireTime > 0 )
 		{
-			int expireTime = (int)( pNode->expireTime ) - (int)( curTime );
-			if( expireTime > 0 )
-			{
-				pNode = pNode->next;
-				continue;
-			}
-			
-			pNode->expireTime = curTime + pNode->expire;
-			
-            if( pNode->time > 0 )
-            {
-                --pNode->time;
-            }
-			
-			id = pNode->id;
-			
-            // 如果定时器执行次数为0则删除
-            if( 0 == pNode->time )
-            {		
-				if( iter->second.head == pNode )
-				{
-					iter->second.head = pNode->next;
-				}
-				else
-				{
-					if( pNode->pre )
-					{
-						pNode->pre->next = pNode->next;
-					}
-					if( pNode->next )
-					{
-						pNode->next->pre = pNode->pre;
-					}
-				}
-				delete pNode;
-				pNode = NULL;
-            }
-			
-			break;
+			pNode = pNode->next;
+			continue;
 		}
-		iter->second.unlock();
+			
+		pNode->expireTime = curTime + pNode->expire;
+			
+        if( pNode->time > 0 )
+        {
+            --pNode->time;
+        }
+			
+		id = pNode->id;
+			
+        // 如果定时器执行次数为0则删除
+       if( 0 == pNode->time )
+       {		
+			if( m_Timers.head == pNode )
+			{
+				m_Timers.head = pNode->next;
+			}
+			else
+			{
+				if( pNode->pre )
+				{
+					pNode->pre->next = pNode->next;
+				}
+				if( pNode->next )
+				{
+					pNode->next->pre = pNode->pre;
+				}
+			}
+			delete pNode;
+			pNode = NULL;
+       }
 	}
+	m_TimerLocker.unlock();
 	
 	return id;
 }
@@ -156,49 +141,33 @@ int KernalTimer::getMinTimerExpire()
     unsigned int curTime = gettime();
 	int minExpire = -1;
 	
-	pthread_t tid = pthread_self();
-	auto iter = m_Timers.find( tid );
-	if( iter != m_Timers.end() )
+	m_TimerLocker.lock();
+	struct KernalTimerNode *pNode = m_Timers.head;
+	while( pNode )
 	{
-		iter->second.lock();
-		struct KernalTimerNode *pNode = iter->second.head;
-		while( pNode )
+		int expireTime = (int)( pNode->expireTime ) - (int)( curTime );
+		if( expireTime < 0 )
 		{
-			int expireTime = (int)( pNode->expireTime ) - (int)( curTime );
-			if( expireTime < 0 )
-			{
-				expireTime = 0;
-			}
-			
-			if( -1 == minExpire )
-			{
-				minExpire = expireTime;
-			}
-			
-			if( minExpire > expireTime )
-			{
-				minExpire = expireTime;
-			}
-			
-			pNode = pNode->next;
-			if( 0 == minExpire )
-			{
-				break;
-			}
+			expireTime = 0;
 		}
-		iter->second.unlock();
+			
+		if( -1 == minExpire )
+		{
+			minExpire = expireTime;
+		}
+			
+		if( minExpire > expireTime )
+		{
+			minExpire = expireTime;
+		}
+			
+		pNode = pNode->next;
+		if( 0 == minExpire )
+		{
+			break;
+		}
 	}
+	m_TimerLocker.unlock();
 	return minExpire;
 }
 
-void KernalTimer::initThreadTimer()
-{
-	m_TimerLocker.lock();
-	pthread_t tid = pthread_self();
-	auto iter = m_Timers.find( tid );
-	if( iter == m_Timers.end() )
-	{
-		m_Timers.insert( std::make_pair( tid, KernalTimerNodeList() ) );
-	}
-	m_TimerLocker.unlock();
-}

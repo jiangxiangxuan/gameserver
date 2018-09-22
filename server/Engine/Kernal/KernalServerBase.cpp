@@ -75,16 +75,11 @@ void KernalServerBase::init( const char *configPath )
 	{
 		m_threadNum = 1;
 	}
-	
-	// 创建工作线程管道
-	for( int i = 1; i <= m_threadNum; ++i )
-	{
-		m_Epoll.createWorkerPipe( i );
-	}
-	
+
 	// 创建工作线程
 	for( int i = 1; i <= m_threadNum; ++i )
 	{
+		m_Epoll.createWorkerPipe( i );
 		KernalWorkerThreadArg *pWorkerThreadArg = new KernalWorkerThreadArg();
 		pWorkerThreadArg->pServerBase = this;
 		pWorkerThreadArg->arg = i;
@@ -115,7 +110,8 @@ void KernalServerBase::epollWroker()
 	KernalRequestMsg result;
 	while( !m_quit )
 	{
-		KernalSocketMessageType type = m_Epoll.handleMessage( result );
+		int minExpire = m_Timer.getMinTimerExpire(); // 获取最近过期时间的定时器的expire
+		KernalSocketMessageType type = m_Epoll.handleMessage( result, minExpire );
 		switch( type )
 		{
 			case KernalSocketMessageType_SOCKET_DATA: // 如果接收到数据则加入到队列中
@@ -138,71 +134,44 @@ void KernalServerBase::epollWroker()
 
 			}
 		}
+		
+		// 处理定时器消息
+		while( true )
+		{
+			unsigned int timerId = m_Timer.popExpired();
+			if( timerId == 0 )
+			{
+				break;
+			}
+			pushMsg( TIMER_DATA, KernalNetWorkType_NO, NULL, 0, timerId );
+		}
 	}
 }
 
 void KernalServerBase::worker( int arg )
 {
-	m_Timer.initThreadTimer();
-	pthread_setspecific(m_Epoll.getWorkerKey(), &arg);
-
-	KernalPipe* pPipe = m_Epoll.getWorkerPipeByIndex( arg );
-
+	pthread_setspecific( m_WorkerKey, &arg );
 	while( !m_quit )
-	{		
-		int minExpire = m_Timer.getMinTimerExpire(); // 获取最近过期时间的定时器的expire
-		fd_set rset;
-		FD_ZERO( &rset );
-		FD_SET( pPipe->pipe[1], &rset );
-		int retval = 0;
-		if( -1 == minExpire )
+	{
+		m_MessageCond.wait();
+		KernalMessage *pMsg = m_Messages.pop();	
+		// 处理消息
+		switch( pMsg->type )
 		{
-			retval = ::select( pPipe->pipe[1] + 1, &rset, NULL, NULL, NULL );
-		}
-		else
-		{
-			struct timeval tm = {0, minExpire * 10000};
-			retval = ::select( pPipe->pipe[1] + 1, &rset, NULL, NULL, &tm );
-		}
-		if( retval > 0 && FD_ISSET(pPipe->pipe[1], &rset)  )
-		{
-			// 处理网络消息
-			KernalMessage pMsg;
-			::read(pPipe->pipe[1], &pMsg.type, sizeof(pMsg.type));
-			::read(pPipe->pipe[1], &pMsg.netType, sizeof(pMsg.netType));
-			::read(pPipe->pipe[1], &pMsg.id, sizeof(pMsg.id));
-			::read(pPipe->pipe[1], &pMsg.size, sizeof(pMsg.size));
-			pMsg.data = ( char* )malloc( pMsg.size );
-			memset( pMsg.data, 0, pMsg.size );
-			::read(pPipe->pipe[1], pMsg.data, pMsg.size);
-
-			// 处理消息
-			switch( pMsg.type )
+			case NETWORK_DATA:
+			case NETWORK_CLOSE:
+			case NETWORK_CONNECT:
+			case TIMER_DATA:
 			{
-				case NETWORK_DATA:
-				case NETWORK_CLOSE:
-				case NETWORK_CONNECT:
-				{
-					onMsg(  pMsg.id, pMsg.netType, pMsg.type, (const char *)pMsg.data, pMsg.size );
-					break;
-				}
-				default:
-				{
-					break;
-				}
+				onMsg(  pMsg->id, pMsg->netType, pMsg->type, (const char *)pMsg->data, pMsg->size );
+				break;
 			}
-		}
-		
-		// 处理定时器消息
-		while( true )
-		{
-			unsigned int timeID = m_Timer.popExpired();
-			if( timeID == 0 )
+			default:
 			{
 				break;
 			}
-			onMsg(  timeID, KernalNetWorkType_NO, TIMER_DATA, NULL, 0 );
-		}		
+		}
+		
 	}
 }
 
@@ -225,15 +194,15 @@ void KernalServerBase::flush()
 
 void KernalServerBase::pushMsg( KernalMessageType type, KernalNetWorkType netType, void *data, unsigned int size, unsigned int id )
 {
-	KernalPipe* pPipe = m_Epoll.randWorkerPipe();
-	if( pPipe )
-	{
-		::write( pPipe->pipe[0], &type, sizeof(type) );
-		::write( pPipe->pipe[0], &netType, sizeof(netType) );
-		::write( pPipe->pipe[0], &id, sizeof(id) );
-		::write( pPipe->pipe[0], &size, sizeof(size) );
-		::write( pPipe->pipe[0], (char*)data, size );
-	}
+	KernalMessage *pMsg = new KernalMessage();
+	pMsg->type = type;
+	pMsg->netType = netType;
+	pMsg->id = id;
+	pMsg->size = size;
+	pMsg->data = ( char* )malloc( size );
+	memset( pMsg->data, 0, size );
+	memcpy( pMsg->data, data, size);
+	m_Messages.push(pMsg);
 }
 
 void KernalServerBase::sendMsg( int fd, char *buff, int len )
@@ -243,5 +212,7 @@ void KernalServerBase::sendMsg( int fd, char *buff, int len )
 
 int KernalServerBase::getWorkerThreadKey()
 {
-	return m_Epoll.getWorkerThreadKey();
+	int *workerarg = (int*)pthread_getspecific( m_WorkerKey );
+	return *workerarg;
 }
+

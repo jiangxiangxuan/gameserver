@@ -177,101 +177,6 @@ int KernalEpoll::connect( const char *addr, const int port, int &sfd, bool isHtt
     return id;
 }
 
-// 创建工作线程管道
-KernalPipe *KernalEpoll::createWorkerPipe( pthread_t tid )
-{
-	KernalPipe *pPipe = new KernalPipe();
-	pPipe->tid = tid; 
-	if( ::socketpair( AF_UNIX, SOCK_STREAM, 0, pPipe->pipe ) )
-    {
-		delete pPipe;
-		pPipe = NULL;
-    }
-	
-	if( pPipe )
-	{
-		int id =  getSocketID();
-		struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
-		pNetWork->init();
-		pNetWork->type = KernalNetWorkType_CONNECTED;
-		pNetWork->fd   = pPipe->pipe[0];
-		pNetWork->id   = id;
-		epollAdd( id );
-		
-		m_WorkerPipes.insert( std::pair< pthread_t, KernalPipe* >( tid, pPipe ) ); 
-	}
-	return pPipe;
-}
-
-KernalPipe *KernalEpoll::randWorkerPipe()
-{
-	int index = rand()%m_WorkerPipes.size();
-	KernalPipe *pPipe = NULL;
-	for( auto iter = m_WorkerPipes.begin(); iter != m_WorkerPipes.end(); ++iter )
-	{
-		--index;
-		if( index <= 0 )
-		{
-			pPipe = iter->second;
-			break;
-		}
-	}
-	return pPipe;
-}
-
-bool KernalEpoll::checkIsPipe( int fd )
-{
-	if( fd == m_ctrlfd[0] )
-	{
-		return true;
-	}
-	for( auto iter = m_WorkerPipes.begin(); iter != m_WorkerPipes.end(); ++iter )
-	{
-		if( iter->second->pipe[0] == fd )
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-KernalPipe *KernalEpoll::getWorkerPipe()
-{
-	int *workerarg = (int*)pthread_getspecific( m_workerKey );
-	auto iter = m_WorkerPipes.find( *workerarg );
-	
-	if( iter != m_WorkerPipes.end() )
-	{
-		return iter->second;
-	}
-	return NULL;
-}
-
-int KernalEpoll::getWorkerThreadKey()
-{
-	int *workerarg = (int*)pthread_getspecific( m_workerKey );
-	return *workerarg;
-}
-
-KernalPipe *KernalEpoll::getWorkerPipeByIndex( int index )
-{
-	auto iter = m_WorkerPipes.find( index );
-	if( iter != m_WorkerPipes.end() )
-	{
-		return iter->second;
-	}
-	return NULL;
-}
-
-void KernalEpoll::releaseWorkerPipes()
-{
-	for( auto iter = m_WorkerPipes.begin(); iter != m_WorkerPipes.end(); ++iter )
-	{
-		::close( iter->second->pipe[0] );
-		::close( iter->second->pipe[1] );
-	}
-}
-
 int KernalEpoll::listenHttp( const char *addr, const int port )
 {
     int id = listen( addr, port, true );
@@ -480,12 +385,12 @@ int KernalEpoll::sendMsg( int fd, const void *data, int &offSet, int size, bool 
 }
 
 // TODO: 待优化
-KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result )
+KernalSocketMessageType KernalEpoll::handleMessage( KernalRequestMsg &result, int expire )
 {
     result.init();
     if( m_eventNum == m_eventIndex )
     {
-        m_eventNum = epoll_wait( m_epollfd, m_events, MAX_EVENTS, -1 );
+        m_eventNum = epoll_wait( m_epollfd, m_events, MAX_EVENTS, expire );
         m_eventIndex = 0;
 		if( m_eventNum <= 0)
     	{
@@ -885,7 +790,6 @@ void KernalEpoll::release()
     ::close( m_epollfd );
 	::close( m_ctrlfd[0] );
 	::close( m_ctrlfd[1] );
-	releaseWorkerPipes();
 }
 
 void KernalEpoll::closeSocket( int id )
@@ -955,6 +859,60 @@ int KernalEpoll::getSocketID()
     }
 	m_locker.unlock();
     return -1;
+}
+
+// 创建工作线程管道
+KernalPipe *KernalEpoll::createWorkerPipe( pthread_t tid )
+{
+	KernalPipe *pPipe = new KernalPipe();
+	pPipe->tid = tid; 
+	if( ::socketpair( AF_UNIX, SOCK_STREAM, 0, pPipe->pipe ) )
+    {
+		delete pPipe;
+		pPipe = NULL;
+    }
+	
+	if( pPipe )
+	{
+		int id =  getSocketID();
+		struct KernalNetWork *pNetWork = &m_NetWorks[ HASH_ID( id ) ];
+		pNetWork->init();
+		pNetWork->type = KernalNetWorkType_CONNECTED;
+		pNetWork->fd   = pPipe->pipe[0];
+		pNetWork->id   = id;
+		epollAdd( id );
+		
+		m_WorkerPipes.insert( std::pair< pthread_t, KernalPipe* >( tid, pPipe ) ); 
+	}
+	return pPipe;
+}
+
+KernalPipe *KernalEpoll::getWorkerPipe()
+{
+	int *workerarg = (int*)pthread_getspecific( m_workerKey );
+	auto iter = m_WorkerPipes.find( *workerarg );
+	
+	if( iter != m_WorkerPipes.end() )
+	{
+		return iter->second;
+	}
+	return NULL;
+}
+
+bool KernalEpoll::checkIsPipe( int fd )
+{
+	if( fd == m_ctrlfd[0] )
+	{
+		return true;
+	}
+	for( auto iter = m_WorkerPipes.begin(); iter != m_WorkerPipes.end(); ++iter )
+	{
+		if( iter->second->pipe[0] == fd )
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 void KernalEpoll::heartbeat()

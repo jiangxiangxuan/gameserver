@@ -203,15 +203,9 @@ public:
     bool create();
     int listen( const char *addr, const int port, bool isHttp = false );
     int connect( const char *addr, const int port, int &sfd, bool isHttp = false, bool addToEpoll = true );
-	
+
 	// 创建工作线程管道
-	KernalPipe *createWorkerPipe( pthread_t tid );
-	// 随机获取一个工作线程管道
-	KernalPipe *randWorkerPipe();
-	KernalPipe *getWorkerPipeByIndex( int index ); 
-	void releaseWorkerPipes();
-	int getWorkerThreadKey();
-	
+	KernalPipe *createWorkerPipe( pthread_t tid );	
     // HTTP
     int listenHttp( const char *addr, const int port );
     int connectHttp( const char *addr, const int port );
@@ -222,7 +216,7 @@ public:
     // 发送HTTP数据
     void sendHttpData( int id, const void *data, int size );
     // 处理消息（每次处理一条消息）
-    KernalSocketMessageType handleMessage( KernalRequestMsg &result );
+    KernalSocketMessageType handleMessage( KernalRequestMsg &result, int expire );
 
     void epollAdd( int id, bool isET = false );
     void epollAdd( int fd, void *data, bool isET = false );

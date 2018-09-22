@@ -76,6 +76,7 @@ public:
 	void epollWroker();
 	
 	void worker( int arg );
+	int getWorkerThreadKey();
 
     // 检测心跳
     void heartbeatWorker();
@@ -89,7 +90,6 @@ public:
 	};
 
 	void sendMsg( int fd, char *buff, int len );
-	int getWorkerThreadKey();
 
 	virtual void onMsg( unsigned int id, KernalNetWorkType netType, KernalMessageType type, const char *data, unsigned int size ) = 0;
 	virtual void onInit() = 0;
@@ -101,6 +101,7 @@ protected:
 	KernalTimer                 m_Timer;
 	KernalLog                   m_Log;
 private:
+	pthread_key_t   	 						   m_WorkerKey;
 	std::vector<KernalThread*>                     m_WorkThreads;    //工作线程
 	KernalThread                                   m_EpollThread;    //Epoll 线程
 	KernalThread                                   m_HeartBeatThread;//心跳 线程
@@ -108,6 +109,7 @@ private:
 	KernalCond                                     m_MessageCond;    //条件变量
 	KernalSem                                      m_MessageSem;     //信号量
 	std::vector<KernalWorkerThreadArg*>            m_WorkThreadArgs; //工作线程参数
+	KernalStack<KernalMessage>                     m_Messages;       //网络消息
 	bool                                           m_quit;           //是否退出
 };
 
