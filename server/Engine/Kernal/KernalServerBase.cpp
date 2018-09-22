@@ -177,7 +177,8 @@ void KernalServerBase::worker( int arg )
 				break;
 			}
 		}
-		
+		delete pMsg;
+		pMsg = NULL;
 	}
 }
 
