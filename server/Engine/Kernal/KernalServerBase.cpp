@@ -145,6 +145,8 @@ void KernalServerBase::epollWroker()
 			}
 			pushMsg( TIMER_DATA, KernalNetWorkType_NO, NULL, 0, timerId );
 		}
+		
+		m_MessageCond.broadcast();
 	}
 }
 
@@ -154,7 +156,11 @@ void KernalServerBase::worker( int arg )
 	while( !m_quit )
 	{
 		m_MessageCond.wait();
-		KernalMessage *pMsg = m_Messages.pop();	
+		KernalMessage *pMsg = m_Messages.pop();
+		if( !pMsg )
+		{
+			continue;
+		}
 		// 处理消息
 		switch( pMsg->type )
 		{
