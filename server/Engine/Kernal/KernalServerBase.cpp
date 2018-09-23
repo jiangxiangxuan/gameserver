@@ -220,4 +220,3 @@ int KernalServerBase::getWorkerThreadKey()
 	int *workerarg = (int*)pthread_getspecific( m_WorkerKey );
 	return *workerarg;
 }
-

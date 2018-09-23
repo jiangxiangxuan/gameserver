@@ -32,6 +32,8 @@ class KernalMessage
 {
 public:
 	KernalMessage()
+		:size( 0 ),
+		 data( NULL )
 	{
 
 	}
