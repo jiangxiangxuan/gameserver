@@ -206,9 +206,7 @@ void KernalServerBase::pushMsg( KernalMessageType type, KernalNetWorkType netTyp
 	pMsg->netType = netType;
 	pMsg->id = id;
 	pMsg->size = size;
-	pMsg->data = ( char* )malloc( size );
-	memset( pMsg->data, 0, size );
-	memcpy( pMsg->data, data, size);
+	pMsg->data = (char*)data;
 	m_Messages.push(pMsg);
 }
 

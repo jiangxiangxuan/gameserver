@@ -57,8 +57,8 @@ T *KernalStack< T >::pop( )
 	if( !m_stack.empty() )
 	{
 		t = m_stack.top();
+		m_stack.pop();
 	}
-	m_stack.pop();
 	m_locker.unlock();
 	return t;
 }
